@@ -57,9 +57,22 @@ include CMakeFiles/sim.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/sim.dir/flags.make
 
+CMakeFiles/sim.dir/src/Boundary.cpp.o: CMakeFiles/sim.dir/flags.make
+CMakeFiles/sim.dir/src/Boundary.cpp.o: ../src/Boundary.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/sim.dir/src/Boundary.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/sim.dir/src/Boundary.cpp.o -c /home/mckenna/Documents/microtubules/src/Boundary.cpp
+
+CMakeFiles/sim.dir/src/Boundary.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/sim.dir/src/Boundary.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mckenna/Documents/microtubules/src/Boundary.cpp > CMakeFiles/sim.dir/src/Boundary.cpp.i
+
+CMakeFiles/sim.dir/src/Boundary.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/sim.dir/src/Boundary.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mckenna/Documents/microtubules/src/Boundary.cpp -o CMakeFiles/sim.dir/src/Boundary.cpp.s
+
 CMakeFiles/sim.dir/src/Interaction.cpp.o: CMakeFiles/sim.dir/flags.make
 CMakeFiles/sim.dir/src/Interaction.cpp.o: ../src/Interaction.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/sim.dir/src/Interaction.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/sim.dir/src/Interaction.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/sim.dir/src/Interaction.cpp.o -c /home/mckenna/Documents/microtubules/src/Interaction.cpp
 
 CMakeFiles/sim.dir/src/Interaction.cpp.i: cmake_force
@@ -72,7 +85,7 @@ CMakeFiles/sim.dir/src/Interaction.cpp.s: cmake_force
 
 CMakeFiles/sim.dir/src/Parameters.cpp.o: CMakeFiles/sim.dir/flags.make
 CMakeFiles/sim.dir/src/Parameters.cpp.o: ../src/Parameters.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/sim.dir/src/Parameters.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/sim.dir/src/Parameters.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/sim.dir/src/Parameters.cpp.o -c /home/mckenna/Documents/microtubules/src/Parameters.cpp
 
 CMakeFiles/sim.dir/src/Parameters.cpp.i: cmake_force
@@ -85,7 +98,7 @@ CMakeFiles/sim.dir/src/Parameters.cpp.s: cmake_force
 
 CMakeFiles/sim.dir/src/Particle.cpp.o: CMakeFiles/sim.dir/flags.make
 CMakeFiles/sim.dir/src/Particle.cpp.o: ../src/Particle.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/sim.dir/src/Particle.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/sim.dir/src/Particle.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/sim.dir/src/Particle.cpp.o -c /home/mckenna/Documents/microtubules/src/Particle.cpp
 
 CMakeFiles/sim.dir/src/Particle.cpp.i: cmake_force
@@ -98,7 +111,7 @@ CMakeFiles/sim.dir/src/Particle.cpp.s: cmake_force
 
 CMakeFiles/sim.dir/src/mainsim.cpp.o: CMakeFiles/sim.dir/flags.make
 CMakeFiles/sim.dir/src/mainsim.cpp.o: ../src/mainsim.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/sim.dir/src/mainsim.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/sim.dir/src/mainsim.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/sim.dir/src/mainsim.cpp.o -c /home/mckenna/Documents/microtubules/src/mainsim.cpp
 
 CMakeFiles/sim.dir/src/mainsim.cpp.i: cmake_force
@@ -111,6 +124,7 @@ CMakeFiles/sim.dir/src/mainsim.cpp.s: cmake_force
 
 # Object files for target sim
 sim_OBJECTS = \
+"CMakeFiles/sim.dir/src/Boundary.cpp.o" \
 "CMakeFiles/sim.dir/src/Interaction.cpp.o" \
 "CMakeFiles/sim.dir/src/Parameters.cpp.o" \
 "CMakeFiles/sim.dir/src/Particle.cpp.o" \
@@ -119,6 +133,7 @@ sim_OBJECTS = \
 # External object files for target sim
 sim_EXTERNAL_OBJECTS =
 
+../sim: CMakeFiles/sim.dir/src/Boundary.cpp.o
 ../sim: CMakeFiles/sim.dir/src/Interaction.cpp.o
 ../sim: CMakeFiles/sim.dir/src/Parameters.cpp.o
 ../sim: CMakeFiles/sim.dir/src/Particle.cpp.o
@@ -126,7 +141,7 @@ sim_EXTERNAL_OBJECTS =
 ../sim: CMakeFiles/sim.dir/build.make
 ../sim: /usr/local/lib/libyaml-cpp.a
 ../sim: CMakeFiles/sim.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable ../sim"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mckenna/Documents/microtubules/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ../sim"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/sim.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

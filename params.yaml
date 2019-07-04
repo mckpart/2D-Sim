@@ -1,19 +1,21 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 5
-type1_Particles : 2
-type2_Particles : 3
+totalParticles  : 40
+type1_Particles : 25
+type2_Particles : 15
  # - Total : 2
  # - One   : 1
  # - Two   : 1
 
-seed            : 203985720398
-weight          : .5
+seed            : 8625938934095
+weight          : .3
 
-particleRadius_1 : .2
-particleRadius_2 : .08
+particleRadius_1 : .05
+particleRadius_2 : .1
 
 numberUpdates  : 1000
+
+hardDisks : true
 
 # internalPotential   : false
 # externalPotential   : false

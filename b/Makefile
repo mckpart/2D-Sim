@@ -123,6 +123,33 @@ sim/fast:
 	$(MAKE) -f CMakeFiles/sim.dir/build.make CMakeFiles/sim.dir/build
 .PHONY : sim/fast
 
+src/Boundary.o: src/Boundary.cpp.o
+
+.PHONY : src/Boundary.o
+
+# target to build an object file
+src/Boundary.cpp.o:
+	$(MAKE) -f CMakeFiles/sim.dir/build.make CMakeFiles/sim.dir/src/Boundary.cpp.o
+.PHONY : src/Boundary.cpp.o
+
+src/Boundary.i: src/Boundary.cpp.i
+
+.PHONY : src/Boundary.i
+
+# target to preprocess a source file
+src/Boundary.cpp.i:
+	$(MAKE) -f CMakeFiles/sim.dir/build.make CMakeFiles/sim.dir/src/Boundary.cpp.i
+.PHONY : src/Boundary.cpp.i
+
+src/Boundary.s: src/Boundary.cpp.s
+
+.PHONY : src/Boundary.s
+
+# target to generate assembly for a file
+src/Boundary.cpp.s:
+	$(MAKE) -f CMakeFiles/sim.dir/build.make CMakeFiles/sim.dir/src/Boundary.cpp.s
+.PHONY : src/Boundary.cpp.s
+
 src/Interaction.o: src/Interaction.cpp.o
 
 .PHONY : src/Interaction.o
@@ -240,6 +267,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... sim"
 	@echo "... edit_cache"
+	@echo "... src/Boundary.o"
+	@echo "... src/Boundary.i"
+	@echo "... src/Boundary.s"
 	@echo "... src/Interaction.o"
 	@echo "... src/Interaction.i"
 	@echo "... src/Interaction.s"

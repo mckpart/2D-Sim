@@ -27,6 +27,9 @@ double Parameters::getWeight(){
 bool Parameters::getRigidBC(){
 	return rigidBC; 
 }
+bool Parameters::getHardDisk(){
+	return hardDisk; 
+}
 
 ///////// SETTERS /////////////
 
@@ -46,4 +49,7 @@ void Parameters::setWeight(double w){
 
 void Parameters::setRigidBC(bool r){
 	rigidBC = r; 
+}
+void Parameters::setHardDisk(bool h){
+	hardDisk = h; 
 }

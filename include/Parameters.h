@@ -11,7 +11,8 @@ class Parameters{
 
 		double weight = 0; 
 
-		bool rigidBC = 0;   	
+		bool rigidBC = 0; 
+		bool hardDisk = 0;    	
 
 	public: 
 		
@@ -22,6 +23,7 @@ class Parameters{
 		double getWeight(); 
 
 		bool getRigidBC(); 
+		bool getHardDisk(); 
 
 		void setUpdates(int u);
 		void setNumParticles(int num); 
@@ -30,5 +32,6 @@ class Parameters{
 		void setWeight(double w); 
 
 		void setRigidBC(bool r); 
+		void setHardDisk(bool h); 
 }; 
 #endif 

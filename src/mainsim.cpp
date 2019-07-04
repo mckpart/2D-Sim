@@ -6,12 +6,14 @@
 #include "Particle.h"
 #include "Parameters.h"
 #include "Interaction.h"
+#include "Boundary.h"
 
 Parameters setSystemParams(Parameters param, std::string yamlFile); 
 void setParticleParams(Particle* particles,std::string yamlFile);
 
 void simulation(Particle* particles, Parameters param){
 	
+	Boundary bound;
 	Interaction interact; 
 	Particle prt; 
 
@@ -44,9 +46,14 @@ void simulation(Particle* particles, Parameters param){
 			x_trial = prt.x_trial(randVal.RandomUniformDbl());  
 			y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
 
-			if(param.getRigidBC() == 1){
-				accept = interact.rigidCollisions(particles,k,n_particles,x_trial,y_trial);
-			// }
+			if(param.getHardDisk() == 1){
+				accept = interact.hardDisks(particles,k,n_particles,x_trial,y_trial);
+				// std::cout << "hard disk accept: " << accept << std::endl; 
+			}
+			if(param.getRigidBC() == 1 && accept == 1){
+				accept = bound.rigidBoundary(particles,k,n_particles,x_trial,y_trial); 
+				std::cout << "rigid boundary accept: " << accept << std::endl; 
+			}
 
 			if(accept == 1){
 				prt.setX_Position(x_trial);
@@ -59,10 +66,8 @@ void simulation(Particle* particles, Parameters param){
 			else{
 				n_rejects++; 
 				k = k - 1;   					// reject trial move
-			}}
-			else{
-				std::cout << "rigidbc not turned on" << std::endl; 
 			}
+
 		}
 
 		pos_file << std::endl; 					// starts new line in position file
@@ -95,7 +100,7 @@ int main(int num, char *input[]){
 	}
 }
 
-Parameters setSystemParams(Parameters param, std::string yamlFile){
+Parameters setSystemParams(Parameters param, std::string yamlFile){		// change this to a pointer
 
 	YAML::Node node = YAML::LoadFile(yamlFile); 
 
@@ -104,6 +109,7 @@ Parameters setSystemParams(Parameters param, std::string yamlFile){
 	param.setUpdates(		node["numberUpdates"].as<int>()); 
 
 	param.setRigidBC(		node["rigidBoundary"].as<bool>()); 
+	param.setHardDisk(		node["hardDisks"].as<bool>()); 
 
 	return param; 
 }
