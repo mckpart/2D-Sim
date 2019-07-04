@@ -1,0 +1,26 @@
+### total = type1 + type2 ######
+
+totalParticles  : 5
+type1_Particles : 2
+type2_Particles : 3
+ # - Total : 2
+ # - One   : 1
+ # - Two   : 1
+
+seed            : 203985720398
+weight          : .5
+
+particleRadius_1 : .2
+particleRadius_2 : .08
+
+numberUpdates  : 1000
+
+# internalPotential   : false
+# externalPotential   : false
+rigidBoundary       : true 
+# periodicBoundary    : false  
+
+# convergence_test    : false
+
+boxLength   : 1 
+# restLength  : 1
