@@ -1,21 +1,21 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 40
-type1_Particles : 25
-type2_Particles : 15
- # - Total : 2
- # - One   : 1
- # - Two   : 1
+totalParticles  : 27
+type1_Particles : 18
+type2_Particles : 9
 
-seed            : 8625938934095
-weight          : .3
+seed            : 756534526765
+weight          : .2
 
-particleRadius_1 : .05
+particleRadius_1 : .08
 particleRadius_2 : .1
 
 numberUpdates  : 1000
 
-hardDisks : true
+hardDisks    : false
+lennardJones : true
+
+wellDepth : .7
 
 # internalPotential   : false
 # externalPotential   : false

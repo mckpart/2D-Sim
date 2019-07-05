@@ -8,6 +8,21 @@
 // 	weight = 0; 
 // }
 
+
+Parameters::Parameters(std::string yamlFile){
+
+	YAML::Node node = YAML::LoadFile(yamlFile); 
+
+	seed 		= node["seed"].as<long>(); 
+	n_particles = node["totalParticles"].as<int>();
+	n_updates 	= node["numberUpdates"].as<int>(); 
+
+	rigidBC 	= node["rigidBoundary"].as<bool>(); 
+	hardDisk 	= node["hardDisks"].as<bool>(); 
+	lenJones 	= node["lennardJones"].as<bool>(); 	
+}
+
+
 ///// GETTERS ////////////////
 
 int Parameters::getUpdates(){
@@ -29,6 +44,9 @@ bool Parameters::getRigidBC(){
 }
 bool Parameters::getHardDisk(){
 	return hardDisk; 
+}
+bool Parameters::getLenJones(){
+	return lenJones; 
 }
 
 ///////// SETTERS /////////////
@@ -52,4 +70,7 @@ void Parameters::setRigidBC(bool r){
 }
 void Parameters::setHardDisk(bool h){
 	hardDisk = h; 
+}
+void Parameters::setLenJones(bool l){
+	lenJones = l; 
 }

@@ -24,10 +24,10 @@ class Particle{
 	double getRadius(); 
 	double getX_Position(); 
 	double getY_Position(); 
-	double getStepWeight(); 	// may be unnecessary 
+	double getStepWeight(); 	
 
 	void setType(int t); 
-	void setIdentifier(int id); //may be unnecessary 
+	void setIdentifier(int id); 
 
 	void setRadius(double rad); 
 	void setX_Position(double x); 

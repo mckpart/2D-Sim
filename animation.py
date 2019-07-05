@@ -52,11 +52,9 @@ position = np.asarray(position)
 #         print "error"
 #         print i 
   
-
-
 def init():
     if(rigidBC == 1):
-        ax.set_xlim(-1,1)           # may be unnecessary if periodic BCs are never implemented. 
+        ax.set_xlim(-1,1)       
         ax.set_ylim(-1,1)
     else:
         ax.set_xlim(-3,3)

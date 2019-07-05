@@ -8,13 +8,15 @@
 #include "Interaction.h"
 #include "Boundary.h"
 
-Parameters setSystemParams(Parameters param, std::string yamlFile); 
 void setParticleParams(Particle* particles,std::string yamlFile);
 
-void simulation(Particle* particles, Parameters param){
+double boltzmannFactor(double energy){
+	return exp(-1 * energy); 
+}
+
+void simulation(Particle* particles, Parameters* param, Interaction* interact){
 	
 	Boundary bound;
-	Interaction interact; 
 	Particle prt; 
 
 	int n_particles = 0; 
@@ -26,18 +28,21 @@ void simulation(Particle* particles, Parameters param){
 	double x_trial = 0; 
 	double y_trial = 0; 
 
+	double delta_energy = 0; 
+	double total_prob   = 0; 
+
 	bool accept = 0; 
 
 	std::ofstream pos_file; 
 	pos_file.open("positions.txt"); 
 
 	KISSRNG randVal; 
-	randVal.InitCold(param.getSeed()); 
+	randVal.InitCold(param->getSeed()); 
 
-	n_particles = param.getNumParticles(); 
-	n_updates 	= param.getUpdates(); 
+	n_particles = param->getNumParticles(); 
+	n_updates 	= param->getUpdates(); 
 
-	interact.initialPosition(particles,n_particles,randVal); 
+	interact->initialPosition(particles,n_particles,randVal); 
 
 	for(int n = 0; n < n_updates; n++){
 		for(int k = 0; k < n_particles; k++){
@@ -46,13 +51,29 @@ void simulation(Particle* particles, Parameters param){
 			x_trial = prt.x_trial(randVal.RandomUniformDbl());  
 			y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
 
-			if(param.getHardDisk() == 1){
-				accept = interact.hardDisks(particles,k,n_particles,x_trial,y_trial);
-				// std::cout << "hard disk accept: " << accept << std::endl; 
+			accept = 1; 
+
+			if(param->getHardDisk() == 1){
+				accept = interact->hardDisks(particles,k,n_particles,x_trial,y_trial);
 			}
-			if(param.getRigidBC() == 1 && accept == 1){
+			else if(param->getLenJones() == 1){
+				delta_energy = interact->lennardJones(particles,k,n_particles,x_trial,y_trial); 
+			}
+			// std::cout << "the change in energy is: " << delta_energy << std::endl; 
+			if(param->getRigidBC() == 1 && accept == 1){
 				accept = bound.rigidBoundary(particles,k,n_particles,x_trial,y_trial); 
-				std::cout << "rigid boundary accept: " << accept << std::endl; 
+			}
+
+			if(accept == 1 && delta_energy > 0){
+				total_prob = boltzmannFactor(delta_energy); 
+				// std::cout << "the probability of acceptance is " << total_prob << std::endl; 
+
+				if(randVal.RandomUniformDbl() < total_prob){
+					accept = 1; 
+				}
+				else{
+					accept = 0; 
+				}
 			}
 
 			if(accept == 1){
@@ -87,32 +108,20 @@ int main(int num, char *input[]){
 
 		yamlFile = input[1];
 
-		Parameters param;
-		param = setSystemParams(param,yamlFile); 
+		Parameters param(yamlFile);
+
+		Interaction interact(yamlFile); 
 
 		Particle particles[param.getNumParticles()]; 
 		setParticleParams(particles,yamlFile); 
 
-		simulation(particles, param); 
+		simulation(particles, &param, &interact); 
 	}
 	else{
 		std::cout << "ERROR: NO .YAML FILE" << std::endl; 
 	}
 }
 
-Parameters setSystemParams(Parameters param, std::string yamlFile){		// change this to a pointer
-
-	YAML::Node node = YAML::LoadFile(yamlFile); 
-
-	param.setSeed(			node["seed"].as<long>()); 
-	param.setNumParticles(	node["totalParticles"].as<int>());
-	param.setUpdates(		node["numberUpdates"].as<int>()); 
-
-	param.setRigidBC(		node["rigidBoundary"].as<bool>()); 
-	param.setHardDisk(		node["hardDisks"].as<bool>()); 
-
-	return param; 
-}
 
 void setParticleParams(Particle* particles,std::string yamlFile){
 

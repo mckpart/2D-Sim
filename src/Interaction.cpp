@@ -8,7 +8,71 @@ double distance(double x1,double x2,double y1, double y2){
 	return sqrt(pow(x2 - x1,2) + pow(y2 - y1,2)); 	
 }
 
-bool Interaction::hardDisks(Particle* particles, int index, int n_particles, double x_temp, double y_temp){ // consider making x,y trials part of particle class
+double Interaction::lennardJones(Particle* particles, int index, int n_particles, 
+								 double x_temp, double y_temp){
+
+	Particle current_prt; 
+	Particle compare_prt; 						
+
+	double x_curr	  = 0; 
+	double y_curr	  = 0; 
+	double x_comp	  = 0; 
+	double y_comp	  = 0; 
+
+	double sigma = 0; 
+
+	double delta_energy = 0; 
+	double energy_curr   = 0; 
+	double energy_temp   = 0; 
+
+	double rad_curr   = 0; 
+	double rad_comp   = 0; 
+	double num 	  	  = 0; 
+
+	double dist_curr  = 0; 
+	double dist_temp  = 0; 	
+
+	current_prt = particles[index];
+
+	rad_curr = current_prt.getRadius(); 
+	x_curr   = current_prt.getX_Position(); 
+	y_curr   = current_prt.getY_Position(); 
+
+	for(int k = 0; k < n_particles; k++){
+
+		compare_prt = particles[k]; 
+
+		if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
+
+			x_comp   = compare_prt.getX_Position(); 
+			y_comp   = compare_prt.getY_Position(); 
+			rad_comp = compare_prt.getRadius(); 
+
+			dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
+			dist_temp = distance(x_temp,x_comp,y_temp,y_comp); 
+
+			sigma = (rad_curr + rad_comp); 
+
+			if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
+
+				energy_curr = 30 * LJ_wellDepth * (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); 
+				energy_temp = 30 * LJ_wellDepth * (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 				
+			} 
+			else{												// interaction between unlike particles
+
+				energy_curr = 4 * LJ_wellDepth * (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); 
+				energy_temp = 4 * LJ_wellDepth * (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 
+			}	
+
+			delta_energy = delta_energy + (energy_temp - energy_curr); 
+		}
+	}
+
+	return delta_energy; 	
+}
+
+bool Interaction::hardDisks(Particle* particles, int index, int n_particles, 
+							double x_temp, double y_temp){ 
 	
 	Particle current_prt; 
 	Particle compare_prt; 						
@@ -31,9 +95,11 @@ bool Interaction::hardDisks(Particle* particles, int index, int n_particles, dou
 //////// CHECK FOR PARTICLE-PARTICLE COLLISION //////////
 		
 for(int k = 0; k < n_particles; k++){
-	if(k != index){
-		compare_prt = particles[k]; 		// compare all particles positions
-											// to current particle's position
+
+	compare_prt = particles[k]; 		// compare all particles positions
+										// to current particle's position	
+	if(current_prt.getIdentifier() != compare_prt.getIdentifier()){
+											
 		x_comp = compare_prt.getX_Position();
 		y_comp = compare_prt.getY_Position(); 
 		rad_comp = compare_prt.getRadius(); 
@@ -46,7 +112,7 @@ for(int k = 0; k < n_particles; k++){
 	}	
 }
 
-	return accept; 										// returns 1 if trial move is accepted 
+	return accept; 							// returns 1 if trial move is accepted 
 }
 
 
@@ -143,4 +209,25 @@ void Interaction::initialPosition(Particle* particles, int n_particles,
 		}
 
 	}
+}
+
+////// DEFAULT CONSTRUCTOR ////////////////
+
+Interaction::Interaction(std::string yamlFile){
+
+	YAML::Node node = YAML::LoadFile(yamlFile);
+
+	LJ_wellDepth = node["wellDepth"].as<double>(); 	
+}
+
+
+
+/////// GETTERS AND SETTERS ///////////////
+
+double Interaction::getWellDepth(){
+	return LJ_wellDepth; 
+}
+
+void Interaction::setWellDepth(double w){
+	LJ_wellDepth = w; 
 }
