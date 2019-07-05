@@ -13,7 +13,9 @@ class Parameters{
 
 		double weight = 0; 
 
-		bool rigidBC = 0; 
+		bool rigidBC 	= 0; 
+		bool periodicBC = 0; 
+
 		bool hardDisk = 0;  
 		bool lenJones = 0;  	
 
@@ -28,6 +30,8 @@ class Parameters{
 		double getWeight(); 
 
 		bool getRigidBC(); 
+		bool getPeriodicBC(); 
+
 		bool getHardDisk(); 
 		bool getLenJones(); 
 
@@ -42,6 +46,8 @@ class Parameters{
 		void setWeight(double w); 
 
 		void setRigidBC(bool r); 
+		void setPeriodicBC(bool p); 
+
 		void setHardDisk(bool h); 
 		void setLenJones(bool l); 
 }; 

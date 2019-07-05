@@ -18,6 +18,8 @@ Parameters::Parameters(std::string yamlFile){
 	n_updates 	= node["numberUpdates"].as<int>(); 
 
 	rigidBC 	= node["rigidBoundary"].as<bool>(); 
+	periodicBC	= node["periodicBoundary"].as<bool>(); 
+
 	hardDisk 	= node["hardDisks"].as<bool>(); 
 	lenJones 	= node["lennardJones"].as<bool>(); 	
 }
@@ -42,6 +44,10 @@ double Parameters::getWeight(){
 bool Parameters::getRigidBC(){
 	return rigidBC; 
 }
+bool Parameters::getPeriodicBC(){
+	return periodicBC; 
+}
+
 bool Parameters::getHardDisk(){
 	return hardDisk; 
 }
@@ -68,6 +74,10 @@ void Parameters::setWeight(double w){
 void Parameters::setRigidBC(bool r){
 	rigidBC = r; 
 }
+void Parameters::setPeriodicBC(bool p){
+	periodicBC = p; 
+}
+
 void Parameters::setHardDisk(bool h){
 	hardDisk = h; 
 }

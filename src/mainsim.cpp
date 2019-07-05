@@ -51,18 +51,34 @@ void simulation(Particle* particles, Parameters* param, Interaction* interact){
 			x_trial = prt.x_trial(randVal.RandomUniformDbl());  
 			y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
 
+			prt.setX_TrialPos(x_trial); 
+			prt.setY_TrialPos(y_trial); 
+
+			particles[k] = prt;  
+
 			accept = 1; 
 
-			if(param->getHardDisk() == 1){
-				accept = interact->hardDisks(particles,k,n_particles,x_trial,y_trial);
+			if(param->getRigidBC() == 1){
+				accept = bound.rigidBoundary(particles,k,n_particles); 
 			}
-			else if(param->getLenJones() == 1){
-				delta_energy = interact->lennardJones(particles,k,n_particles,x_trial,y_trial); 
+			else if(param->getPeriodicBC() == 1){
+				bound.periodicBoundary(particles,k,n_particles); 
+
+				prt = particles[k]; 
+
+				x_trial = prt.getX_TrialPos(); 
+				y_trial = prt.getY_TrialPos();
+				// std::cout << "x: " << x_trial << " and y: " << y_trial << std::endl; 
+			}
+
+			if(param->getHardDisk() == 1 && accept == 1){
+				accept = interact->hardDisks(particles,k,n_particles);
+			}
+			else if(param->getLenJones() == 1 && accept == 1){
+				delta_energy = interact->lennardJones(particles,k,n_particles); 
 			}
 			// std::cout << "the change in energy is: " << delta_energy << std::endl; 
-			if(param->getRigidBC() == 1 && accept == 1){
-				accept = bound.rigidBoundary(particles,k,n_particles,x_trial,y_trial); 
-			}
+
 
 			if(accept == 1 && delta_energy > 0){
 				total_prob = boltzmannFactor(delta_energy); 

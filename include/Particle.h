@@ -9,7 +9,10 @@ class Particle{
 
 		double radius = 0; 
 		double x_position = 0; 
-		double y_position = 0;  
+		double y_position = 0; 
+
+		double x_trialPos = 0; 
+		double y_trialPos = 0;  
 
 		double stepWeight = 0; 
 
@@ -23,7 +26,10 @@ class Particle{
 
 	double getRadius(); 
 	double getX_Position(); 
-	double getY_Position(); 
+	double getY_Position();
+	double getX_TrialPos(); 
+	double getY_TrialPos(); 
+
 	double getStepWeight(); 	
 
 	void setType(int t); 
@@ -32,6 +38,9 @@ class Particle{
 	void setRadius(double rad); 
 	void setX_Position(double x); 
 	void setY_Position(double y); 
+	void setX_TrialPos(double x); 
+	void setY_TrialPos(double y); 
+
 	void setStepWeight(double w); 
 
 	double x_trial(double randVal); 

@@ -53,11 +53,11 @@ position = np.asarray(position)
 #         print i 
   
 def init():
-    if(rigidBC == 1):
-        ax.set_xlim(-1,1)       
-        ax.set_ylim(-1,1)
-    else:
-        ax.set_xlim(-3,3)
+    # if(rigidBC == 1):
+    ax.set_xlim(-1,1)       
+    ax.set_ylim(-1,1)
+    # else:
+    #     ax.set_xlim(-3,3)
         
     for i in range(n_part_tot):
         ax.add_patch(patches[i])

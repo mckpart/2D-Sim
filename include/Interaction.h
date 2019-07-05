@@ -15,8 +15,8 @@ class Interaction{
 
 		Interaction(std::string yamlFile); 
 
-		double lennardJones	(Particle* particles, int index, int n_particles, double x_temp, double y_temp); 
-		bool hardDisks		(Particle* particles, int index, int n_particles, double x_temp, double y_temp); 
+		double lennardJones	(Particle* particles, int index, int n_particles); 
+		bool hardDisks		(Particle* particles, int index, int n_particles); 
 		void initialPosition(Particle* particles, int n_particles, KISSRNG randVal);
 
 		////// GETTERS AND SETTERS //////

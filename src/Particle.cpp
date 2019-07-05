@@ -29,6 +29,13 @@ double Particle::getX_Position(){
 double Particle::getY_Position(){
 	return y_position; 
 }
+double Particle::getX_TrialPos(){
+	return x_trialPos; 
+}
+double Particle::getY_TrialPos(){
+	return y_trialPos; 
+}
+
 double Particle::getStepWeight(){
 	return stepWeight; 
 }
@@ -51,6 +58,13 @@ void Particle::setX_Position(double x){
 void Particle::setY_Position(double y){
 	y_position = y; 
 } 
+void Particle::setX_TrialPos(double x){
+	x_trialPos = x; 
+}
+void Particle::setY_TrialPos(double y){
+	y_trialPos = y; 
+}
+
 void Particle::setStepWeight(double w){
 	stepWeight = w; 
 }

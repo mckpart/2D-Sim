@@ -8,12 +8,13 @@ double distance(double x1,double x2,double y1, double y2){
 	return sqrt(pow(x2 - x1,2) + pow(y2 - y1,2)); 	
 }
 
-double Interaction::lennardJones(Particle* particles, int index, int n_particles, 
-								 double x_temp, double y_temp){
+double Interaction::lennardJones(Particle* particles, int index, int n_particles){
 
 	Particle current_prt; 
 	Particle compare_prt; 						
 
+	double x_temp	  = 0; 
+	double y_temp 	  = 0; 
 	double x_curr	  = 0; 
 	double y_curr	  = 0; 
 	double x_comp	  = 0; 
@@ -34,9 +35,12 @@ double Interaction::lennardJones(Particle* particles, int index, int n_particles
 
 	current_prt = particles[index];
 
-	rad_curr = current_prt.getRadius(); 
+	x_temp = current_prt.getX_TrialPos(); 
+	y_temp = current_prt.getY_TrialPos(); 
+
 	x_curr   = current_prt.getX_Position(); 
 	y_curr   = current_prt.getY_Position(); 
+	rad_curr = current_prt.getRadius(); 
 
 	for(int k = 0; k < n_particles; k++){
 
@@ -71,12 +75,13 @@ double Interaction::lennardJones(Particle* particles, int index, int n_particles
 	return delta_energy; 	
 }
 
-bool Interaction::hardDisks(Particle* particles, int index, int n_particles, 
-							double x_temp, double y_temp){ 
+bool Interaction::hardDisks(Particle* particles, int index, int n_particles){ 
 	
 	Particle current_prt; 
 	Particle compare_prt; 						
 
+	double x_temp = 0; 
+	double y_temp = 0; 
 	double x_comp = 0; 
 	double y_comp = 0; 
 
@@ -88,6 +93,9 @@ bool Interaction::hardDisks(Particle* particles, int index, int n_particles,
 
 
 	current_prt = particles[index];
+
+	x_temp = current_prt.getX_TrialPos(); 
+	y_temp = current_prt.getY_TrialPos(); 
 	rad_temp = current_prt.getRadius(); 
 
 	accept = 1; 
