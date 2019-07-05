@@ -77,8 +77,13 @@ void simulation(Particle* particles, Parameters* param, Interaction* interact){
 			else if(param->getLenJones() == 1 && accept == 1){
 				delta_energy = interact->lennardJones(particles,k,n_particles); 
 			}
+			else if(param->getWAC() == 1 && accept == 1){
+				delta_energy = interact->WACpotential(particles,k,n_particles); 
+			}
 			// std::cout << "the change in energy is: " << delta_energy << std::endl; 
-
+			if(delta_energy < 0){
+				std::cout << "bad" << std::endl; 
+			}
 
 			if(accept == 1 && delta_energy > 0){
 				total_prob = boltzmannFactor(delta_energy); 

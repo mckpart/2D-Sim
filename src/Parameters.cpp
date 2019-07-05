@@ -14,7 +14,7 @@ Parameters::Parameters(std::string yamlFile){
 	YAML::Node node = YAML::LoadFile(yamlFile); 
 
 	seed 		= node["seed"].as<long>(); 
-	n_particles = node["totalParticles"].as<int>();
+	n_particles	= node["totalParticles"].as<int>();
 	n_updates 	= node["numberUpdates"].as<int>(); 
 
 	rigidBC 	= node["rigidBoundary"].as<bool>(); 
@@ -22,6 +22,7 @@ Parameters::Parameters(std::string yamlFile){
 
 	hardDisk 	= node["hardDisks"].as<bool>(); 
 	lenJones 	= node["lennardJones"].as<bool>(); 	
+	WAC			= node["WAC"].as<bool>(); 
 }
 
 
@@ -54,6 +55,9 @@ bool Parameters::getHardDisk(){
 bool Parameters::getLenJones(){
 	return lenJones; 
 }
+bool Parameters::getWAC(){
+	return WAC; 
+}
 
 ///////// SETTERS /////////////
 
@@ -83,4 +87,7 @@ void Parameters::setHardDisk(bool h){
 }
 void Parameters::setLenJones(bool l){
 	lenJones = l; 
+}
+void Parameters::setWAC(bool w){
+	WAC = w; 
 }

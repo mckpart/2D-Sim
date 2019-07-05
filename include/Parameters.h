@@ -18,6 +18,7 @@ class Parameters{
 
 		bool hardDisk = 0;  
 		bool lenJones = 0;  	
+		bool WAC	  = 0; 
 
 	public: 
 		
@@ -34,6 +35,7 @@ class Parameters{
 
 		bool getHardDisk(); 
 		bool getLenJones(); 
+		bool getWAC(); 
 
 		// NOTE: THE SETTERS ARE NOT NECESSARY
 		// GIVEN THAT THESE PARAMETERS ARE CONSTANT
@@ -50,5 +52,6 @@ class Parameters{
 
 		void setHardDisk(bool h); 
 		void setLenJones(bool l); 
+		void setWAC(bool w); 
 }; 
 #endif 

@@ -10,17 +10,18 @@ weight          : .3
 particleRadius_1 : .15
 particleRadius_2 : .1
 
-numberUpdates  : 100
+numberUpdates  : 1000
 
 hardDisks    : false
-lennardJones : true
+lennardJones : false
+WAC          : true 
 
-wellDepth : .7
+wellDepth : 50
 
 # internalPotential   : false
 # externalPotential   : false
-rigidBoundary       : false 
-periodicBoundary    : true  
+rigidBoundary       : true 
+periodicBoundary    : false  
 
 # convergence_test    : false
 

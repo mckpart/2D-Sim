@@ -34,14 +34,6 @@ float.h
 limits.h
 -
 
-/home/mckenna/Documents/microtubules/src/Boundary.cpp
-iostream
--
-cmath
--
-Boundary.h
-/home/mckenna/Documents/microtubules/src/Boundary.h
-
 /home/mckenna/Documents/microtubules/src/mainsim.cpp
 iostream
 -
