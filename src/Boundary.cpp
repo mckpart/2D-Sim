@@ -7,7 +7,7 @@ double distance(double x1,double x2){
 	return fabs(x2 - x1); 
 }
 
-bool Boundary::rigidBoundary(Particle* particles, int index, int n_particles){
+bool Boundary::rigidBoundary(std::vector<Particle>* particles, int index, int n_particles){
 
 	Particle current_prt; 
 
@@ -23,7 +23,7 @@ bool Boundary::rigidBoundary(Particle* particles, int index, int n_particles){
 
 	bool accept = 0;	
 
-	current_prt = particles[index];
+	current_prt = (*particles)[index];
 
 	x_temp = current_prt.getX_TrialPos(); // reads in the current x,y trial position
 	y_temp = current_prt.getY_TrialPos(); // and the radius of the trial particle
@@ -72,7 +72,7 @@ bool Boundary::rigidBoundary(Particle* particles, int index, int n_particles){
 	return accept; 			// returns 1 if trial move is accepted
 }
 
-void Boundary::periodicBoundary(Particle* particles, int index, int n_particles){
+void Boundary::periodicBoundary(std::vector<Particle>* particles, int index, int n_particles){
 
 	Particle current_prt; 
 
@@ -93,8 +93,8 @@ void Boundary::periodicBoundary(Particle* particles, int index, int n_particles)
 	double dist_xwall 	= 0; 
 	double dist_ywall 	= 0 ;
 
-	current_prt = particles[index];
-
+	current_prt = (*particles)[index];
+	
 	x_curr = current_prt.getX_Position(); 	// sets the current particle's x,y
 	y_curr = current_prt.getY_Position(); 	// position
 	x_temp = current_prt.getX_TrialPos(); 	// set the x,y trial position for 
@@ -157,6 +157,6 @@ void Boundary::periodicBoundary(Particle* particles, int index, int n_particles)
 	current_prt.setX_TrialPos(x_temp); 	// puts the updated particle with updated 
 	current_prt.setY_TrialPos(y_temp); 	// trial positions back into the array 
 
-	particles[index] = current_prt; 
+	(*particles)[index] = current_prt; 
 
 }

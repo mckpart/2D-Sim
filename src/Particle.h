@@ -18,8 +18,8 @@ class Particle{
 
 	public: 
 
-	Particle(); 
-	Particle(int t, double rad, double w); 
+	// Particle(); 
+	// Particle(int t, double rad, double w); 
 
 	int getType(); 
 	int getIdentifier(); 

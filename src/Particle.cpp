@@ -1,16 +1,16 @@
 #include <iostream>
-#include <Particle.h>
+#include "Particle.h"
 
-Particle::Particle(int t, double rad, double w){
-	type = t; 
-	radius = rad; 
-	stepWeight = w; 
-}
-Particle::Particle(){		// this may be unnecessary 
-	type = 0; 
-	radius = 0; 
-	stepWeight = 0; 
-}
+// Particle::Particle(int t, double rad, double w){
+// 	type = t; 
+// 	radius = rad; 
+// 	stepWeight = w; 
+// }
+// Particle::Particle(){		// this may be unnecessary 
+// 	type = 0; 
+// 	radius = 0; 
+// 	stepWeight = 0; 
+// }
 /////////// GETTERS ////////////////////
 
 int Particle::getType(){

@@ -18,11 +18,11 @@ class Parameters{
 
 		bool hardDisk = 0;  
 		bool lenJones = 0;  	
-		bool WAC	  = 0; 
+		bool WCA	  = 0; 
 
 	public: 
 		
-		Parameters(std::string yamlFile); 
+		void initializeParameters(std::string yamlFile); // may need to add a default constructor
 
 		int getUpdates(); 	
 		int getNumParticles(); 
@@ -35,23 +35,11 @@ class Parameters{
 
 		bool getHardDisk(); 
 		bool getLenJones(); 
-		bool getWAC(); 
+		bool getWCA(); 
 
 		// NOTE: THE SETTERS ARE NOT NECESSARY
 		// GIVEN THAT THESE PARAMETERS ARE CONSTANT
 		// THROUGHOUT THE SIMULATION
 
-		// void setUpdates(int u);
-		// void setNumParticles(int num); 
-		// void setSeed(long s); 
-		
-		// void setWeight(double w); 
-
-		// void setRigidBC(bool r); 
-		// void setPeriodicBC(bool p); 
-
-		// void setHardDisk(bool h); 
-		// void setLenJones(bool l); 
-		// void setWAC(bool w); 
 }; 
 #endif 

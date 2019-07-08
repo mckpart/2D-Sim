@@ -10,7 +10,6 @@ def density(): 			# compute the number of particles per area
 	for n in range(step): 
 
 		area = math.pi * (deltaR * (n+1))**2
-		# a = 2 * math.pi * deltaR * (n+1)**2
 		part = float(N[n])
 		g[n] = part/area
 

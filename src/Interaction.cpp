@@ -8,7 +8,7 @@ double distance(double x1,double x2,double y1, double y2){
 	return sqrt(pow(x2 - x1,2) + pow(y2 - y1,2)); 	
 }
 
-double Interaction::WACpotential(Particle* particles, int index, int n_particles){
+double Interaction::WCApotential(std::vector<Particle>* particles, int index, int n_particles){
 
 	Particle current_prt; 
 	Particle compare_prt; 						
@@ -33,7 +33,7 @@ double Interaction::WACpotential(Particle* particles, int index, int n_particles
 	double dist_curr = 0; 
 	double dist_temp = 0; 	
 
-	current_prt = particles[index];			// assign current particle
+	current_prt = (*particles)[index];		// assign current particle
 
 	x_temp = current_prt.getX_TrialPos(); 	// assign the current and trial
 	y_temp = current_prt.getY_TrialPos(); 	// positions and the radius of 
@@ -44,7 +44,16 @@ double Interaction::WACpotential(Particle* particles, int index, int n_particles
 
 	for(int k = 0; k < n_particles; k++){	// the O(N^2)... think about 
 											// implementing neighbor lists here
-		compare_prt = particles[k]; 		// assign comparison particle
+		compare_prt = (*particles)[k]; 		// assign comparison particle
+
+
+		/*	- CHECK THAT THE COMPARISON PARTICLE IS NOT THE CURRENT PARTICLE 
+			- SET THE COMPARISON POSITION AND RADIUS
+			- IF THE DISTANCE BETWEEN PARTICLES IS > SIGMA * 2^(1/6), THE CHANGE
+			  IN ENERGY IS ZERO
+			- IF LESS THAN SIGMA * 2^(1/6), THE LENNARD JONES REPULSION IS USED
+			- SUM THE TOTAL CHANGE IN ENERGY
+		*/	 
 
 		if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
 
@@ -57,9 +66,9 @@ double Interaction::WACpotential(Particle* particles, int index, int n_particles
 
 			sigma = (rad_curr + rad_comp); 				
 
-			if(dist_curr > pow(2,1/6) * sigma){
-				energy_curr = 0; 
-			}	
+			if(dist_curr > pow(2,1/6) * sigma){	// the potential does not extend past 
+				energy_curr = 0; 				// this maximum distance - there is no
+			}									// change in energy beyond this distance
 			else{
 				energy_curr = 4 * LJ_wellDepth * 
 				(pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6) + .25); 
@@ -77,10 +86,10 @@ double Interaction::WACpotential(Particle* particles, int index, int n_particles
 		}
 	}
 
-	return delta_energy; 	
+	return delta_energy; 	// returns the total change in energy associated with this move
 }
 
-double Interaction::lennardJones(Particle* particles, int index, int n_particles){
+double Interaction::lennardJones(std::vector<Particle>* particles, int index, int n_particles){
 
 	Particle current_prt; 
 	Particle compare_prt; 						
@@ -105,7 +114,7 @@ double Interaction::lennardJones(Particle* particles, int index, int n_particles
 	double dist_curr = 0; 
 	double dist_temp = 0; 	
 
-	current_prt = particles[index];			// assign current particle
+	current_prt = (*particles)[index];			// assign current particle
 
 	x_temp = current_prt.getX_TrialPos(); 	// assign the current and trial
 	y_temp = current_prt.getY_TrialPos(); 	// positions and the radius of 
@@ -116,11 +125,11 @@ double Interaction::lennardJones(Particle* particles, int index, int n_particles
 
 	for(int k = 0; k < n_particles; k++){
 
-		compare_prt = particles[k]; 		// assign the comparison particle
+		compare_prt = (*particles)[k]; 		// assign the comparison particle
 
 
 		/* 	- CHECK THAT THE COMPARISON PARTICLE IS NOT THE CURRENT PARTICLE
-			- SET THE COMPARISON POSITION 
+			- SET THE COMPARISON POSITION AND RADIUS
 			- COMPUTE THE CURRENT DISTANCE BETWEEN THE TWO PARTICLES 
 			- COMPUTE THE TRIAL DISTANCE BETWEEN THE TWO PARTICLES
 			- IF THE PARTICLES ARE OF THE SAME TYPE, HAVE A DEEPER
@@ -166,7 +175,7 @@ double Interaction::lennardJones(Particle* particles, int index, int n_particles
 	return delta_energy; 	// returns the total change in energy 
 }
 
-bool Interaction::hardDisks(Particle* particles, int index, int n_particles){ 
+bool Interaction::hardDisks(std::vector<Particle>* particles, int index, int n_particles){ 
 	
 	Particle current_prt; 
 	Particle compare_prt; 						
@@ -183,7 +192,7 @@ bool Interaction::hardDisks(Particle* particles, int index, int n_particles){
 	bool accept = 0; 
 
 
-	current_prt = particles[index];			// assign the current particle
+	current_prt = (*particles)[index];			// assign the current particle
 
 	x_temp = current_prt.getX_TrialPos(); 	// assign x,y trial position
 	y_temp = current_prt.getY_TrialPos(); 	// and the radius of the current
@@ -195,7 +204,7 @@ bool Interaction::hardDisks(Particle* particles, int index, int n_particles){
 		
 for(int k = 0; k < n_particles; k++){
 
-	compare_prt = particles[k]; 		// compare all particles positions
+	compare_prt = (*particles)[k]; 		// compare all particles positions
 										// to current particle's position	
 	if(current_prt.getIdentifier() != compare_prt.getIdentifier()){
 											
@@ -215,7 +224,7 @@ for(int k = 0; k < n_particles; k++){
 }
 
 
-void Interaction::initialPosition(Particle* particles, int n_particles, 
+void Interaction::initialPosition(std::vector<Particle>* particles, int n_particles, 
 								  KISSRNG randVal){
 	Particle current_prt; 
 	Particle compare_prt; 
@@ -236,7 +245,7 @@ void Interaction::initialPosition(Particle* particles, int n_particles,
 
 	for(int k = 0; k < n_particles; k++){
 
-		current_prt = particles[k];
+		current_prt = (*particles)[k];
 		rad_temp = current_prt.getRadius(); 
 		wall_bound = 1;			 				// checks that distance is < 2 * radius
 
@@ -284,7 +293,7 @@ void Interaction::initialPosition(Particle* particles, int n_particles,
 		}
 		else if(k != 0){						
 			for(int n = 0; n < k; n++){
-				compare_prt = particles[n]; 			// assign comparison particle 
+				compare_prt = (*particles)[n]; 			// assign comparison particle 
 
 				x_comp = compare_prt.getX_Position();	// assign the comparison x,y position
 				y_comp = compare_prt.getY_Position(); 	// and radius
@@ -302,7 +311,7 @@ void Interaction::initialPosition(Particle* particles, int n_particles,
 			current_prt.setX_Position(x_temp);	// x,y position to current particle
 			current_prt.setY_Position(y_temp); 
 
-			particles[k] = current_prt; 		// put initialized particle into array 
+			(*particles)[k] = current_prt; 		// put initialized particle into array 
 		}
 		else{
 			k = k - 1; 			// generate a new random position for the SAME particle
@@ -313,21 +322,10 @@ void Interaction::initialPosition(Particle* particles, int n_particles,
 
 ////// DEFAULT CONSTRUCTOR ////////////////
 
-Interaction::Interaction(std::string yamlFile){
+void Interaction::initializeInteraction(std::string yamlFile){
 
 	YAML::Node node = YAML::LoadFile(yamlFile);
 
 	LJ_wellDepth = node["wellDepth"].as<double>(); 	
 }
 
-
-
-/////// GETTERS AND SETTERS ///////////////
-
-double Interaction::getWellDepth(){	// this is a purely 'internal' variable
-	return LJ_wellDepth; 			// and thus a getter in unnecessary
-}
-
-// void Interaction::setWellDepth(double w){
-// 	LJ_wellDepth = w; 
-// }

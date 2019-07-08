@@ -1,15 +1,8 @@
 #include <iostream>
 #include "Parameters.h"
 
-// Parameters::Parameters(){
-// 	n_updates = 0; 
-// 	n_particles = 0; 
-// 	seed = 0; 
-// 	weight = 0; 
-// }
 
-
-Parameters::Parameters(std::string yamlFile){
+void Parameters::initializeParameters(std::string yamlFile){
 
 	YAML::Node node = YAML::LoadFile(yamlFile); 
 
@@ -22,7 +15,7 @@ Parameters::Parameters(std::string yamlFile){
 
 	hardDisk 	= node["hardDisks"].as<bool>(); 
 	lenJones 	= node["lennardJones"].as<bool>(); 	
-	WAC			= node["WAC"].as<bool>(); 
+	WCA			= node["WCA"].as<bool>(); 
 }
 
 
@@ -55,39 +48,6 @@ bool Parameters::getHardDisk(){
 bool Parameters::getLenJones(){
 	return lenJones; 
 }
-bool Parameters::getWAC(){
-	return WAC; 
+bool Parameters::getWCA(){
+	return WCA; 
 }
-
-///////// SETTERS /////////////
-
-// void Parameters::setUpdates(int u){
-// 	n_updates = u; 
-// }
-// void Parameters::setNumParticles(int num){
-// 	n_particles = num; 
-// }
-// void Parameters::setSeed(long s){
-// 	seed = s; 
-// }
-
-// void Parameters::setWeight(double w){
-// 	weight = w; 
-// }
-
-// void Parameters::setRigidBC(bool r){
-// 	rigidBC = r; 
-// }
-// void Parameters::setPeriodicBC(bool p){
-// 	periodicBC = p; 
-// }
-
-// void Parameters::setHardDisk(bool h){
-// 	hardDisk = h; 
-// }
-// void Parameters::setLenJones(bool l){
-// 	lenJones = l; 
-// }
-// void Parameters::setWAC(bool w){
-// 	WAC = w; 
-// }

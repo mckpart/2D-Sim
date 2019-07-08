@@ -1,8 +1,8 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 16
-type1_Particles : 8
-type2_Particles : 8
+totalParticles  : 5
+type1_Particles : 2
+type2_Particles : 3
 
 seed            : 62384925602983
 weight          : .3
@@ -13,17 +13,14 @@ particleRadius_2 : .085
 numberUpdates  : 50
 
 hardDisks    : false
-lennardJones : true
-WAC          : false 
+lennardJones : false
+WCA          : true 
 
 wellDepth : 4
 
-# internalPotential   : false
-# externalPotential   : false
-rigidBoundary       : false 
-periodicBoundary    : true  
+rigidBoundary       : true 
+periodicBoundary    : false  
 
 # convergence_test    : false
 
 boxLength   : 1 
-# restLength  : 1
