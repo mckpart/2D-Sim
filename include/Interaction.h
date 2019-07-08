@@ -24,6 +24,6 @@ class Interaction{
 
 		double getWellDepth(); 
 
-		void setWellDepth(double w); 	 
+		// void setWellDepth(double w); 	 
 };
 #endif

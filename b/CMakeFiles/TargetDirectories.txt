@@ -1,3 +1,0 @@
-/home/mckenna/Documents/microtubules/b/CMakeFiles/rebuild_cache.dir
-/home/mckenna/Documents/microtubules/b/CMakeFiles/sim.dir
-/home/mckenna/Documents/microtubules/b/CMakeFiles/edit_cache.dir

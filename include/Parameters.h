@@ -41,17 +41,17 @@ class Parameters{
 		// GIVEN THAT THESE PARAMETERS ARE CONSTANT
 		// THROUGHOUT THE SIMULATION
 
-		void setUpdates(int u);
-		void setNumParticles(int num); 
-		void setSeed(long s); 
+		// void setUpdates(int u);
+		// void setNumParticles(int num); 
+		// void setSeed(long s); 
 		
-		void setWeight(double w); 
+		// void setWeight(double w); 
 
-		void setRigidBC(bool r); 
-		void setPeriodicBC(bool p); 
+		// void setRigidBC(bool r); 
+		// void setPeriodicBC(bool p); 
 
-		void setHardDisk(bool h); 
-		void setLenJones(bool l); 
-		void setWAC(bool w); 
+		// void setHardDisk(bool h); 
+		// void setLenJones(bool l); 
+		// void setWAC(bool w); 
 }; 
 #endif 

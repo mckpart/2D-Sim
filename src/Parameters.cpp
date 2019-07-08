@@ -61,33 +61,33 @@ bool Parameters::getWAC(){
 
 ///////// SETTERS /////////////
 
-void Parameters::setUpdates(int u){
-	n_updates = u; 
-}
-void Parameters::setNumParticles(int num){
-	n_particles = num; 
-}
-void Parameters::setSeed(long s){
-	seed = s; 
-}
+// void Parameters::setUpdates(int u){
+// 	n_updates = u; 
+// }
+// void Parameters::setNumParticles(int num){
+// 	n_particles = num; 
+// }
+// void Parameters::setSeed(long s){
+// 	seed = s; 
+// }
 
-void Parameters::setWeight(double w){
-	weight = w; 
-}
+// void Parameters::setWeight(double w){
+// 	weight = w; 
+// }
 
-void Parameters::setRigidBC(bool r){
-	rigidBC = r; 
-}
-void Parameters::setPeriodicBC(bool p){
-	periodicBC = p; 
-}
+// void Parameters::setRigidBC(bool r){
+// 	rigidBC = r; 
+// }
+// void Parameters::setPeriodicBC(bool p){
+// 	periodicBC = p; 
+// }
 
-void Parameters::setHardDisk(bool h){
-	hardDisk = h; 
-}
-void Parameters::setLenJones(bool l){
-	lenJones = l; 
-}
-void Parameters::setWAC(bool w){
-	WAC = w; 
-}
+// void Parameters::setHardDisk(bool h){
+// 	hardDisk = h; 
+// }
+// void Parameters::setLenJones(bool l){
+// 	lenJones = l; 
+// }
+// void Parameters::setWAC(bool w){
+// 	WAC = w; 
+// }
