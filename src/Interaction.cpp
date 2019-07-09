@@ -22,13 +22,13 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index, in
 
    double sigma = 0; 
 
-   double delta_energy	= 0;  
-   double energy_curr	= 0; 
-   double energy_temp	= 0; 
+   double delta_energy = 0;  
+   double energy_curr = 0; 
+   double energy_temp = 0; 
 
-   double rad_curr	= 0; 
-   double rad_comp	= 0; 
-   double num		= 0; 
+   double rad_curr = 0; 
+   double rad_comp = 0; 
+   double num = 0; 
 
    double dist_curr = 0; 
    double dist_temp = 0; 	
@@ -222,100 +222,100 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index, int n_p
 }
 
 
-void Interaction::initialPosition(std::vector<Particle>* particles, int n_particles, 
-								  KISSRNG randVal){
-   Particle current_prt; 
-   Particle compare_prt; 
+// void Interaction::initialPosition(std::vector<Particle>* particles, int n_particles, 
+// 								  KISSRNG randVal){
+//    Particle current_prt; 
+//    Particle compare_prt; 
 
-   double x_temp = 0; 
-   double y_temp = 0; 
-   double x_comp = 0; 
-   double y_comp = 0; 
-   double x_wall = 0; 
-   double y_wall = 0;   // the locations of the nearest 'wall'
+//    double x_temp = 0; 
+//    double y_temp = 0; 
+//    double x_comp = 0; 
+//    double y_comp = 0; 
+//    double x_wall = 0; 
+//    double y_wall = 0;   // the locations of the nearest 'wall'
 
-   double rad_temp = 0; 
-   double rad_comp = 0; 
-   double num = 0; 
-   double wall_bound = 0; 						
+//    double rad_temp = 0; 
+//    double rad_comp = 0; 
+//    double num = 0; 
+//    double wall_bound = 0; 						
 
-   bool accept = 0; 
+//    bool accept = 0; 
 
-   for(int k = 0; k < n_particles; k++){
+//    for(int k = 0; k < n_particles; k++){
 
-      current_prt = (*particles)[k];
-      rad_temp = current_prt.getRadius();  
-      wall_bound = 1;			 	// checks that distance is < 2 * radius
+//       current_prt = (*particles)[k];
+//       rad_temp = current_prt.getRadius();  
+//       wall_bound = 1;			 	// checks that distance is < 2 * radius
 
-      x_temp = randVal.RandomUniformDbl(); 
-      y_temp = randVal.RandomUniformDbl(); 
+//       x_temp = randVal.RandomUniformDbl(); 
+//       y_temp = randVal.RandomUniformDbl(); 
 
-      /*   - GENERATE A RANDOM NUMBER FROM [0,1)
-           - PROVIDES DIFFERENT 'QUADRANTS' FOR THE PARTICLE TO BE GENERATED IN 
-           - ASSIGNS THE NEAREST X,Y 'WALLS'
-      */
+//       /*   - GENERATE A RANDOM NUMBER FROM [0,1)
+//            - PROVIDES DIFFERENT 'QUADRANTS' FOR THE PARTICLE TO BE GENERATED IN 
+//            - ASSIGNS THE NEAREST X,Y 'WALLS'
+//       */
 
-      num = randVal.RandomUniformDbl(); 
+//       num = randVal.RandomUniformDbl(); 
 
-      if(k % 2 == 0 && num <.5){      // the acceptance presented in 
-         x_temp = -1 * x_temp;        // 'check collision' is not implemented here
-                                      // since the initial position cannot exceed 1
-         x_wall = -1 * wall_bound;
-         y_wall = wall_bound;         // randomly assigns a negative/positive
-      }	                              // value to the generated position
-      else if(k % 2 == 0 && num >= .5){
-         y_temp = -1 * y_temp; 
+//       if(k % 2 == 0 && num <.5){      // the acceptance presented in 
+//          x_temp = -1 * x_temp;        // 'check collision' is not implemented here
+//                                       // since the initial position cannot exceed 1
+//          x_wall = -1 * wall_bound;
+//          y_wall = wall_bound;         // randomly assigns a negative/positive
+//       }	                              // value to the generated position
+//       else if(k % 2 == 0 && num >= .5){
+//          y_temp = -1 * y_temp; 
 
-         x_wall = wall_bound; 
-         y_wall = -1 * wall_bound; 
-      }
-      else if(k % 2 != 0 && num < .5){
-         x_temp = -1 * x_temp; 
-         y_temp = -1 * y_temp; 
+//          x_wall = wall_bound; 
+//          y_wall = -1 * wall_bound; 
+//       }
+//       else if(k % 2 != 0 && num < .5){
+//          x_temp = -1 * x_temp; 
+//          y_temp = -1 * y_temp; 
 
-         x_wall = -1 * wall_bound; 
-         y_wall = -1 * wall_bound; 
-      }
-      else{
-         x_wall = wall_bound; 
-         y_wall = wall_bound; 
-      }
+//          x_wall = -1 * wall_bound; 
+//          y_wall = -1 * wall_bound; 
+//       }
+//       else{
+//          x_wall = wall_bound; 
+//          y_wall = wall_bound; 
+//       }
 
-      accept = 1;                           // the following statements can only change 
-                                            // accept to 0
-      if(abs(x_temp - x_wall) < rad_temp){  // if particle's center is closer than 
-         accept = 0;                        // one radius to the wall, reject move
-      }
-      else if(abs(y_temp - y_wall) < rad_temp){
-         accept = 0; 
-      }
-      else if(k != 0){						
-      	 for(int n = 0; n < k; n++){
-      	    compare_prt = (*particles)[n];           // assign comparison particle 
+//       accept = 1;                           // the following statements can only change 
+//                                             // accept to 0
+//       if(abs(x_temp - x_wall) < rad_temp){  // if particle's center is closer than 
+//          accept = 0;                        // one radius to the wall, reject move
+//       }
+//       else if(abs(y_temp - y_wall) < rad_temp){
+//          accept = 0; 
+//       }
+//       else if(k != 0){						
+//       	 for(int n = 0; n < k; n++){
+//       	    compare_prt = (*particles)[n];           // assign comparison particle 
 
-      	    x_comp = compare_prt.getX_Position();    // assign the comparison x,y position
-      	    y_comp = compare_prt.getY_Position();    // and radius
-      	    rad_comp = compare_prt.getRadius(); 
+//       	    x_comp = compare_prt.getX_Position();    // assign the comparison x,y position
+//       	    y_comp = compare_prt.getY_Position();    // and radius
+//       	    rad_comp = compare_prt.getRadius(); 
 
-      	    if(distance(x_temp,x_comp,y_temp,y_comp) // if the distance between particles is 
-      	                < rad_comp + rad_temp){      // is closer than the sum of the radii, 
-      	       accept = 0;                           // reject position
-      	       break; 
-      	    }
-         }
-      }
+//       	    if(distance(x_temp,x_comp,y_temp,y_comp) // if the distance between particles is 
+//       	                < rad_comp + rad_temp){      // is closer than the sum of the radii, 
+//       	       accept = 0;                           // reject position
+//       	       break; 
+//       	    }
+//          }
+//       }
 
-      if(accept == 1){                      // if the position is accepted, assign the 
-         current_prt.setX_Position(x_temp); // x,y position to current particle
-         current_prt.setY_Position(y_temp); 
+//       if(accept == 1){                      // if the position is accepted, assign the 
+//          current_prt.setX_Position(x_temp); // x,y position to current particle
+//          current_prt.setY_Position(y_temp); 
 
-         (*particles)[k] = current_prt;     // put initialized particle into array 
-      }
-      else{
-         k = k - 1; // generate a new random position for the SAME particle
-      }
-   }
-}
+//          (*particles)[k] = current_prt;     // put initialized particle into array 
+//       }
+//       else{
+//          k = k - 1; // generate a new random position for the SAME particle
+//       }
+//    }
+// }
 
 ////// DEFAULT CONSTRUCTOR ////////////////
 

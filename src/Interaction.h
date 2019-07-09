@@ -9,18 +9,18 @@
 
 class Interaction{ 
 	
-	private:
+private:
 
-		double LJ_wellDepth = 0; 	
+   double LJ_wellDepth = 0; 	
 
-	public: 
+public: 
 
-		void initializeInteraction(std::string yamlFile); 
+   void initializeInteraction(std::string yamlFile); 
 
-		double lennardJones		(std::vector<Particle>* particles, int index, int n_particles); 
-		double WCApotential		(std::vector<Particle>* particles, int index, int n_particles);
-		bool hardDisks			(std::vector<Particle>* particles, int index, int n_particles); 
-		void initialPosition	(std::vector<Particle>* particles, int n_particles, KISSRNG randVal);
+   double lennardJones(std::vector<Particle>* particles, int index, int n_particles); 
+   double WCApotential(std::vector<Particle>* particles, int index, int n_particles);
+   bool hardDisks     (std::vector<Particle>* particles, int index, int n_particles); 
+   // void initialPosition	(std::vector<Particle>* particles, int n_particles, KISSRNG randVal);
 
 };
 #endif

@@ -11,6 +11,7 @@ Simulation::Simulation(std::string yf){
 
    param.initializeParameters(yamlFile);    // initialize the parameters
    interact.initializeInteraction(yamlFile);// for the simulation
+   bound.initializeBoundary(yamlFile); 
 
    n_particles = param.getNumParticles();   // initialize vector of
    particles.resize(n_particles);           // particles and set particle
@@ -42,7 +43,7 @@ void Simulation::runSimulation(){
 
    n_updates 	= param.getUpdates(); 
 
-   interact.initialPosition(&particles,n_particles,randVal); 
+   bound.initialPosition(&particles,n_particles,randVal); 
 
    for(int n = 0; n < n_updates; n++){
       for(int k = 0; k < n_particles; k++){

@@ -13,14 +13,16 @@ def dist(x1,x2,y1,y2):
 with open("params.yaml",'r') as yf:
     yaml_dict = yaml.safe_load(yf)
 
-radius_1    = float(yaml_dict["particleRadius_1"])
-radius_2    = float(yaml_dict["particleRadius_2"])     
-n_part_1    = yaml_dict["type1_Particles"]
-n_part_2    = yaml_dict["type2_Particles"]
-n_part_tot  = yaml_dict["totalParticles"]
+radius_1   = float(yaml_dict["particleRadius_1"])
+radius_2   = float(yaml_dict["particleRadius_2"])     
+n_part_1   = yaml_dict["type1_Particles"]
+n_part_2   = yaml_dict["type2_Particles"]
+n_part_tot = yaml_dict["totalParticles"]
 
-numIter     = yaml_dict["numberUpdates"]
-rigidBC     = yaml_dict["rigidBoundary"]
+numIter    = yaml_dict["numberUpdates"]
+rigidBC    = yaml_dict["rigidBoundary"]
+
+boxLength  = yaml_dict["boxLength"]
 # periodBC    = yaml_dict["periodicBoundary"]
 
 ######### initialize lists and read in position data ##########
@@ -54,8 +56,8 @@ position = np.asarray(position)
   
 def init():
 
-    ax.set_xlim(-1,1)       
-    ax.set_ylim(-1,1)
+    ax.set_xlim(-1 * boxLength,boxLength)       
+    ax.set_ylim(-1 * boxLength,boxLength)
         
     for i in range(n_part_tot):
         ax.add_patch(patches[i])
