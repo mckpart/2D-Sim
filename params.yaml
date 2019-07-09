@@ -8,18 +8,19 @@ seed            : 62384925602983
 weight          : .3
 
 particleRadius_1 : .1
-particleRadius_2 : .085
+particleRadius_2 : .12
 
-numberUpdates  : 50
+numberUpdates  : 300
 
-hardDisks    : false
+hardDisks    : true
 lennardJones : false
-WCA          : true 
+WCA          : false 
 
 wellDepth : 4
 
-rigidBoundary       : true 
-periodicBoundary    : false  
+rigidBoundary    : false 
+periodicBoundary : false  
+externalWell     : true
 
 # convergence_test    : false
 

@@ -7,18 +7,19 @@ class Parameters{
 
 	private:
 
-		int n_updates   = 0; 
+		int n_updates = 0; 
 		int n_particles = 0; 
 		long seed = 0; 
 
 		double weight = 0; 
 
-		bool rigidBC 	= 0; 
+		bool rigidBC = 0; 
 		bool periodicBC = 0; 
+		bool extWell = 0; 
 
 		bool hardDisk = 0;  
 		bool lenJones = 0;  	
-		bool WCA	  = 0; 
+		bool WCA = 0; 
 
 	public: 
 		
@@ -32,6 +33,7 @@ class Parameters{
 
 		bool getRigidBC(); 
 		bool getPeriodicBC(); 
+		bool getExtWell(); 
 
 		bool getHardDisk(); 
 		bool getLenJones(); 

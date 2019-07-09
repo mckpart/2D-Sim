@@ -12,6 +12,7 @@ void Parameters::initializeParameters(std::string yamlFile){
 
 	rigidBC 	= node["rigidBoundary"].as<bool>(); 
 	periodicBC	= node["periodicBoundary"].as<bool>(); 
+	extWell 	= node["externalWell"].as<bool>(); 
 
 	hardDisk 	= node["hardDisks"].as<bool>(); 
 	lenJones 	= node["lennardJones"].as<bool>(); 	
@@ -40,6 +41,9 @@ bool Parameters::getRigidBC(){
 }
 bool Parameters::getPeriodicBC(){
 	return periodicBC; 
+}
+bool Parameters::getExtWell(){
+	return extWell; 
 }
 
 bool Parameters::getHardDisk(){
