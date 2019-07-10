@@ -21,6 +21,7 @@ n_part_tot = yaml_dict["totalParticles"]
 
 numIter    = yaml_dict["numberUpdates"]
 rigidBC    = yaml_dict["rigidBoundary"]
+c_linkers  = yaml_dict["crosslinkers"]
 
 boxLength  = yaml_dict["boxLength"]
 # periodBC    = yaml_dict["periodicBoundary"]
@@ -56,8 +57,12 @@ position = np.asarray(position)
   
 def init():
 
-    ax.set_xlim(-1 * boxLength,boxLength)       
-    ax.set_ylim(-1 * boxLength,boxLength)
+    if(c_linkers == 1 and rigidBC != 1):
+        ax.set_xlim(-2,2)
+        ax.set_ylim(-2,2)
+    else:  
+        ax.set_xlim(-1 * boxLength,boxLength)       
+        ax.set_ylim(-1 * boxLength,boxLength)
         
     for i in range(n_part_tot):
         ax.add_patch(patches[i])

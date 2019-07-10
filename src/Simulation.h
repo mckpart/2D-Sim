@@ -15,22 +15,22 @@ class Simulation{
 
 private: 
 
-	std::string yamlFile;
+   std::string yamlFile;
 
-	Parameters param; 
-	Interaction interact;
-	Boundary bound;
+   Parameters param; 
+   Interaction interact;
+   Boundary bound;
 
-	std::vector<Particle> particles; 	  
+   std::vector<Particle> particles; 	  
 
-	int n_particles = 0; 
+   int n_particles = 0; 
 
 public: 
 
-	Simulation(std::string yf); 
+   Simulation(std::string yf); 
 
-	void runSimulation(); 
-	void setParticleParams(); 
+   void runSimulation(); 
+   void setParticleParams(); 
 
 }; 
 #endif

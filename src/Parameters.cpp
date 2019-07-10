@@ -4,54 +4,58 @@
 
 void Parameters::initializeParameters(std::string yamlFile){
 
-	YAML::Node node = YAML::LoadFile(yamlFile); 
+   YAML::Node node = YAML::LoadFile(yamlFile); 
 
-	seed 		= node["seed"].as<long>(); 
-	n_particles	= node["totalParticles"].as<int>();
-	n_updates 	= node["numberUpdates"].as<int>(); 
+   seed        = node["seed"].as<long>(); 
+   n_particles = node["totalParticles"].as<int>();
+   n_updates   = node["numberUpdates"].as<int>(); 
+  
+   rigidBC     = node["rigidBoundary"].as<bool>(); 
+   periodicBC  = node["periodicBoundary"].as<bool>(); 
+   extWell     = node["externalWell"].as<bool>(); 
 
-	rigidBC 	= node["rigidBoundary"].as<bool>(); 
-	periodicBC	= node["periodicBoundary"].as<bool>(); 
-	extWell 	= node["externalWell"].as<bool>(); 
-
-	hardDisk 	= node["hardDisks"].as<bool>(); 
-	lenJones 	= node["lennardJones"].as<bool>(); 	
-	WCA			= node["WCA"].as<bool>(); 
+   hardDisk    = node["hardDisks"].as<bool>(); 
+   lenJones    = node["lennardJones"].as<bool>(); 	
+   WCA         = node["WCA"].as<bool>(); 
+   c_linkers   = node["crosslinkers"].as<bool>(); 
 }
 
 
 ///// GETTERS ////////////////
 
 int Parameters::getUpdates(){
-	return n_updates; 
+   return n_updates; 
 } 	
 int Parameters::getNumParticles(){
-	return n_particles; 
+   return n_particles; 
 }
 long Parameters::getSeed(){
-	return seed; 
+   return seed; 
 }
 
 double Parameters::getWeight(){
-	return weight; 
+   return weight; 
 }
 
 bool Parameters::getRigidBC(){
-	return rigidBC; 
+   return rigidBC; 
 }
 bool Parameters::getPeriodicBC(){
-	return periodicBC; 
+   return periodicBC; 
 }
 bool Parameters::getExtWell(){
-	return extWell; 
+   return extWell; 
 }
 
 bool Parameters::getHardDisk(){
-	return hardDisk; 
+   return hardDisk; 
 }
 bool Parameters::getLenJones(){
-	return lenJones; 
+   return lenJones; 
 }
 bool Parameters::getWCA(){
-	return WCA; 
+   return WCA; 
+}
+bool Parameters::getCrosslinkers(){
+   return c_linkers; 
 }

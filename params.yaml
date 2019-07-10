@@ -1,13 +1,13 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 50
-type1_Particles : 15
-type2_Particles : 35
+totalParticles  : 40
+type1_Particles : 40
+type2_Particles : 0
 
-seed            : 62384925602983
+seed            : 98638175623423
 weight          : .3
 
-particleRadius_1 : .15
+particleRadius_1 : .13
 particleRadius_2 : .12
 
 numberUpdates  : 300
@@ -16,10 +16,16 @@ hardDisks    : true
 lennardJones : false
 WCA          : false 
 
+crosslinkers   : true 
+restLength     : .3676955
+springConstant : 15
+truncationDist : .5
+
 wellDepth : 4
 
-rigidBoundary    : true 
+rigidBoundary    : false 
 periodicBoundary : false  
-externalWell     : false
+externalWell     : true
 
-boxLength   : 1.3
+boxLength   : 1.1
+

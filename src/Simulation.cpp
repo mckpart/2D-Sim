@@ -25,13 +25,13 @@ void Simulation::runSimulation(){
    int n_updates = 0;
 
    double n_rejects = 0;  
-   double perc_rej  = 0; 
+   double perc_rej = 0; 
 
    double x_trial = 0; 
    double y_trial = 0; 
 
    double delta_energy = 0; 
-   double total_prob   = 0; 
+   double total_prob = 0; 
 
    bool accept = 0; 
 
@@ -41,7 +41,7 @@ void Simulation::runSimulation(){
    KISSRNG randVal; 
    randVal.InitCold(param.getSeed()); 	// warms the RNG
 
-   n_updates 	= param.getUpdates(); 
+   n_updates = param.getUpdates(); 
 
    bound.initialPosition(&particles,n_particles,randVal); 
 
@@ -57,7 +57,8 @@ void Simulation::runSimulation(){
 
          particles[k] = prt;  
 
-         accept = 1; 		
+         accept = 1;
+         delta_energy = 0;  		
 
          if(param.getRigidBC() == 1){        // run sim with hard boundaries
             accept = bound.rigidBoundary(&particles,k);  
@@ -98,6 +99,12 @@ void Simulation::runSimulation(){
                            interact.WCApotential(&particles,k,n_particles); 
          }
 
+         if(param.getCrosslinkers() == 1 && accept == 1){  
+            delta_energy = delta_energy +  
+                           interact.crosslinkers(&particles,k,n_particles); 
+            // std::cout << "the change in energy is: " << delta_energy << std::endl; 
+         }         
+
          if(accept == 1 && delta_energy > 0){
             total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
 
@@ -110,9 +117,9 @@ void Simulation::runSimulation(){
          }
 
          if(accept == 1){
-            prt.setX_Position(x_trial);	// if trial move is accepted, update the 
-            prt.setY_Position(y_trial); // position of the current particle
-            particles[k] = prt;         // and put back into array
+            prt.setX_Position(x_trial);  // if trial move is accepted, update the 
+            prt.setY_Position(y_trial);  // position of the current particle
+            particles[k] = prt;          // and put back into array
 
             pos_file << prt.getX_Position() << " "; // read updated positions into  
             pos_file << prt.getY_Position() << " "; // file

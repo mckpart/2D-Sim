@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Interaction.h"
 #include <cmath>
-#include <array>
 
 
 double distance(double x1,double x2,double y1, double y2){
@@ -38,8 +37,8 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index, in
    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
    y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
                                          // the current particle
-   x_curr   = current_prt.getX_Position(); 
-   y_curr   = current_prt.getY_Position(); 
+   x_curr = current_prt.getX_Position(); 
+   y_curr = current_prt.getY_Position(); 
    rad_curr = current_prt.getRadius(); 
 
    for(int k = 0; k < n_particles; k++){  // the O(N^2)... think about 
@@ -57,8 +56,8 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index, in
 
       if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
 
-         x_comp   = compare_prt.getX_Position(); 
-         y_comp   = compare_prt.getY_Position(); 
+         x_comp = compare_prt.getX_Position(); 
+         y_comp = compare_prt.getY_Position(); 
          rad_comp = compare_prt.getRadius(); 
 
          dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
@@ -119,8 +118,8 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
    y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
                                          // the current particle
-   x_curr   = current_prt.getX_Position(); 
-   y_curr   = current_prt.getY_Position(); 
+   x_curr = current_prt.getX_Position(); 
+   y_curr = current_prt.getY_Position(); 
    rad_curr = current_prt.getRadius(); 
 
    for(int k = 0; k < n_particles; k++){
@@ -142,8 +141,8 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
 
       if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
 
-         x_comp   = compare_prt.getX_Position(); 
-         y_comp   = compare_prt.getY_Position(); 
+         x_comp = compare_prt.getX_Position(); 
+         y_comp = compare_prt.getY_Position(); 
          rad_comp = compare_prt.getRadius(); 
 
          dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
@@ -190,7 +189,6 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index, int n_p
 
    bool accept = 0; 
 
-
    current_prt = (*particles)[index];   // assign the current particle
 
    x_temp = current_prt.getX_TrialPos(); // assign x,y trial position
@@ -221,101 +219,74 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index, int n_p
    return accept;     // returns 1 if trial move is accepted 
 }
 
+double Interaction::crosslinkers(std::vector<Particle>* particles, int index, int n_particles){
+   
+   Particle current_prt; 
+   Particle compare_prt;                  
 
-// void Interaction::initialPosition(std::vector<Particle>* particles, int n_particles, 
-// 								  KISSRNG randVal){
-//    Particle current_prt; 
-//    Particle compare_prt; 
+   double x_temp = 0; 
+   double y_temp = 0; 
+   double x_curr = 0; 
+   double y_curr = 0; 
+   double x_comp = 0; 
+   double y_comp = 0; 
 
-//    double x_temp = 0; 
-//    double y_temp = 0; 
-//    double x_comp = 0; 
-//    double y_comp = 0; 
-//    double x_wall = 0; 
-//    double y_wall = 0;   // the locations of the nearest 'wall'
+   double sigma = 0; 
 
-//    double rad_temp = 0; 
-//    double rad_comp = 0; 
-//    double num = 0; 
-//    double wall_bound = 0; 						
+   double delta_energy = 0; 
+   double energy_curr = 0; 
+   double energy_temp = 0; 
 
-//    bool accept = 0; 
+   double rad_curr = 0; 
+   double rad_comp = 0; 
+   double num = 0; 
 
-//    for(int k = 0; k < n_particles; k++){
+   double dist_curr = 0; 
+   double dist_temp = 0;   
 
-//       current_prt = (*particles)[k];
-//       rad_temp = current_prt.getRadius();  
-//       wall_bound = 1;			 	// checks that distance is < 2 * radius
+   current_prt = (*particles)[index];    // assign current particle
+ 
+   x_temp = current_prt.getX_TrialPos(); // assign the current and trial
+   y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
+                                         // the current particle
+   x_curr = current_prt.getX_Position(); 
+   y_curr = current_prt.getY_Position(); 
+   // rad_curr = current_prt.getRadius(); 
 
-//       x_temp = randVal.RandomUniformDbl(); 
-//       y_temp = randVal.RandomUniformDbl(); 
+   for(int k = 0; k < n_particles; k++){
 
-//       /*   - GENERATE A RANDOM NUMBER FROM [0,1)
-//            - PROVIDES DIFFERENT 'QUADRANTS' FOR THE PARTICLE TO BE GENERATED IN 
-//            - ASSIGNS THE NEAREST X,Y 'WALLS'
-//       */
+      compare_prt = (*particles)[k]; // assign the comparison particle 
+                                     // comparison particle cannot be current
+      if(compare_prt.getIdentifier() != current_prt.getIdentifier()){
 
-//       num = randVal.RandomUniformDbl(); 
+         x_comp = compare_prt.getX_Position();  // assign x,y comparison 
+         y_comp = compare_prt.getY_Position();  // position 
+         // rad_comp = compare_prt.getRadius(); 
 
-//       if(k % 2 == 0 && num <.5){      // the acceptance presented in 
-//          x_temp = -1 * x_temp;        // 'check collision' is not implemented here
-//                                       // since the initial position cannot exceed 1
-//          x_wall = -1 * wall_bound;
-//          y_wall = wall_bound;         // randomly assigns a negative/positive
-//       }	                              // value to the generated position
-//       else if(k % 2 == 0 && num >= .5){
-//          y_temp = -1 * y_temp; 
+         dist_curr = distance(x_curr,x_comp,y_curr,y_comp); // current distance 
+                                                            // between particles
+         if(dist_curr > truncDist){    // particles do not interact if current
+            energy_curr = 0;           // distance is greater than the truncation
+	 }                             // distance
+         else{
+	    energy_curr = 0.5 * sprConstant * pow(dist_curr - restLength,2);  
+	 }
 
-//          x_wall = wall_bound; 
-//          y_wall = -1 * wall_bound; 
-//       }
-//       else if(k % 2 != 0 && num < .5){
-//          x_temp = -1 * x_temp; 
-//          y_temp = -1 * y_temp; 
-
-//          x_wall = -1 * wall_bound; 
-//          y_wall = -1 * wall_bound; 
-//       }
-//       else{
-//          x_wall = wall_bound; 
-//          y_wall = wall_bound; 
-//       }
-
-//       accept = 1;                           // the following statements can only change 
-//                                             // accept to 0
-//       if(abs(x_temp - x_wall) < rad_temp){  // if particle's center is closer than 
-//          accept = 0;                        // one radius to the wall, reject move
-//       }
-//       else if(abs(y_temp - y_wall) < rad_temp){
-//          accept = 0; 
-//       }
-//       else if(k != 0){						
-//       	 for(int n = 0; n < k; n++){
-//       	    compare_prt = (*particles)[n];           // assign comparison particle 
-
-//       	    x_comp = compare_prt.getX_Position();    // assign the comparison x,y position
-//       	    y_comp = compare_prt.getY_Position();    // and radius
-//       	    rad_comp = compare_prt.getRadius(); 
-
-//       	    if(distance(x_temp,x_comp,y_temp,y_comp) // if the distance between particles is 
-//       	                < rad_comp + rad_temp){      // is closer than the sum of the radii, 
-//       	       accept = 0;                           // reject position
-//       	       break; 
-//       	    }
-//          }
-//       }
-
-//       if(accept == 1){                      // if the position is accepted, assign the 
-//          current_prt.setX_Position(x_temp); // x,y position to current particle
-//          current_prt.setY_Position(y_temp); 
-
-//          (*particles)[k] = current_prt;     // put initialized particle into array 
-//       }
-//       else{
-//          k = k - 1; // generate a new random position for the SAME particle
-//       }
-//    }
-// }
+	 dist_temp = distance(x_temp,x_comp,y_temp,y_comp); // trial distance  
+                                                            // between particles
+         if(dist_temp > truncDist){ // particles do not interact if trial 
+            energy_temp = 0;        // trial distance is greater than the 
+	 }                          // truncation distance
+         else{
+	    energy_temp = 0.5 * sprConstant * pow(dist_temp - restLength,2); 
+	 }
+        
+         delta_energy = delta_energy + (energy_temp - energy_curr); // running sum of
+      }                                                             // total change in 
+   }                                                                // energy 
+   std::cout << "the change in energy is: " << delta_energy << std::endl; 
+   return delta_energy;  // returns total change in energy 
+}
 
 ////// DEFAULT CONSTRUCTOR ////////////////
 
@@ -324,5 +295,8 @@ void Interaction::initializeInteraction(std::string yamlFile){
    YAML::Node node = YAML::LoadFile(yamlFile);
 
    LJ_wellDepth = node["wellDepth"].as<double>(); 	
+   restLength   = node["restLength"].as<double>();
+   sprConstant  = node["springConstant"].as<double>(); 
+   truncDist    = node["truncationDist"].as<double>();  
 }
 
