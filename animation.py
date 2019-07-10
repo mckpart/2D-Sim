@@ -6,12 +6,12 @@ import yaml
 import math
 
 def dist(x1,x2,y1,y2):
-    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+   return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 ######## read in .yaml parameters #######
 
 with open("params.yaml",'r') as yf:
-    yaml_dict = yaml.safe_load(yf)
+   yaml_dict = yaml.safe_load(yf)
 
 radius_1   = float(yaml_dict["particleRadius_1"])
 radius_2   = float(yaml_dict["particleRadius_2"])     
@@ -57,32 +57,32 @@ position = np.asarray(position)
   
 def init():
 
-    if(c_linkers == 1 and rigidBC != 1):
-        ax.set_xlim(-2,2)
-        ax.set_ylim(-2,2)
-    else:  
-        ax.set_xlim(-1 * boxLength,boxLength)       
-        ax.set_ylim(-1 * boxLength,boxLength)
+   if(c_linkers == 1 and rigidBC != 1):
+      ax.set_xlim(-2,2)
+      ax.set_ylim(-2,2)
+   else:  
+      ax.set_xlim(-1 * boxLength,boxLength)       
+      ax.set_ylim(-1 * boxLength,boxLength)
         
-    for i in range(n_part_tot):
-        ax.add_patch(patches[i])
+   for i in range(n_part_tot):
+      ax.add_patch(patches[i])
 
-    return patches
+   return patches
 
 def update(frame):
 
-    frame = int(frame)
-    print "frame is ", frame
+   frame = int(frame)
+   print "frame is ", frame
+   
+   for k in range(n_part_tot):
+      x = position[frame][k * 2]
+      y = position[frame][(k * 2) + 1]
 
-    for k in range(n_part_tot):
-        x = position[frame][k * 2]
-        y = position[frame][(k * 2) + 1]
+      patch = patches[k]
+      patch.center = (x,y)
+      patches[k] = patch
 
-        patch = patches[k]
-        patch.center = (x,y)
-        patches[k] = patch
-
-    return patches
+   return patches
 
 
 t = np.linspace(0,numIter - 1,numIter) 
