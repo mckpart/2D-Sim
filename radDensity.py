@@ -4,36 +4,36 @@ import math
 import yaml
 
 def dist(x1,x2,y1,y2):
-    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+   return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 def density(): 			# compute the number of particles per area
-	for n in range(step): 
+   for n in range(step): 
 
-		area = math.pi * (deltaR * (n+1))**2
-		part = float(N[n])
-		g[n] = part/area
+      area = math.pi * (deltaR * (n+1))**2
+      part = float(N[n])
+      g[n] = part/area
 
 def numberAtRadius():	# compute the number of particles =< a distance
 
-	x1 = position[4,0]
-	y1 = position[4,1]
+   x1 = position[4,0]
+   y1 = position[4,1]
 
-	for n in range(step):
+   for n in range(step):
 
-		num = 0
+      num = 0
 
-		for k in range(int(n_part_tot - 1)): 
+      for k in range(int(n_part_tot - 1)): 
+       
+         x2 = position[4,(k + 1) * 2]
+         y2 = position[4,(k + 1) * 2 + 1]
+         
+         d = dist(x1,x2,y1,y2)
+      
+         if(d < deltaR * (n+1)): 
+            num = num + 1
 
-			x2 = position[4,(k + 1) * 2]
-			y2 = position[4,(k + 1) * 2 + 1]
-
-			d = dist(x1,x2,y1,y2)
-
-			if(d < deltaR * (n+1)): 
-				num = num + 1
-		print num,n
-		N[n] = num	
-
+            print num,n
+            N[n] = num	
 
 ######## read in .yaml parameters #######
 
@@ -49,9 +49,9 @@ position = []
 
 file = open( "positions.txt", "r" )
 for line in file:
-    row = line.split()
-    row = [float(i) for i in row]
-    position.append(row)
+   row = line.split()
+   row = [float(i) for i in row]
+   position.append(row)
 
 position = np.asarray(position)
 # print position
