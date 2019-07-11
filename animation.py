@@ -19,7 +19,7 @@ n_part_1   = yaml_dict["type1_Particles"]
 n_part_2   = yaml_dict["type2_Particles"]
 n_part_tot = yaml_dict["totalParticles"]
 
-numIter    = yaml_dict["numberUpdates"]
+# numIter    = yaml_dict["numberUpdates"]
 rigidBC    = yaml_dict["rigidBoundary"]
 c_linkers  = yaml_dict["crosslinkers"]
 
@@ -49,12 +49,7 @@ for line in file:
 position = np.asarray(position)
 # print position
 
-# for i in range(numIter): 
-#     d = dist(position[i][0],position[i][4],position[i][1],position[i][5])     # used for debugging
-#     if(d < 0.35):
-#         print "error"
-#         print i 
-  
+numIter = len(position[:,0]) 
 def init():
 
    if(c_linkers == 1 and rigidBC != 1):

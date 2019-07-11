@@ -148,14 +148,14 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
          dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
          dist_temp = distance(x_temp,x_comp,y_temp,y_comp); 
 
-         sigma = (rad_curr + rad_comp);                      // sigma = deal separation distance
+         sigma = (rad_curr + rad_comp) * pow(2,.5);                      // sigma = deal separation distance
                                                              // between particles
          if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
 
-            energy_curr = 50 * LJ_wellDepth * 
+            energy_curr = 10 * LJ_wellDepth * 
             (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); // 6-12 potential 
 
-            energy_temp = 50 * LJ_wellDepth * 
+            energy_temp = 10 * LJ_wellDepth * 
             (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 				
          } 
          else{                                             // interaction between unlike particles
@@ -284,7 +284,7 @@ double Interaction::crosslinkers(std::vector<Particle>* particles, int index, in
          delta_energy = delta_energy + (energy_temp - energy_curr); // running sum of
       }                                                             // total change in 
    }                                                                // energy 
-   std::cout << "the change in energy is: " << delta_energy << std::endl; 
+   // std::cout << "the change in energy is: " << delta_energy << std::endl; 
    return delta_energy;  // returns total change in energy 
 }
 

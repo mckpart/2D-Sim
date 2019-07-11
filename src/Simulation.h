@@ -31,6 +31,6 @@ public:
 
    void runSimulation(); 
    void setParticleParams(); 
-
+   void writePositions(std::ofstream* pos_file); 
 }; 
 #endif

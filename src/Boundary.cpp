@@ -181,8 +181,8 @@ double Boundary::externalWell(std::vector<Particle>* particles, int index){
    x_curr = current_prt.getX_Position(); 
    y_curr = current_prt.getY_Position(); 
 
-   energy_curr = 2 * (pow(x_curr,2) + pow(y_curr,2)); // treat the constants as 1 for now.. change later
-   energy_temp = 2 * (pow(x_temp,2) + pow(x_temp,2)); 
+   energy_curr = 4 * (pow(x_curr,2) + pow(y_curr,2)); // treat the constants as 1 for now.. change later
+   energy_temp = 4 * (pow(x_temp,2) + pow(x_temp,2)); 
 
    delta_energy = energy_temp - energy_curr; 
 

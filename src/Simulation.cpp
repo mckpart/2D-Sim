@@ -6,6 +6,25 @@ double boltzmannFactor(double energy){
    return exp(-1 * energy); 
 }
 
+void Simulation::writePositions(std::ofstream* pos_file){
+   Particle prt; 
+
+   if(pos_file->is_open()){
+      
+      for(int k = 0; k < n_particles; k++){
+         prt = particles[k];
+
+	 (*pos_file) << prt.getX_Position() << " "; // reads updated positions
+	 (*pos_file) << prt.getY_Position() << " "; // into position file
+      }
+
+      (*pos_file) << std::endl; 
+   }
+   else{
+      std::cout << "ERROR: THE .TXT FILE COULD NOT OPEN" << std::endl; 
+   }
+}
+
 Simulation::Simulation(std::string yf){
    yamlFile = yf; 
 
@@ -23,6 +42,7 @@ void Simulation::runSimulation(){
    Particle prt; 
 
    int n_updates = 0;
+   int curr_index = 0; 
 
    double n_rejects = 0;  
    double perc_rej = 0; 
@@ -45,95 +65,93 @@ void Simulation::runSimulation(){
 
    bound.initialPosition(&particles,n_particles,randVal); 
 
-   for(int n = 0; n < n_updates; n++){
-      for(int k = 0; k < n_particles; k++){
-	     prt = particles[k]; 
+   for(int k = 0; k < n_updates; k++){
+ 
+      curr_index = int(randVal.RandomUniformDbl() * n_particles); // choose random   
+      prt = particles[curr_index];                                // particle
 
-         x_trial = prt.x_trial(randVal.RandomUniformDbl());  
-         y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
+      x_trial = prt.x_trial(randVal.RandomUniformDbl());  
+      y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
 
-         prt.setX_TrialPos(x_trial); 	// generate and set the
-         prt.setY_TrialPos(y_trial); 	// x,y trial position
+      prt.setX_TrialPos(x_trial); 	// generate and set the
+      prt.setY_TrialPos(y_trial); 	// x,y trial position
 
-         particles[k] = prt;  
+      particles[curr_index] = prt;  
 
-         accept = 1;
-         delta_energy = 0;  		
+      accept = 1;
+      delta_energy = 0;  		
 
-         if(param.getRigidBC() == 1){        // run sim with hard boundaries
-            accept = bound.rigidBoundary(&particles,k);  
-         }
-         else if(param.getPeriodicBC() == 1){     // run simulation with 
-            bound.periodicBoundary(&particles,k); // periodic boundaries
+      if(param.getRigidBC() == 1){        // run sim with hard boundaries
+         accept = bound.rigidBoundary(&particles,curr_index);  
+      }
+      else if(param.getPeriodicBC() == 1){     // run simulation with 
+         bound.periodicBoundary(&particles,curr_index); // periodic boundaries
 
-            prt = particles[k]; 
+         prt = particles[curr_index]; 
 
-            x_trial = prt.getX_TrialPos();   // updates trial position in function
-            y_trial = prt.getY_TrialPos();   // then particle - particle 
-         }                                   // interactions are checked
-         else if(param.getExtWell() == 1){
-            delta_energy = bound.externalWell(&particles,k); 
-         }
-
-      /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
-          - HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY 
-            IS NOT RETURNED
-          - THE CHANGE IN ENERGY IS RETURNED FROM LENJONES AND WCA
-            POTENTIAL 
-          - THIS TOTAL CHANGE IS SENT INTO THE BOLTZMANN FACTOR 
-            FUNCTION TO CALCULATE THE TOTAL PROBABILITY OF
-            ACCEPTING THE TRIAL MOVE. IF THE TOTAL CHANGE < 0, THE
-            MOVE IS ACCEPTED. ELSE A RANDOM NUMBER IS GENERATED TO 
-            DETERMINE WHETHER THE MOVE IS TO BE ACCEPTED
-      */		  
-				  
-         if(param.getHardDisk() == 1 && accept == 1){
-            accept = interact.hardDisks(&particles,k,n_particles);
-         }
-         else if(param.getLenJones() == 1 && accept == 1){
-            delta_energy = delta_energy +  
-                           interact.lennardJones(&particles,k,n_particles); 
-         }
-         else if(param.getWCA() == 1 && accept == 1){
-            delta_energy = delta_energy +  
-                           interact.WCApotential(&particles,k,n_particles); 
-         }
-
-         if(param.getCrosslinkers() == 1 && accept == 1){  
-            delta_energy = delta_energy +  
-                           interact.crosslinkers(&particles,k,n_particles); 
-            // std::cout << "the change in energy is: " << delta_energy << std::endl; 
-         }         
-
-         if(accept == 1 && delta_energy > 0){
-            total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
-
-            if(randVal.RandomUniformDbl() < total_prob){
-               accept = 1; 
-            }
-            else{
-               accept = 0; 
-            }
-         }
-
-         if(accept == 1){
-            prt.setX_Position(x_trial);  // if trial move is accepted, update the 
-            prt.setY_Position(y_trial);  // position of the current particle
-            particles[k] = prt;          // and put back into array
-
-            pos_file << prt.getX_Position() << " "; // read updated positions into  
-            pos_file << prt.getY_Position() << " "; // file
-         }
-         else{
-            n_rejects++;   // keeps count of total moves rejected
-            k = k - 1;     // reject trial move - will generate new trial 
-         }                 // position for the same particle 	
+         x_trial = prt.getX_TrialPos();   // updates trial position in function
+         y_trial = prt.getY_TrialPos();   // then particle - particle 
+      }                                   // interactions are checked
+      else if(param.getExtWell() == 1){
+         delta_energy = bound.externalWell(&particles,curr_index); 
       }
 
-      pos_file << std::endl;   // starts new line in position file
+  /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
+      - HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY 
+        IS NOT RETURNED
+      - THE CHANGE IN ENERGY IS RETURNED FROM LENJONES AND WCA
+        POTENTIAL 
+      - THIS TOTAL CHANGE IS SENT INTO THE BOLTZMANN FACTOR 
+        FUNCTION TO CALCULATE THE TOTAL PROBABILITY OF
+        ACCEPTING THE TRIAL MOVE. IF THE TOTAL CHANGE < 0, THE
+        MOVE IS ACCEPTED. ELSE A RANDOM NUMBER IS GENERATED TO 
+        DETERMINE WHETHER THE MOVE IS TO BE ACCEPTED
+  */		  
+			  
+      if(param.getHardDisk() == 1 && accept == 1){
+         accept = interact.hardDisks(&particles,curr_index,n_particles);
+      }
+      else if(param.getLenJones() == 1 && accept == 1){
+         delta_energy = delta_energy +  
+                        interact.lennardJones(&particles,curr_index,n_particles); 
+      }
+      else if(param.getWCA() == 1 && accept == 1){
+         delta_energy = delta_energy +  
+                        interact.WCApotential(&particles,curr_index,n_particles); 
+      }
+
+      if(param.getCrosslinkers() == 1 && accept == 1){  
+         delta_energy = delta_energy +  
+                        interact.crosslinkers(&particles,curr_index,n_particles); 
+      }         
+
+      if(accept == 1 && delta_energy > 0){
+         total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
+
+         if(randVal.RandomUniformDbl() < total_prob){
+            accept = 1; 
+         }
+         else{
+            accept = 0; 
+         }
+      }
+
+      if(accept == 1){
+         prt.setX_Position(x_trial);  // if trial move is accepted, update the 
+         prt.setY_Position(y_trial);  // position of the current particle
+         particles[curr_index] = prt;          // and put back into array
+     
+         if(k % (2 * n_particles) == 0){
+            writePositions(&pos_file); 
+         }
+      }
+      else{
+         n_rejects++;   // keeps count of total moves rejected
+         k = k - 1;     // reject trial move - will generate new trial 
+      }                 // position for the same particle 	
    }
 
-   perc_rej = n_rejects / (n_rejects + (n_updates * n_particles)) * 100.0; 
+   perc_rej = n_rejects / (n_rejects + n_updates) * 100.0; 
    std::cout << perc_rej << "% of the moves were rejected." << std::endl; 
 }
 
