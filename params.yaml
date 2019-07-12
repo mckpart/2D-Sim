@@ -1,31 +1,33 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 50
-type1_Particles : 50
+totalParticles  : 63
+type1_Particles : 63
 type2_Particles : 0
 
-seed            : 98638175623423
-weight          : .15
-
-particleRadius_1 : .12
+particleRadius_1 : .1
 particleRadius_2 : .12
 
-numberUpdates  : 10000
+seed            : 98638175623423
+weight          : .2
+
+numberUpdates  : 35000
 
 hardDisks    : false
-lennardJones : false
-WCA          : true
+lennardJones : true
+WCA          : false
 
-crosslinkers   : false 
-restLength     : .24
-springConstant : 20
-truncationDist : .28
+crosslinkers   : false
+restLength     : .22449
+springConstant : 10
+truncationDist : .4
+beta           : .8
 
-wellDepth : 1
+wellDepth : 2         # corresponds unit of energy
+sigma : .2
 
 rigidBoundary    : false 
 periodicBoundary : true 
 externalWell     : false
 
-boxLength   : 1.2
+boxLength   : 1
 

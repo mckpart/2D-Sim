@@ -100,8 +100,6 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
    double x_comp = 0; 
    double y_comp = 0; 
 
-   double sigma = 0; 
-
    double delta_energy = 0; 
    double energy_curr = 0; 
    double energy_temp = 0; 
@@ -148,14 +146,14 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
          dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
          dist_temp = distance(x_temp,x_comp,y_temp,y_comp); 
 
-         sigma = (rad_curr + rad_comp) * pow(2,.5);                      // sigma = deal separation distance
-                                                             // between particles
+         // sigma = (rad_curr + rad_comp) * 1.2;          // sigma = deal separation distance
+         //   sigma = 1;                              // between particles
          if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
 
-            energy_curr = 10 * LJ_wellDepth * 
+            energy_curr = 4 * LJ_wellDepth * 
             (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); // 6-12 potential 
 
-            energy_temp = 10 * LJ_wellDepth * 
+            energy_temp = 4 * LJ_wellDepth * 
             (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 				
          } 
          else{                                             // interaction between unlike particles
@@ -247,11 +245,10 @@ double Interaction::crosslinkers(std::vector<Particle>* particles, int index, in
    current_prt = (*particles)[index];    // assign current particle
  
    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
-   y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
-                                         // the current particle
+   y_temp = current_prt.getY_TrialPos(); // positions of current particle 
+                                         
    x_curr = current_prt.getX_Position(); 
    y_curr = current_prt.getY_Position(); 
-   // rad_curr = current_prt.getRadius(); 
 
    for(int k = 0; k < n_particles; k++){
 
@@ -261,30 +258,21 @@ double Interaction::crosslinkers(std::vector<Particle>* particles, int index, in
 
          x_comp = compare_prt.getX_Position();  // assign x,y comparison 
          y_comp = compare_prt.getY_Position();  // position 
-         // rad_comp = compare_prt.getRadius(); 
 
          dist_curr = distance(x_curr,x_comp,y_curr,y_comp); // current distance 
                                                             // between particles
-         if(dist_curr > truncDist){    // particles do not interact if current
-            energy_curr = 0;           // distance is greater than the truncation
-	 }                             // distance
-         else{
-	    energy_curr = 0.5 * sprConstant * pow(dist_curr - restLength,2);  
-	 }
+	 energy_curr = 1/beta * exp(-.5 * sprConstant * beta * 
+		       pow(dist_curr - restLength,2)); 
 
 	 dist_temp = distance(x_temp,x_comp,y_temp,y_comp); // trial distance  
                                                             // between particles
-         if(dist_temp > truncDist){ // particles do not interact if trial 
-            energy_temp = 0;        // trial distance is greater than the 
-	 }                          // truncation distance
-         else{
-	    energy_temp = 0.5 * sprConstant * pow(dist_temp - restLength,2); 
-	 }
+	 energy_temp = 1/beta * exp(-.5 * sprConstant * beta * 
+		       pow(dist_temp - restLength,2)); 
         
          delta_energy = delta_energy + (energy_temp - energy_curr); // running sum of
       }                                                             // total change in 
    }                                                                // energy 
-   // std::cout << "the change in energy is: " << delta_energy << std::endl; 
+   std::cout << "the change in energy is: " << delta_energy << std::endl; 
    return delta_energy;  // returns total change in energy 
 }
 
@@ -294,9 +282,11 @@ void Interaction::initializeInteraction(std::string yamlFile){
 
    YAML::Node node = YAML::LoadFile(yamlFile);
 
-   LJ_wellDepth = node["wellDepth"].as<double>(); 	
+   LJ_wellDepth = node["wellDepth"].as<double>();
+   sigma        = node["sigma"].as<double>();    
    restLength   = node["restLength"].as<double>();
    sprConstant  = node["springConstant"].as<double>(); 
-   truncDist    = node["truncationDist"].as<double>();  
+   truncDist    = node["truncationDist"].as<double>();
+   beta         = node["beta"].as<double>();   
 }
 

@@ -21,10 +21,10 @@ n_part_tot = yaml_dict["totalParticles"]
 
 # numIter    = yaml_dict["numberUpdates"]
 rigidBC    = yaml_dict["rigidBoundary"]
+periodBC    = yaml_dict["periodicBoundary"]
 c_linkers  = yaml_dict["crosslinkers"]
 
 boxLength  = yaml_dict["boxLength"]
-# periodBC    = yaml_dict["periodicBoundary"]
 
 ######### initialize lists and read in position data ##########
 
@@ -52,7 +52,7 @@ position = np.asarray(position)
 numIter = len(position[:,0]) 
 def init():
 
-   if(c_linkers == 1 and rigidBC != 1):
+   if(c_linkers == 1 and rigidBC != 1 and periodBC != 1):
       ax.set_xlim(-2,2)
       ax.set_ylim(-2,2)
    else:  

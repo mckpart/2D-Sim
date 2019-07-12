@@ -10,10 +10,14 @@
 class Interaction{ 
 	
 private:
-   double LJ_wellDepth = 0; 
-   double restLength = 0; 
-   double sprConstant = 0; 	
-   double truncDist = 0; 
+   double LJ_wellDepth = 0; // for LJ Potential
+   double sigma = 0; 
+
+   double restLength = 0;  // for crosslinking 
+   double sprConstant = 0; // potential  	
+  
+   double truncDist = 0;
+   double beta = 0; 
 public: 
 
    void initializeInteraction(std::string yamlFile); 
