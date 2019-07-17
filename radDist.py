@@ -5,12 +5,21 @@ from matplotlib import pyplot as plt
 import math
 import yaml
 
-def dist(x1,x2,y1,y2):
-   return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+def dist(x1,x2):
+   return abs(x2 - x1)
 
 def calculate_g():	# compute the number of particles =< a distance
 
-    sys_dens = n_part_tot / (math.pi * boxLength**2) # system density
+    sys_dens = n_part_tot / ((2 * boxLength)**2) # system density
+    truncDist = 2.5 * sigma
+    fact = 1
+
+    if(n_part_tot > 400 or n_positions > 400): 
+        fact = 20
+    elif(n_part_tot >= 100): 
+        fact = 3
+    elif(n_part_tot > 60): 
+        fact = 2
 
     for n in range(step):  
       num = 0.0 
@@ -18,24 +27,39 @@ def calculate_g():	# compute the number of particles =< a distance
 
       area = math.pi * ((r_curr + deltaR)**2 - r_curr**2) # current area
        
-      for count in range(n_positions): # averages over position and time
+      for count in range(n_positions/fact): # averages over position and time
          for p in range(n_part_tot):
 
-            x1 = position[count,2 * p]
-            y1 = position[count,(2 * p) + 1]
+            x_curr = position[fact * count,2 * p]
+            y_curr = position[fact * count,(2 * p) + 1]
+
+            d_wall_curr_x = boxLength - abs(x_curr)
+            d_wall_curr_y = boxLength - abs(y_curr)
 
             for k in range(int(n_part_tot)): 
                if(k != p):
 
-                  x2 = position[count,k * 2]
-                  y2 = position[count,(k * 2) + 1]
-            
-                  d = dist(x1,x2,y1,y2)
+                  x_comp = position[fact * count,k * 2]
+                  y_comp = position[fact * count,(k * 2) + 1]
+                  
+                  x_dist = dist(x_curr,x_comp)
+                  y_dist = dist(y_curr,y_comp)
+
+                  d_wall_comp_x = boxLength - abs(x_comp)
+                  d_wall_comp_y = boxLength - abs(y_comp)
+
+                  if(d_wall_curr_x + d_wall_comp_x < truncDist and x_comp * x_curr < 0): 
+                     x_dist = 2 * boxLength - x_dist
+
+                  if(d_wall_curr_y + d_wall_comp_y < truncDist and y_comp * y_curr < 0):    
+                     y_dist = 2 * boxLength - y_dist
+                  
+                  dist_tot = math.sqrt(x_dist**2 + y_dist**2)
       
-                  if(d > r_curr and d <= r_curr + deltaR): # counts the number
+                  if(dist_tot > r_curr and dist_tot <= r_curr + deltaR): # counts the number
                      num = num + 1          # of particles at current distance
           
-      avgNum = num /(.5 * n_positions * (n_part_tot )) # agrees with simple model
+      avgNum = float(fact) * num /(.5 * n_positions * (n_part_tot ))# agrees with simple model
       g[n] = avgNum/(area * sys_dens)   # normalizes the function
 
 ######## read in .yaml parameters #######
@@ -43,7 +67,9 @@ def calculate_g():	# compute the number of particles =< a distance
 with open("params.yaml",'r') as yf:
     yaml_dict = yaml.safe_load(yf)
 
+n_updates = yaml_dict["numberUpdates"]
 n_part_tot  = yaml_dict["totalParticles"]
+beta = yaml_dict["beta"]
 boxLength = yaml_dict["boxLength"]
 restLength = yaml_dict["restLength"]
 sigma = yaml_dict["sigma"]
@@ -52,7 +78,7 @@ LJ = yaml_dict["lennardJones"]
 
 ######### initialize lists and read in position data ######
 
-deltaR = boxLength/100.0
+deltaR = boxLength/float(n_part_tot)
 position = []
 
 file = open( "positions.txt", "r" )
@@ -80,11 +106,14 @@ if(LJ == 1):        # reduced length for lennard jones system
 
 #### generate densities and plot ###########3
 
-calculate_g(); 
+calculate_g();
+
+plt.figure(figsize = (7.5,6.5))
 plt.plot(r,g)
 
 plt.axvline(x = restLength, color = 'r', linestyle = '--')
 plt.axvline(x = radius_1 * 2, color = 'g', linestyle = '--')
+plt.axhline(y = 1, linestyle = '--')
 
 plt.xlim([0,max(r)])
 plt.ylim([0,max(g) * 1.1])
@@ -93,6 +122,11 @@ plt.title("Radial Distribution Function")
 plt.xlabel(r'$\frac{r}{\sigma}$')
 plt.ylabel(r'$g(\frac{r}{\sigma})$')
 plt.legend([r'$g(\frac{r}{\sigma})$', 'rest length', 'diameter'])
+
+txt = "Iterations: " + str(n_updates) + "  Particles: " + str(n_part_tot) + \
+        r'  $\frac{1}{k_BT}: $' + str(beta) + "  Box Length: " + str(2*boxLength) 
+
+plt.figtext(.5,.013,txt,wrap = True, ha = 'center')
 
 plt.show()
  

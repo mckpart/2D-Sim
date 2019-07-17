@@ -2,8 +2,8 @@
 #include "Simulation.h"
 
 
-double boltzmannFactor(double energy){
-   return exp(-1 * energy); 
+double boltzmannFactor(double energy,double beta){
+   return exp(-1 * beta * energy); 
 }
 
 void Simulation::writePositions(std::ofstream* pos_file){
@@ -83,6 +83,7 @@ void Simulation::runSimulation(){
    int n_updates = 0;
    int curr_index = 0; 
 
+   double beta = 0; 
    double n_rejects = 0;  
    double perc_rej = 0; 
 
@@ -101,8 +102,10 @@ void Simulation::runSimulation(){
    randVal.InitCold(param.getSeed()); 	// warms the RNG
 
    n_updates = param.getUpdates(); 
+   beta = param.getBeta(); 
 
    bound.initialPosition(&particles,n_particles,randVal); 
+   std::cout << "SUCCESSFULLY INITIALIZED" << std::endl; 
 
    for(int k = 0; k < n_updates; k++){
  
@@ -165,7 +168,7 @@ void Simulation::runSimulation(){
       }         
 
       if(accept == 1 && delta_energy > 0){
-         total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
+         total_prob = boltzmannFactor(delta_energy,beta); // compute acceptance probability
 
          if(randVal.RandomUniformDbl() < total_prob){
             accept = 1; 

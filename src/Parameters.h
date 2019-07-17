@@ -12,7 +12,8 @@ private:
    long seed = 0; 
 
    double weight = 0; 
-   
+   double beta = 0; 
+
    bool rigidBC = 0; 
    bool periodicBC = 0; 
    bool extWell = 0; 
@@ -30,8 +31,8 @@ public:
    int getNumParticles(); 
    long getSeed(); 
 
-		
    double getWeight(); 
+   double getBeta(); 
 
    bool getRigidBC(); 		
    bool getPeriodicBC(); 		

@@ -6,6 +6,9 @@
 double distance(double x1,double x2,double y1, double y2){
    return sqrt(pow(x2 - x1,2) + pow(y2 - y1,2)); 	
 }
+double dist1D(double x1,double x2){
+   return fabs(x2 - x1); 
+}
 
 double Interaction::WCApotential(std::vector<Particle>* particles, int index, int n_particles){
 
@@ -108,18 +111,38 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
    double rad_comp = 0; 
    double num = 0; 
 
-   double dist_curr = 0; 
-   double dist_temp = 0; 	
+   double dist_curr_x = 0;
+   double dist_curr_y = 0;  
+   double dist_temp_x = 0; 	
+   double dist_temp_y = 0; 
+
+   double dist_curr_tot = 0; 
+   double dist_temp_tot = 0; 
+
+   double d_curr_wall_x = 0; 
+   double d_curr_wall_y = 0; 
+   double d_temp_wall_x = 0; 
+   double d_temp_wall_y = 0; 
+   double d_comp_wall_x = 0; 
+   double d_comp_wall_y = 0; 
+
+   double dist_trunc = 0; 
 
    current_prt = (*particles)[index];    // assign current particle
  
    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
    y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
                                          // the current particle
+   d_temp_wall_x = boxLength - fabs(x_temp); // x,y distance from 
+   d_temp_wall_y = boxLength - fabs(y_temp); // nearest walls
+
    x_curr = current_prt.getX_Position(); 
    y_curr = current_prt.getY_Position(); 
    rad_curr = current_prt.getRadius(); 
 
+   d_curr_wall_x = boxLength - fabs(x_curr); // x,y distance from
+   d_curr_wall_y = boxLength - fabs(y_curr); // nearets walls
+   
    for(int k = 0; k < n_particles; k++){
 
       compare_prt = (*particles)[k];   // assign the comparison particle
@@ -142,28 +165,69 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
          x_comp = compare_prt.getX_Position(); 
          y_comp = compare_prt.getY_Position(); 
          rad_comp = compare_prt.getRadius(); 
+         
+	 d_comp_wall_x = boxLength - fabs(x_comp);
+         d_comp_wall_y = boxLength - fabs(y_comp);
+         
+	 dist_curr_x = dist1D(x_curr,x_comp);
+	 dist_curr_y = dist1D(y_curr,y_comp); 
+         dist_temp_x = dist1D(x_temp,x_comp); 
+	 dist_temp_y = dist1D(y_temp,y_comp); 
 
-         dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
-         dist_temp = distance(x_temp,x_comp,y_temp,y_comp); 
 
-         // sigma = (rad_curr + rad_comp) * 1.2;          // sigma = deal separation distance
-         //   sigma = 1;                              // between particles
          if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
+	    
+            /* IF THE SUMMATION OF THE X DISTANCES FROM THE WALL IS WITHIN THE 
+	     *    DISTANCE OF INTERACTION AND THE PARTICLES ARE NOT ON THE SAME SIDE
+	     *    OF THE BOX, UPDATE THE X DISTANCE BETWEEN THE PARTICLES
+	     * IF THE SUMMATION OF THE Y DISTANCES FROM THE WALL IS WITHIN THE
+	     *    DISTANCE OF INTERACTION AND THE PARTICLES ARE NOT ON THE SAME SIDE
+	     *    OF THE BOX, UPDATE THE Y DISTAANCE BETWEEN THE PARTICLES
+	     * COMPUTE THE RADIAL DISTANCE BETWEEN THE CURRENT PARTICLE AND 
+	     *    COMPARISON PARTICLE ONCE X,Y DISTANCES ARE UPDATED ACCORDINGLY
+	     */
+		 
+	    if(d_curr_wall_x + d_comp_wall_x < truncDist && x_curr * x_comp < 0){    // truncation dist = sigma * 2.5
+               dist_curr_x = 2 * boxLength - dist_curr_x;   
+	    }
+	    if(d_curr_wall_y + d_comp_wall_y < truncDist && y_curr * y_comp < 0){
+	       dist_curr_y = 2 * boxLength - dist_curr_y; 
+	    }
 
-            energy_curr = 4 * LJ_wellDepth * 
-            (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); // 6-12 potential 
+            if(d_temp_wall_x + d_comp_wall_x < truncDist && x_temp * x_comp < 0){
+	       dist_temp_x = 2 * boxLength - dist_temp_x; 
+	    }
+	    if(d_temp_wall_y + d_comp_wall_y < truncDist && y_temp * y_comp < 0){
+	       dist_temp_y = 2 * boxLength - dist_temp_y; 
+	    }
 
-            energy_temp = 4 * LJ_wellDepth * 
-            (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 				
-         } 
-         else{                                             // interaction between unlike particles
+	    dist_curr_tot = sqrt(pow(dist_curr_x,2) + pow(dist_curr_y,2)); 
+            dist_temp_tot = sqrt(pow(dist_temp_x,2) + pow(dist_temp_y,2));  
 
-            energy_curr = 4 * LJ_wellDepth * 
-            (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); // 6-12 potential 
+	    if(dist_curr_tot < truncDist){
+               energy_curr = 4 * LJ_wellDepth *        // 6-12 potential 
+               (pow(sigma/dist_curr_tot,12) - pow(sigma/dist_curr_tot,6)); 
+	    }
+	    else{
+	       energy_curr = 0;
+	    }
 
-            energy_temp = 4 * LJ_wellDepth * 
-            (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 
-         }	
+	    if(dist_temp_tot < truncDist){
+               energy_temp = 4 * LJ_wellDepth *        // 6-12 potential 
+               (pow(sigma/dist_temp_tot,12) - pow(sigma/dist_temp_tot,6)); 				
+	    }
+	    else{
+	       energy_temp = 0; 
+	    }   
+	 } 
+//         else{                                             // interaction between unlike particles
+
+//           energy_curr = 4 * LJ_wellDepth * 
+//           (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); // 6-12 potential 
+
+//            energy_temp = 4 * LJ_wellDepth * 
+//            (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 
+//         }	
 
          delta_energy = delta_energy + (energy_temp - energy_curr);  // running sum of total change
       }                                                              // of current particle's energy 
@@ -261,18 +325,28 @@ double Interaction::crosslinkers(std::vector<Particle>* particles, int index, in
 
          dist_curr = distance(x_curr,x_comp,y_curr,y_comp); // current distance 
                                                             // between particles
-	 energy_curr = 1/beta * exp(-.5 * sprConstant * beta * 
-		       pow(dist_curr - restLength,2)); 
+	 if(dist_curr < truncDist){                                             
+   	    energy_curr = 1/beta * exp(-.5 * sprConstant * beta * 
+		        pow(dist_curr - restLength,2)); 
+         }
+	 else{
+	    energy_curr = 0; 
+	 }
 
 	 dist_temp = distance(x_temp,x_comp,y_temp,y_comp); // trial distance  
-                                                            // between particles
-	 energy_temp = 1/beta * exp(-.5 * sprConstant * beta * 
-		       pow(dist_temp - restLength,2)); 
-        
-         delta_energy = delta_energy + (energy_temp - energy_curr); // running sum of
+                                                            // between particles 
+	if(dist_temp < truncDist){
+	   energy_temp = 1/beta * exp(-.5 * sprConstant * beta * 
+		         pow(dist_temp - restLength,2));  
+	} 
+        else{
+	   energy_temp = 0; 
+	}	
+
+	delta_energy = delta_energy + (energy_temp - energy_curr); // running sum of
       }                                                             // total change in 
    }                                                                // energy 
-   std::cout << "the change in energy is: " << delta_energy << std::endl; 
+   // std::cout << "the change in energy is: " << delta_energy << std::endl; 
    return delta_energy;  // returns total change in energy 
 }
 
@@ -286,7 +360,10 @@ void Interaction::initializeInteraction(std::string yamlFile){
    sigma        = node["sigma"].as<double>();    
    restLength   = node["restLength"].as<double>();
    sprConstant  = node["springConstant"].as<double>(); 
-   truncDist    = node["truncationDist"].as<double>();
+//   truncDist    = node["truncationDist"].as<double>();
    beta         = node["beta"].as<double>();   
+   boxLength    = node["boxLength"].as<double>(); 
+
+   truncDist = 2.5 * sigma; 
 }
 

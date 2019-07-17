@@ -9,7 +9,9 @@ void Parameters::initializeParameters(std::string yamlFile){
    seed        = node["seed"].as<long>(); 
    n_particles = node["totalParticles"].as<int>();
    n_updates   = node["numberUpdates"].as<int>(); 
-  
+ 
+   beta        = node["beta"].as<double>();
+
    rigidBC     = node["rigidBoundary"].as<bool>(); 
    periodicBC  = node["periodicBoundary"].as<bool>(); 
    extWell     = node["externalWell"].as<bool>(); 
@@ -36,6 +38,9 @@ long Parameters::getSeed(){
 double Parameters::getWeight(){
    return weight; 
 }
+double Parameters::getBeta(){
+   return beta; 
+}
 
 bool Parameters::getRigidBC(){
    return rigidBC; 
@@ -59,3 +64,4 @@ bool Parameters::getWCA(){
 bool Parameters::getCrosslinkers(){
    return c_linkers; 
 }
+

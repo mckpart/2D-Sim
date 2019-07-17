@@ -14,10 +14,12 @@ private:
    double sigma = 0; 
 
    double restLength = 0;  // for crosslinking 
-   double sprConstant = 0; // potential  	
   
+   double sprConstant = 0; // potential  	
    double truncDist = 0;
-   double beta = 0; 
+   double beta = 0;
+
+   double boxLength = 0;  
 public: 
 
    void initializeInteraction(std::string yamlFile); 
