@@ -15,7 +15,7 @@ def calculate_g():	# compute the number of particles =< a distance
     fact = 1
 
     if(n_part_tot > 400 or n_positions > 400): 
-        fact = 20
+        fact = 10
     elif(n_part_tot >= 100): 
         fact = 3
     elif(n_part_tot > 60): 
@@ -59,7 +59,7 @@ def calculate_g():	# compute the number of particles =< a distance
                   if(dist_tot > r_curr and dist_tot <= r_curr + deltaR): # counts the number
                      num = num + 1          # of particles at current distance
           
-      avgNum = float(fact) * num /(.5 * n_positions * (n_part_tot ))# agrees with simple model
+      avgNum = float(fact) * num /(.5 * n_positions * (n_part_tot - 1 ))# agrees with simple model
       g[n] = avgNum/(area * sys_dens)   # normalizes the function
 
 ######## read in .yaml parameters #######
@@ -124,8 +124,8 @@ plt.ylabel(r'$g(\frac{r}{\sigma})$')
 plt.legend([r'$g(\frac{r}{\sigma})$', 'rest length', 'diameter'])
 
 txt = "Iterations: " + str(n_updates) + "  Particles: " + str(n_part_tot) + \
-        r'  $\frac{1}{k_BT}: $' + str(beta) + "  Box Length: " + str(2*boxLength) 
-
+        r'  $\frac{1}{k_BT}: $' + str(beta) + "  Box Length: " + str(2*boxLength) \
+        + r'  $\sigma: $' + str(sigma)
 plt.figtext(.5,.013,txt,wrap = True, ha = 'center')
 
 plt.show()

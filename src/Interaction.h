@@ -19,15 +19,16 @@ private:
    double truncDist = 0;
    double beta = 0;
 
-   double boxLength = 0;  
+   double boxLength = 0; 
+   int n_particles = 0;  
 public: 
 
    void initializeInteraction(std::string yamlFile); 
 
-   double lennardJones(std::vector<Particle>* particles, int index, int n_particles); 
-   double WCApotential(std::vector<Particle>* particles, int index, int n_particles);
-   double crosslinkers(std::vector<Particle>* particles, int index, int n_particles); 
-   bool hardDisks     (std::vector<Particle>* particles, int index, int n_particles);
+   double lennardJones(std::vector<Particle>* particles, int index); 
+   double WCApotential(std::vector<Particle>* particles, int index);
+   double crosslinkers(std::vector<Particle>* particles, int index); 
+   bool hardDisks     (std::vector<Particle>* particles, int index);
 
 
 };

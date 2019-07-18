@@ -10,7 +10,7 @@ double dist1D(double x1,double x2){
    return fabs(x2 - x1); 
 }
 
-double Interaction::WCApotential(std::vector<Particle>* particles, int index, int n_particles){
+double Interaction::WCApotential(std::vector<Particle>* particles, int index){
 
    Particle current_prt; 
    Particle compare_prt; 						
@@ -91,7 +91,7 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index, in
    return delta_energy;  // returns the total change in energy associated with this move
 }
 
-double Interaction::lennardJones(std::vector<Particle>* particles, int index, int n_particles){
+double Interaction::lennardJones(std::vector<Particle>* particles, int index){
 
    Particle current_prt; 
    Particle compare_prt; 						
@@ -235,7 +235,7 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index, in
    return delta_energy;      // returns the total change in energy 
 }
 
-bool Interaction::hardDisks(std::vector<Particle>* particles, int index, int n_particles){ 
+bool Interaction::hardDisks(std::vector<Particle>* particles, int index){ 
 	
    Particle current_prt; 
    Particle compare_prt; 						
@@ -281,7 +281,7 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index, int n_p
    return accept;     // returns 1 if trial move is accepted 
 }
 
-double Interaction::crosslinkers(std::vector<Particle>* particles, int index, int n_particles){
+double Interaction::crosslinkers(std::vector<Particle>* particles, int index){
    
    Particle current_prt; 
    Particle compare_prt;                  
@@ -363,7 +363,13 @@ void Interaction::initializeInteraction(std::string yamlFile){
 //   truncDist    = node["truncationDist"].as<double>();
    beta         = node["beta"].as<double>();   
    boxLength    = node["boxLength"].as<double>(); 
+   n_particles  = node["totalParticles"].as<int>(); 
 
    truncDist = 2.5 * sigma; 
+   std::cout << "The reduced temperature, T*, of the system is "; 
+   std::cout << 1/(beta * LJ_wellDepth) << std::endl;
+   std::cout << "The reduced density of the system is "; 
+   std::cout << n_particles / pow(2*boxLength,2) * pow(sigma,2);
+   std::cout << std::endl; 
 }
 

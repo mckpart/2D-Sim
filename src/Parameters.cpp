@@ -12,6 +12,8 @@ void Parameters::initializeParameters(std::string yamlFile){
  
    beta        = node["beta"].as<double>();
 
+   init_type   = node["initializationType"].as<int>(); 
+
    rigidBC     = node["rigidBoundary"].as<bool>(); 
    periodicBC  = node["periodicBoundary"].as<bool>(); 
    extWell     = node["externalWell"].as<bool>(); 
@@ -40,6 +42,10 @@ double Parameters::getWeight(){
 }
 double Parameters::getBeta(){
    return beta; 
+}
+
+int Parameters::getInit_Type(){
+   return init_type; 
 }
 
 bool Parameters::getRigidBC(){

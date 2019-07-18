@@ -25,6 +25,7 @@ periodBC    = yaml_dict["periodicBoundary"]
 c_linkers  = yaml_dict["crosslinkers"]
 
 boxLength  = yaml_dict["boxLength"]
+pos_file   = yaml_dict["animationFile"]
 
 ######### initialize lists and read in position data ##########
 
@@ -40,7 +41,7 @@ for i in range(n_part_1):
 for i in range(n_part_2):
     patches += [plt.Circle((0,0), radius_2, color = colors[i + n_part_1])]    
 
-file = open( "positions.txt", "r" )
+file = open(pos_file, "r" )
 for line in file:
     row = line.split()
     row = [float(i) for i in row]
@@ -50,6 +51,10 @@ position = np.asarray(position)
 # print position
 
 numIter = len(position[:,0]) 
+
+#Writer = FuncAnimation.writers['ffmpeg']
+#writer = FuncAnimation.FFMpegWriter(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+
 def init():
 
    if(c_linkers == 1 and rigidBC != 1 and periodBC != 1):
@@ -84,3 +89,5 @@ t = np.linspace(0,numIter - 1,numIter)
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 plt.show()
+
+

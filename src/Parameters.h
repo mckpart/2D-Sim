@@ -14,6 +14,8 @@ private:
    double weight = 0; 
    double beta = 0; 
 
+   int init_type = 0; 
+
    bool rigidBC = 0; 
    bool periodicBC = 0; 
    bool extWell = 0; 
@@ -33,6 +35,8 @@ public:
 
    double getWeight(); 
    double getBeta(); 
+
+   int getInit_Type(); 
 
    bool getRigidBC(); 		
    bool getPeriodicBC(); 		

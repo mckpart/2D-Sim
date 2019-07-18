@@ -104,8 +104,21 @@ void Simulation::runSimulation(){
    n_updates = param.getUpdates(); 
    beta = param.getBeta(); 
 
-   bound.initialPosition(&particles,n_particles,randVal); 
-   std::cout << "SUCCESSFULLY INITIALIZED" << std::endl; 
+   int n_initial = n_particles; 
+   if(param.getInit_Type() == 0){		   
+      bound.initialPosition(&particles,n_particles,randVal); 
+   }
+   else if(param.getInit_Type() == 1){
+      n_initial = bound.initialHexagonal(&particles,n_particles);
+   }
+
+   if(n_initial < n_particles){
+      std::cout << "ERROR: TOO MANY PARTICLES. INITIALIZED "
+                << n_initial << " PARTICLES" << std::endl;
+   }
+   else{
+      std::cout << "SUCCESSFULLY INITIALIZED" << std::endl; 
+   }
 
    for(int k = 0; k < n_updates; k++){
  
@@ -151,20 +164,20 @@ void Simulation::runSimulation(){
   */		  
 			  
       if(param.getHardDisk() == 1 && accept == 1){
-         accept = interact.hardDisks(&particles,curr_index,n_particles);
+         accept = interact.hardDisks(&particles,curr_index);
       }
       else if(param.getLenJones() == 1 && accept == 1){
          delta_energy = delta_energy +  
-                        interact.lennardJones(&particles,curr_index,n_particles); 
+                        interact.lennardJones(&particles,curr_index); 
       }
       else if(param.getWCA() == 1 && accept == 1){
          delta_energy = delta_energy +  
-                        interact.WCApotential(&particles,curr_index,n_particles); 
+                        interact.WCApotential(&particles,curr_index); 
       }
 
       if(param.getCrosslinkers() == 1 && accept == 1){  
          delta_energy = delta_energy +  
-                        interact.crosslinkers(&particles,curr_index,n_particles); 
+                        interact.crosslinkers(&particles,curr_index); 
       }         
 
       if(accept == 1 && delta_energy > 0){
