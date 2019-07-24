@@ -188,18 +188,18 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index){
 	     */
 		 
 	    if(d_curr_wall_x + d_comp_wall_x < truncDist && x_curr * x_comp < 0){    // truncation dist = sigma * 2.5
-               dist_curr_x = 2 * boxLength - dist_curr_x;   
+	       dist_curr_x = d_curr_wall_x + d_comp_wall_x; 
 	    }
 	    if(d_curr_wall_y + d_comp_wall_y < truncDist && y_curr * y_comp < 0){
-	       dist_curr_y = 2 * boxLength - dist_curr_y; 
+	       dist_curr_y = d_curr_wall_y + d_comp_wall_y; 
 	    }
 
             if(d_temp_wall_x + d_comp_wall_x < truncDist && x_temp * x_comp < 0){
-	       dist_temp_x = 2 * boxLength - dist_temp_x; 
+	       dist_temp_x = d_temp_wall_x + d_comp_wall_x; 
 	    }
 	    if(d_temp_wall_y + d_comp_wall_y < truncDist && y_temp * y_comp < 0){
-	       dist_temp_y = 2 * boxLength - dist_temp_y; 
-	    }
+	       dist_temp_y = d_temp_wall_y + d_comp_wall_y; 
+	    }   
 
 	    dist_curr_tot = sqrt(pow(dist_curr_x,2) + pow(dist_curr_y,2)); 
             dist_temp_tot = sqrt(pow(dist_temp_x,2) + pow(dist_temp_y,2));  

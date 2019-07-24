@@ -30,7 +30,8 @@ Simulation::Simulation(std::string yf){
 
    param.initializeParameters(yamlFile);    // initialize the parameters
    interact.initializeInteraction(yamlFile);// for the simulation
-   bound.initializeBoundary(yamlFile); 
+   bound.initializeBoundary(yamlFile);
+   prop.initializeProperties(yamlFile);  
 
    n_particles = param.getNumParticles();   // initialize vector of
    particles.resize(n_particles);           // particles and set particle
@@ -104,12 +105,17 @@ void Simulation::runSimulation(){
    n_updates = param.getUpdates(); 
    beta = param.getBeta(); 
 
-   int n_initial = n_particles; 
+   int n_initial = 0;
+   n_initial = n_particles;    
+   
    if(param.getInit_Type() == 0){		   
       bound.initialPosition(&particles,n_particles,randVal); 
    }
    else if(param.getInit_Type() == 1){
       n_initial = bound.initialHexagonal(&particles,n_particles);
+   }
+   else if(param.getInit_Type() == 2){
+      n_initial = bound.initialSquare(&particles,n_particles); 
    }
 
    if(n_initial < n_particles){
@@ -117,97 +123,106 @@ void Simulation::runSimulation(){
                 << n_initial << " PARTICLES" << std::endl;
    }
    else{
-      std::cout << "SUCCESSFULLY INITIALIZED" << std::endl; 
+      std::cout << "SUCCESSFULLY INITIALIZED " 
+	        << n_initial << " PARTICLES"<< std::endl; 
    }
-
-   for(int k = 0; k < n_updates; k++){
+   for(int sweepNum = 0; sweepNum < n_updates; sweepNum++){
+      for(int k = 0; k < n_particles; k++){
  
-      curr_index = int(randVal.RandomUniformDbl() * n_particles); // choose random   
-      prt = particles[curr_index];                                // particle
+         curr_index = int(randVal.RandomUniformDbl() * n_particles); // choose random   
+         prt = particles[curr_index];                                // particle
 
-      x_trial = prt.x_trial(randVal.RandomUniformDbl());  
-      y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
+         x_trial = prt.x_trial(randVal.RandomUniformDbl());  
+         y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
 
-      prt.setX_TrialPos(x_trial); 	// generate and set the
-      prt.setY_TrialPos(y_trial); 	// x,y trial position
+         prt.setX_TrialPos(x_trial); 	// generate and set the
+         prt.setY_TrialPos(y_trial); 	// x,y trial position
 
-      particles[curr_index] = prt;  
+         particles[curr_index] = prt;  
 
-      accept = 1;
-      delta_energy = 0;  		
+         accept = 1;
+         delta_energy = 0;  		
 
-      if(param.getRigidBC() == 1){        // run sim with hard boundaries
-         accept = bound.rigidBoundary(&particles,curr_index);  
-      }
-      else if(param.getPeriodicBC() == 1){     // run simulation with 
-         bound.periodicBoundary(&particles,curr_index); // periodic boundaries
+         if(param.getRigidBC() == 1){        // run sim with hard boundaries
+            accept = bound.rigidBoundary(&particles,curr_index);  
+         }
+         else if(param.getPeriodicBC() == 1){     // run simulation with 
+            bound.periodicBoundary(&particles,curr_index); // periodic boundaries
 
-         prt = particles[curr_index]; 
+            prt = particles[curr_index]; 
 
-         x_trial = prt.getX_TrialPos();   // updates trial position in function
-         y_trial = prt.getY_TrialPos();   // then particle - particle 
-      }                                   // interactions are checked
-      else if(param.getExtWell() == 1){
-         delta_energy = bound.externalWell(&particles,curr_index); 
-      }
+            x_trial = prt.getX_TrialPos();   // updates trial position in function
+            y_trial = prt.getY_TrialPos();   // then particle - particle 
+         }                                   // interactions are checked
+         else if(param.getExtWell() == 1){
+            delta_energy = bound.externalWell(&particles,curr_index); 
+         }
 
-  /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
-      - HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY 
-        IS NOT RETURNED
-      - THE CHANGE IN ENERGY IS RETURNED FROM LENJONES AND WCA
-        POTENTIAL 
-      - THIS TOTAL CHANGE IS SENT INTO THE BOLTZMANN FACTOR 
-        FUNCTION TO CALCULATE THE TOTAL PROBABILITY OF
-        ACCEPTING THE TRIAL MOVE. IF THE TOTAL CHANGE < 0, THE
-        MOVE IS ACCEPTED. ELSE A RANDOM NUMBER IS GENERATED TO 
-        DETERMINE WHETHER THE MOVE IS TO BE ACCEPTED
-  */		  
+     /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
+         - HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY 
+           IS NOT RETURNED
+         - THE CHANGE IN ENERGY IS RETURNED FROM LENJONES AND WCA
+           POTENTIAL 
+         - THIS TOTAL CHANGE IS SENT INTO THE BOLTZMANN FACTOR 
+           FUNCTION TO CALCULATE THE TOTAL PROBABILITY OF
+           ACCEPTING THE TRIAL MOVE. IF THE TOTAL CHANGE < 0, THE
+           MOVE IS ACCEPTED. ELSE A RANDOM NUMBER IS GENERATED TO 
+           DETERMINE WHETHER THE MOVE IS TO BE ACCEPTED
+     */		  
 			  
-      if(param.getHardDisk() == 1 && accept == 1){
-         accept = interact.hardDisks(&particles,curr_index);
-      }
-      else if(param.getLenJones() == 1 && accept == 1){
-         delta_energy = delta_energy +  
-                        interact.lennardJones(&particles,curr_index); 
-      }
-      else if(param.getWCA() == 1 && accept == 1){
-         delta_energy = delta_energy +  
-                        interact.WCApotential(&particles,curr_index); 
-      }
+         if(param.getHardDisk() == 1 && accept == 1){
+            accept = interact.hardDisks(&particles,curr_index);
+         }
+         else if(param.getLenJones() == 1 && accept == 1){
+            delta_energy = delta_energy +  
+                           interact.lennardJones(&particles,curr_index); 
+         }  
+         else if(param.getWCA() == 1 && accept == 1){
+            delta_energy = delta_energy +  
+                           interact.WCApotential(&particles,curr_index); 
+         }
 
-      if(param.getCrosslinkers() == 1 && accept == 1){  
-         delta_energy = delta_energy +  
-                        interact.crosslinkers(&particles,curr_index); 
-      }         
+         if(param.getCrosslinkers() == 1 && accept == 1){  
+            delta_energy = delta_energy +  
+                           interact.crosslinkers(&particles,curr_index); 
+         }         
 
-      if(accept == 1 && delta_energy > 0){
-         total_prob = boltzmannFactor(delta_energy,beta); // compute acceptance probability
+         if(accept == 1 && delta_energy > 0){
+            total_prob = boltzmannFactor(delta_energy,beta); // compute acceptance probability
 
-         if(randVal.RandomUniformDbl() < total_prob){
-            accept = 1; 
+            if(randVal.RandomUniformDbl() < total_prob){
+               accept = 1; 
+            }
+            else{
+               accept = 0; 
+            }
+         }
+
+         if(accept == 1){
+            prt.setX_Position(x_trial);  // if trial move is accepted, update the 
+            prt.setY_Position(y_trial);  // position of the current particle
+            particles[curr_index] = prt;          // and put back into array
+     
+//            if(k % (n_particles) == 0 && k > 4 * pow(10,4)){
+//               writePositions(&pos_file); 
+//               prop.calcForces(&particles); 		    
+//            }
          }
          else{
-            accept = 0; 
-         }
-      }
-
-      if(accept == 1){
-         prt.setX_Position(x_trial);  // if trial move is accepted, update the 
-         prt.setY_Position(y_trial);  // position of the current particle
-         particles[curr_index] = prt;          // and put back into array
+            n_rejects++;   // keeps count of total moves rejected
+           // k = k - 1;     // reject trial move - will generate new trial 
+         }                 // position for the same particle 	
+      } 
      
-         if(k % (2 * n_particles) == 0){
-            writePositions(&pos_file); 
-         }
+      if(sweepNum > 0 && sweepNum % 10 == 0){
+         writePositions(&pos_file); 
+         prop.calcForces(&particles); 
       }
-      else{
-         n_rejects++;   // keeps count of total moves rejected
-         k = k - 1;     // reject trial move - will generate new trial 
-      }                 // position for the same particle 	
    }
-
-   perc_rej = n_rejects / (n_rejects + n_updates) * 100.0; 
-   std::cout << perc_rej << "% of the moves were rejected." << std::endl; 
+   prop.writeProperties();   
+   std::cout << "The pressure of the system is " << prop.calcPressure() << std::endl;     
+   perc_rej = n_rejects / (n_updates * n_particles) * 100.0; 
+   std::cout << perc_rej << "% of the moves were rejected." << std::endl;
 }
 
 // THIS IS THE NEXT PIECE TO BE ALTERED ////

@@ -12,10 +12,13 @@ def calculate_g():	# compute the number of particles =< a distance
 
     sys_dens = n_part_tot / ((2 * boxLength)**2) # system density
     truncDist = 2.5 * sigma
-    fact = 1
+    fact1 = 1
+    fact2 = 1
+    if(n_positions > 2000): 
+        fact1 = 100
 
     if(n_part_tot > 400 or n_positions > 400): 
-        fact = 10
+        fact2 = 2
     elif(n_part_tot >= 100): 
         fact = 3
     elif(n_part_tot > 60): 
@@ -27,20 +30,20 @@ def calculate_g():	# compute the number of particles =< a distance
 
       area = math.pi * ((r_curr + deltaR)**2 - r_curr**2) # current area
        
-      for count in range(n_positions/fact): # averages over position and time
-         for p in range(n_part_tot):
+      for count in range(n_positions/fact1): # averages over position and time
+         for p in range(n_part_tot/fact2):
 
-            x_curr = position[fact * count,2 * p]
-            y_curr = position[fact * count,(2 * p) + 1]
+            x_curr = position[fact1 * count,2 * p * fact2]
+            y_curr = position[fact1 * count,(2 * p * fact2) + 1]
 
             d_wall_curr_x = boxLength - abs(x_curr)
             d_wall_curr_y = boxLength - abs(y_curr)
 
-            for k in range(int(n_part_tot)): 
+            for k in range(int(n_part_tot/fact2)): 
                if(k != p):
 
-                  x_comp = position[fact * count,k * 2]
-                  y_comp = position[fact * count,(k * 2) + 1]
+                  x_comp = position[fact1 * count,k * 2 * fact2]
+                  y_comp = position[fact1 * count,(k * 2 * fact2) + 1]
                   
                   x_dist = dist(x_curr,x_comp)
                   y_dist = dist(y_curr,y_comp)
@@ -59,7 +62,7 @@ def calculate_g():	# compute the number of particles =< a distance
                   if(dist_tot > r_curr and dist_tot <= r_curr + deltaR): # counts the number
                      num = num + 1          # of particles at current distance
           
-      avgNum = float(fact) * num /(.5 * n_positions * (n_part_tot - 1 ))# agrees with simple model
+      avgNum = float(fact1) * float(fact2)**2 * num /(0.5 * n_positions * (n_part_tot - 1 ))# agrees with simple model
       g[n] = avgNum/(area * sys_dens)   # normalizes the function
 
 ######## read in .yaml parameters #######
@@ -78,7 +81,7 @@ LJ = yaml_dict["lennardJones"]
 
 ######### initialize lists and read in position data ######
 
-deltaR = boxLength/float(n_part_tot)
+deltaR = boxLength/float(n_part_tot/2.0)
 position = []
 
 file = open( "positions.txt", "r" )
@@ -103,6 +106,7 @@ if(LJ == 1):        # reduced length for lennard jones system
    r = [i/(sigma) for i in r]
    radius_1 = radius_1/sigma
    restLength = 2.0**(1.0/6.0)
+   red_dens = n_part_tot * sigma**2 / (2*boxLength)**2
 
 #### generate densities and plot ###########3
 
@@ -125,8 +129,7 @@ plt.legend([r'$g(\frac{r}{\sigma})$', 'rest length', 'diameter'])
 
 txt = "Iterations: " + str(n_updates) + "  Particles: " + str(n_part_tot) + \
         r'  $\frac{1}{k_BT}: $' + str(beta) + "  Box Length: " + str(2*boxLength) \
-        + r'  $\sigma: $' + str(sigma)
+        + r'  $\sigma: $' + str(sigma) + r'  $\rho^*: $' + str(red_dens)
 plt.figtext(.5,.013,txt,wrap = True, ha = 'center')
 
 plt.show()
- 

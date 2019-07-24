@@ -288,13 +288,14 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
    int k = 0; 
    int flag = 0;
    
+   double h = 0; 
+
    double x_dist = 0; 
    double y_dist = 0; 
    double x_init_dist = 0; 
    double y_init_dist = 0; 
 
    double radius = 0; // use sigma if LJ is turned on 
-   double pi = 0; 
    
    int row1_num = 0;  
    int row2_num = 0; 
@@ -302,27 +303,27 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
 
    int return_num = 0; 
 
-   pi = 3.141592654; // define pi
    return_num = n_particles;   
 
-   if(LJ == 2){
+   h = 0.8660254038; // sin(pi/3)
+
+   if(LJ == 1){
       x_dist = sigma; 
    }
    else{
       prt = (*particles)[0]; 
       radius = prt.getRadius(); // if LJ != 1, use particle diameter
-      
       x_dist = 2 * radius; 
    } 
    
    row1_num = (2 * boxLength)/(x_dist); // may be worth adding x_dist as 
    row2_num = (2 * boxLength - 0.5 * x_dist)/(x_dist); // parameter
  
-   y_dist = x_dist * sin(pi/3);            // distance between rows
+   y_dist = x_dist * h;            // distance between rows
    y_init_dist = boxLength - 0.5 * x_dist; // initial y of the first row
    
    while(k < n_particles){
- 
+      
       /* ALTERNATE THE TWO TYPES OF ROWS
        * FOR EACH ROW, HAVE AN INITAL STARTING X POSITION
        *    THE INITIAL Y POSITION WILL BE INDEPENDENT OF 
@@ -351,18 +352,86 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
          prt.setY_Position(y_init_dist);              // set y pos
 
 	 (*particles)[k] = prt;  
-         k++; 	 
-      }
+         k++; 	
 
+	 if(k == n_particles){
+	    break;
+	 } 
+      }
+      
       flag = (flag == 0); // switch the row type
       y_init_dist = y_init_dist - y_dist; 
 
-      if(y_init_dist < -1 * boxLength + 0.5 * x_dist and k < n_particles){
+      if(y_init_dist < -1 * boxLength + 0.5 * x_dist && k < n_particles){
 	 return_num = k; 
 	 break;
       } 
    }
    return return_num; // returns the number of particles successfully initialized 
+}
+
+int Boundary::initialSquare(std::vector<Particle>* particles, int n_particles){
+   Particle prt; 
+   
+   int k = 0; 
+   int flag = 0;
+   
+   double x_dist = 0; 
+   double y_dist = 0; 
+   double x_init_dist = 0; 
+   double y_init_dist = 0; 
+
+   double radius = 0; // use sigma if LJ is turned on 
+   double pi = 0; 
+   
+   int row1_num = 0;  
+   int row2_num = 0; 
+   int curr_row = 0; 
+
+   int return_num = 0; 
+
+   if(LJ == 1){
+      x_dist = sigma; 
+      y_dist = sigma; 
+   }
+   else{
+      prt = (*particles)[0]; 
+      
+      x_dist = 2 * prt.getRadius(); 
+      y_dist = 2 * prt.getRadius(); 
+   }
+
+   curr_row = (2 * boxLength)/x_dist;    // Determines the number of particles 
+                                         // that fit in one row 
+   x_init_dist = -1 * boxLength + 0.5 * x_dist; 
+   y_init_dist = boxLength - 0.5 * y_dist;   // initial x,y position
+   
+   return_num = n_particles; 
+
+   while(k < n_particles){ 
+	   
+      for(int n = 0; n < curr_row; n++){
+         prt = (*particles)[k];
+	 
+	 prt.setX_Position(x_init_dist + n * x_dist); // y pos stays the same
+	 prt.setY_Position(y_init_dist);              // in for-loop while
+                                                      // x pos updates 
+	 (*particles)[k] = prt; 
+	 k++;
+
+	 if(k == n_particles){
+	    break; 
+	 } 
+      }
+      y_init_dist = y_init_dist - y_dist;             // set y pos of next row
+
+      if(y_init_dist < -1 * boxLength + 0.5 * y_dist &&  k < n_particles){
+	 return_num = k;      
+	 break;
+      } 
+   }
+
+   return return_num;  // returns num of particles successfully initialized
 }
 
 void Boundary::initializeBoundary(std::string yamlFile){

@@ -10,6 +10,7 @@
 #include "Parameters.h"
 #include "Interaction.h"
 #include "Boundary.h"
+#include "Properties.h"
 
 class Simulation{
 
@@ -20,6 +21,7 @@ private:
    Parameters param; 
    Interaction interact;
    Boundary bound;
+   Properties prop; 
 
    std::vector<Particle> particles; 	  
 

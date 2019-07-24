@@ -21,6 +21,7 @@ public:
    void initialPosition (std::vector<Particle>* particles, int n_particles, 
 		         KISSRNG randVal); 
    int initialHexagonal (std::vector<Particle>* particles, int n_particles); // not random
+   int initialSquare    (std::vector<Particle>* particles, int n_particles); 
 
    void periodicBoundary(std::vector<Particle>* particles, int index);
    bool rigidBoundary   (std::vector<Particle>* particles, int index);
