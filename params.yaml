@@ -4,15 +4,15 @@ totalParticles  : 500
 type1_Particles : 500
 type2_Particles : 0
 
-particleRadius_1 : .03
+particleRadius_1 : .05
 particleRadius_2 : .12
 
 seed            : 98638175623423
 weight          : .06
 
-numberUpdates  : 2000
+numberUpdates  : 4500
 
-initializationType : 1 # 0 = random, 1 = hexagonal
+initializationType : 2 # 0 = random, 1 = hexagonal
                        # 2 = square
 hardDisks    : false
 lennardJones : true
@@ -31,6 +31,6 @@ rigidBoundary    : false
 periodicBoundary : true 
 externalWell     : false
 
-boxLength   : 1.33630621
+boxLength   : 1.443375673
 
 animationFile : positions.txt

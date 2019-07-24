@@ -48,10 +48,10 @@ for line in file:
     position.append(row)
 
 position = np.asarray(position)
-# print position
+print position
 
 numIter = len(position[:,0]) 
-
+print numIter
 #Writer = FuncAnimation.writers['ffmpeg']
 #writer = FuncAnimation.FFMpegWriter(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 

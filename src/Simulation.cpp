@@ -214,7 +214,7 @@ void Simulation::runSimulation(){
          }                 // position for the same particle 	
       } 
      
-      if(sweepNum > 0 && sweepNum % 10 == 0){
+      if(sweepNum > 2500 && sweepNum % 10 == 0){
          writePositions(&pos_file); 
          prop.calcForces(&particles); 
       }
@@ -235,6 +235,12 @@ void Simulation::setParticleParams(){
    double radius_1 = 0; 
    double radius_2 = 0; 
 
+   double weight = 0; 
+   double sigma = 0; 
+   double boxLength = 0; 
+
+   double redDensity = 0; 
+
    YAML::Node node = YAML::LoadFile(yamlFile);
 
    num_part1 = node["type1_Particles"].as<int>(); 
@@ -243,8 +249,15 @@ void Simulation::setParticleParams(){
    radius_1 = node["particleRadius_1"].as<double>(); 
    radius_2 = node["particleRadius_2"].as<double>(); 
 
+   sigma = node["sigma"].as<double>(); 
+   boxLength = node["boxLength"].as<double>(); 
+
    Particle prt; 
-   prt.setStepWeight(node["weight"].as<double>());
+   // prt.setStepWeight(node["weight"].as<double>());
+   
+   redDensity = n_particles * pow(sigma,2) / pow(2 * boxLength,2); 
+   weight = sigma * sqrt(1/redDensity); 
+   prt.setStepWeight(weight); 
 
    prt.setRadius(radius_1);
    prt.setType(1); 

@@ -4,12 +4,13 @@ import math
 
 dens = np.linspace(.1,.9,9)
 print dens
-pressure = [.20545, .454075, .782773, 1.20705,1.83991, 2.73406, 4.58495 \
-        , 7.67438, 13.3525]
+pressure = [.212256, .463658, .777451, 1.25733, 1.92992, 2.94772,\
+         4.80433, 8.10383, 14.3627]
 
 for k in range(9):
     plt.plot(dens[k],pressure[k],'ko')
 
+plt.title('Pressure v. Density')
 plt.ylabel('Pressure')
 plt.xlabel('Density')
 

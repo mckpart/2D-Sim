@@ -204,31 +204,12 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index){
 	    dist_curr_tot = sqrt(pow(dist_curr_x,2) + pow(dist_curr_y,2)); 
             dist_temp_tot = sqrt(pow(dist_temp_x,2) + pow(dist_temp_y,2));  
 
-	    if(dist_curr_tot < truncDist){
-               energy_curr = 4 * LJ_wellDepth *        // 6-12 potential 
-               (pow(sigma/dist_curr_tot,12) - pow(sigma/dist_curr_tot,6)); 
-	    }
-	    else{
-	       energy_curr = 0;
-	    }
+            energy_curr = 4 * LJ_wellDepth *        // 6-12 potential 
+            (pow(sigma/dist_curr_tot,12) - pow(sigma/dist_curr_tot,6) + .0040792228); 
 
-	    if(dist_temp_tot < truncDist){
-               energy_temp = 4 * LJ_wellDepth *        // 6-12 potential 
-               (pow(sigma/dist_temp_tot,12) - pow(sigma/dist_temp_tot,6)); 				
-	    }
-	    else{
-	       energy_temp = 0; 
-	    }   
+            energy_temp = 4 * LJ_wellDepth *        // 6-12 potential 
+            (pow(sigma/dist_temp_tot,12) - pow(sigma/dist_temp_tot,6) + .0040792228); 				
 	 } 
-//         else{                                             // interaction between unlike particles
-
-//           energy_curr = 4 * LJ_wellDepth * 
-//           (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6)); // 6-12 potential 
-
-//            energy_temp = 4 * LJ_wellDepth * 
-//            (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6)); 
-//         }	
-
          delta_energy = delta_energy + (energy_temp - energy_curr);  // running sum of total change
       }                                                              // of current particle's energy 
    }

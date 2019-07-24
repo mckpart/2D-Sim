@@ -17,12 +17,15 @@ numIter = np.linspace(1,len(forces),len(forces))
 print numIter
 
 plt.subplot(211)
+
 plt.plot(numIter,forces)
+
+plt.title("Square Lattice")
 plt.xlabel('Number of Sweeps')
 plt.ylabel(r'$F \cdot r$')
 
 ax = plt.gca()
-ticks = tck.FuncFormatter(lambda x, pos: '{0:g}'.format(x*10))
+ticks = tck.FuncFormatter(lambda x, pos: '{0:g}'.format(x*20))
 ax.xaxis.set_major_formatter(ticks)
 
 plt.subplot(212)
@@ -31,7 +34,7 @@ plt.xlabel('Number of Sweeps')
 plt.ylabel('Free energy')
 
 ax = plt.gca()
-ticks = tck.FuncFormatter(lambda x, pos: '{0:g}'.format(x*10))
+ticks = tck.FuncFormatter(lambda x, pos: '{0:g}'.format(x*20))
 ax.xaxis.set_major_formatter(ticks)
 
 plt.show()

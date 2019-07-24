@@ -74,13 +74,7 @@ void Properties::calcForces(std::vector<Particle>* particles){ // this needs to 
 	     
 	    r_dist = radDistance(dist_curr_x, dist_curr_y);
 
-	    if(r_dist < truncDist){
-	       force_tot = lenJonesForce(r_dist); 	    
-	    }
-	    else{
-	       force_tot = 0; 
-	    }
-
+	    force_tot = lenJonesForce(r_dist); 	    
 	 }                       
          
 	 calcEnergy(r_dist);  // this allows the energy to be calculated at the same time as
@@ -143,6 +137,11 @@ void Properties::initializeProperties(std::string yf){
    redTemp = KbT / epsilon; 
 
    truncDist = 2.5 * sigma; 
+
+
+
+
+
 
 //   std::cout << "the reduced density is: " << redDens 
 //	     << " and red temp is: " << redTemp << std::endl; 
