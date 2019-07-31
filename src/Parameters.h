@@ -2,10 +2,16 @@
 #define PARAMETERS_H
 
 #include <yaml-cpp/yaml.h>
+#include <cmath>
 
 class Parameters{
 
 private:
+
+   double redDensity = 0; 
+   double redTemp = 0; 
+   double sigma = 0;
+   double boxLength = 0; 
 
    int n_updates = 0; 
    int n_particles = 0; 
@@ -45,7 +51,11 @@ public:
    bool getHardDisk(); 
    bool getLenJones(); 
    bool getWCA(); 
-   bool getCrosslinkers(); 
+
+   double getRedDens(); 
+   double getRedTemp();
+   double getSigma();
+   double getBoxLength(); 
 
    // NOTE: THE SETTERS ARE NOT NECESSARY
    // GIVEN THAT THESE PARAMETERS ARE CONSTANT

@@ -3,24 +3,28 @@
 
 #include <vector>
 #include <cmath>
-#include <yaml-cpp/yaml.h>
 #include <fstream>
 
+#include "Parameters.h"
 #include "Particle.h"
 
 class Properties{
 
 private:
    double f_energy = 0; 
-   double Z_func = 0; 
+   double f_r = 0; 
+//   double Z_func = 0; 
 
    std::vector<double> sum_Fdot_r; 
    std::vector<double> sum_energy; 
+   std::vector<double> num_density; 
 
+   double delta_r = 0; 
    double sigma = 0; 
-   double epsilon = 0; 
-   double KbT = 0;
+//   double epsilon = 0; 
+//   double KbT = 0;
    double truncDist = 0; 
+   double truncShift = 0; 
 
    double LJ = 0;
 
@@ -31,16 +35,24 @@ private:
    double redTemp = 0;  
 public: 
 
-   void initializeProperties(std::string yf); 
+   void initializeProperties(Parameters* p); 
 
+   void populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions); 
    double lenJonesEnergy(double r);  
    double lenJonesForce(double r);   
-   
-   void calcForces(std::vector<Particle>* particles); 
-   void calcEnergy(double r_dist);
-   
-   double calcPressure();    
 
+   void updateNumDensity(double r);
+
+   void calcPeriodicProp(std::vector<Particle>* particles,std::ofstream* r_dist_file); 
+   
+   void calcEnergy(double r);
+   void calcVirial(double r); 
+   
+   double radDistance(double x1, double x2, double y1, double y2); 
+
+   double calcPressure();    
+   double calcAvgEnergy(); 
+   
    void writeProperties(); 
 }; 
 #endif

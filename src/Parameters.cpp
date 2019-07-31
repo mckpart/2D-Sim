@@ -6,11 +6,29 @@ void Parameters::initializeParameters(std::string yamlFile){
 
    YAML::Node node = YAML::LoadFile(yamlFile); 
 
-   seed        = node["seed"].as<long>(); 
+   /* SET THE REDUCED PARAMETERS OF THE SYTEM */
+
+   redDensity  = node["reducedDens"].as<double>();
+   redTemp     = node["reducedTemp"].as<double>(); 
+   sigma       = node["sigma"].as<double>(); 
+   boxLength   = node["boxLength"].as<double>();
    n_particles = node["totalParticles"].as<int>();
+   
+   if(boxLength == 0){
+      boxLength = sigma * sqrt(n_particles/redDensity); 
+   }
+   else if(sigma == 0){  // add a check such that a bunch of zeros can't be added
+      sigma = boxLength * sqrt(redDensity/n_particles); 
+   }
+
+   std::cout << "reduced density: " << redDensity << " redTemp: " << redTemp 
+	     << " sigma: " << sigma << " boxLength: " << boxLength << std::endl;
+
+
+   seed        = node["seed"].as<long>(); 
    n_updates   = node["numberUpdates"].as<int>(); 
  
-   beta        = node["beta"].as<double>();
+//   beta        = node["beta"].as<double>();
 
    init_type   = node["initializationType"].as<int>(); 
 
@@ -21,7 +39,7 @@ void Parameters::initializeParameters(std::string yamlFile){
    hardDisk    = node["hardDisks"].as<bool>(); 
    lenJones    = node["lennardJones"].as<bool>(); 	
    WCA         = node["WCA"].as<bool>(); 
-   c_linkers   = node["crosslinkers"].as<bool>(); 
+//   c_linkers   = node["crosslinkers"].as<bool>(); 
 }
 
 
@@ -67,7 +85,17 @@ bool Parameters::getLenJones(){
 bool Parameters::getWCA(){
    return WCA; 
 }
-bool Parameters::getCrosslinkers(){
-   return c_linkers; 
+
+double Parameters::getSigma(){
+   return sigma; 
+}
+double Parameters::getRedDens(){
+   return redDensity; 
+}
+double Parameters::getRedTemp(){
+   return redTemp; 
+}
+double Parameters::getBoxLength(){
+   return boxLength; 
 }
 

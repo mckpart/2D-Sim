@@ -27,9 +27,12 @@ private:
 
    int n_particles = 0; 
 
+   double redTemp = 0; 
 public: 
 
    Simulation(std::string yf); 
+
+   double boltzmannFactor(double delta_energy);
 
    void runSimulation(); 
    void setParticleParams(); 

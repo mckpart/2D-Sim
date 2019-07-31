@@ -72,7 +72,7 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index){
             energy_curr = 0;                  // this maximum distance - there is no
          }                                    // change in energy beyond this distance
          else{
-            energy_curr = 4 * LJ_wellDepth * 
+            energy_curr = 4 *  
             (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6) + .25); 
          }
 
@@ -80,7 +80,7 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index){
             energy_temp = 0; 
          }
          else{
-            energy_temp = 4 * LJ_wellDepth * 
+            energy_temp = 4 * 
             (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6) + .25); 								
          }
 
@@ -89,6 +89,22 @@ double Interaction::WCApotential(std::vector<Particle>* particles, int index){
    }
 
    return delta_energy;  // returns the total change in energy associated with this move
+}
+
+void Interaction::populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions){
+   
+//   std::cout << "x: " << x << " y: " <<  y << std::endl; 
+
+   (*cellPositions)[0][0] = x;             (*cellPositions)[0][1] = y; 
+   (*cellPositions)[1][0] = x;             (*cellPositions)[1][1] = y + boxLength; 
+   (*cellPositions)[2][0] = x;             (*cellPositions)[2][1] = y - boxLength; 
+   (*cellPositions)[3][0] = x + boxLength; (*cellPositions)[3][1] = y; 
+   (*cellPositions)[4][0] = x + boxLength; (*cellPositions)[4][1] = y + boxLength; 
+   (*cellPositions)[5][0] = x + boxLength; (*cellPositions)[5][1] = y - boxLength; 
+   (*cellPositions)[6][0] = x - boxLength; (*cellPositions)[6][1] = y; 
+   (*cellPositions)[7][0] = x - boxLength; (*cellPositions)[7][1] = y + boxLength; 
+   (*cellPositions)[8][0] = x - boxLength; (*cellPositions)[8][1] = y - boxLength; 
+
 }
 
 double Interaction::lennardJones(std::vector<Particle>* particles, int index){
@@ -126,6 +142,8 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index){
    double d_comp_wall_x = 0; 
    double d_comp_wall_y = 0; 
 
+   std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));  
+
    double dist_trunc = 0; 
 
    current_prt = (*particles)[index];    // assign current particle
@@ -140,8 +158,8 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index){
    y_curr = current_prt.getY_Position(); 
    rad_curr = current_prt.getRadius(); 
 
-   d_curr_wall_x = boxLength - fabs(x_curr); // x,y distance from
-   d_curr_wall_y = boxLength - fabs(y_curr); // nearets walls
+   d_curr_wall_x = 0.5 * boxLength - fabs(x_curr); // x,y distance from
+   d_curr_wall_y = 0.5 * boxLength - fabs(y_curr); // nearets walls
    
    for(int k = 0; k < n_particles; k++){
 
@@ -165,17 +183,12 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index){
          x_comp = compare_prt.getX_Position(); 
          y_comp = compare_prt.getY_Position(); 
          rad_comp = compare_prt.getRadius(); 
-         
-	 d_comp_wall_x = boxLength - fabs(x_comp);
-         d_comp_wall_y = boxLength - fabs(y_comp);
-         
-	 dist_curr_x = dist1D(x_curr,x_comp);
-	 dist_curr_y = dist1D(y_curr,y_comp); 
-         dist_temp_x = dist1D(x_temp,x_comp); 
-	 dist_temp_y = dist1D(y_temp,y_comp); 
 
-
-         if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
+	 dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
+	 dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp); 
+	   
+//	 std::cout << "curr dist: " << dist_curr_tot << " temp dist: " << dist_temp_tot << std::endl;
+	 if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
 	    
             /* IF THE SUMMATION OF THE X DISTANCES FROM THE WALL IS WITHIN THE 
 	     *    DISTANCE OF INTERACTION AND THE PARTICLES ARE NOT ON THE SAME SIDE
@@ -186,34 +199,47 @@ double Interaction::lennardJones(std::vector<Particle>* particles, int index){
 	     * COMPUTE THE RADIAL DISTANCE BETWEEN THE CURRENT PARTICLE AND 
 	     *    COMPARISON PARTICLE ONCE X,Y DISTANCES ARE UPDATED ACCORDINGLY
 	     */
-		 
-	    if(d_curr_wall_x + d_comp_wall_x < truncDist && x_curr * x_comp < 0){    // truncation dist = sigma * 2.5
-	       dist_curr_x = d_curr_wall_x + d_comp_wall_x; 
+	    if(dist_curr_tot > truncDist || dist_temp_tot > truncDist){
+              
+	       populateCellArray(x_comp,y_comp,&cellPositions);
+               for(int z = 0; z < 9; z++){
+               
+	          x_comp = cellPositions[z][0]; 
+	          y_comp = cellPositions[z][1];
+
+	          dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
+                  dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp);  
+                   
+		  if(dist_curr_tot < truncDist){
+                     energy_curr = 4 *         // 6-12 potential 
+                     (pow(sigma/dist_curr_tot,12) - pow(sigma/dist_curr_tot,6) + truncShift); // this will calulate the reduced 
+		  }
+                  else{
+		     energy_curr = 0; 
+		  }
+		  
+		  if(dist_temp_tot < truncDist){
+                     energy_temp = 4 *        // 6-12 potential 
+                     (pow(sigma/dist_temp_tot,12) - pow(sigma/dist_temp_tot,6) + truncShift); 				
+		  }
+		  else{
+		     energy_temp = 0; 
+		  }
+
+		  delta_energy = delta_energy + (energy_temp - energy_curr); // running summation of change in energy
+	    
+	       }
 	    }
-	    if(d_curr_wall_y + d_comp_wall_y < truncDist && y_curr * y_comp < 0){
-	       dist_curr_y = d_curr_wall_y + d_comp_wall_y; 
+	    else{
+	       energy_curr = 4*(pow(sigma/dist_curr_tot,12) - pow(sigma/dist_curr_tot,6) + truncShift); 
+	       energy_temp = 4*(pow(sigma/dist_temp_tot,12) - pow(sigma/dist_temp_tot,6) + truncShift);
+	    
+	       delta_energy = delta_energy + (energy_temp - energy_curr); 
 	    }
-
-            if(d_temp_wall_x + d_comp_wall_x < truncDist && x_temp * x_comp < 0){
-	       dist_temp_x = d_temp_wall_x + d_comp_wall_x; 
-	    }
-	    if(d_temp_wall_y + d_comp_wall_y < truncDist && y_temp * y_comp < 0){
-	       dist_temp_y = d_temp_wall_y + d_comp_wall_y; 
-	    }   
-
-	    dist_curr_tot = sqrt(pow(dist_curr_x,2) + pow(dist_curr_y,2)); 
-            dist_temp_tot = sqrt(pow(dist_temp_x,2) + pow(dist_temp_y,2));  
-
-            energy_curr = 4 * LJ_wellDepth *        // 6-12 potential 
-            (pow(sigma/dist_curr_tot,12) - pow(sigma/dist_curr_tot,6) + .0040792228); 
-
-            energy_temp = 4 * LJ_wellDepth *        // 6-12 potential 
-            (pow(sigma/dist_temp_tot,12) - pow(sigma/dist_temp_tot,6) + .0040792228); 				
-	 } 
-         delta_energy = delta_energy + (energy_temp - energy_curr);  // running sum of total change
+         } 
       }                                                              // of current particle's energy 
    }
-   return delta_energy;      // returns the total change in energy 
+   return delta_energy + tail_corr;      // returns the total change in energy 
 }
 
 bool Interaction::hardDisks(std::vector<Particle>* particles, int index){ 
@@ -262,95 +288,22 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index){
    return accept;     // returns 1 if trial move is accepted 
 }
 
-double Interaction::crosslinkers(std::vector<Particle>* particles, int index){
-   
-   Particle current_prt; 
-   Particle compare_prt;                  
-
-   double x_temp = 0; 
-   double y_temp = 0; 
-   double x_curr = 0; 
-   double y_curr = 0; 
-   double x_comp = 0; 
-   double y_comp = 0; 
-
-   double sigma = 0; 
-
-   double delta_energy = 0; 
-   double energy_curr = 0; 
-   double energy_temp = 0; 
-
-   double rad_curr = 0; 
-   double rad_comp = 0; 
-   double num = 0; 
-
-   double dist_curr = 0; 
-   double dist_temp = 0;   
-
-   current_prt = (*particles)[index];    // assign current particle
- 
-   x_temp = current_prt.getX_TrialPos(); // assign the current and trial
-   y_temp = current_prt.getY_TrialPos(); // positions of current particle 
-                                         
-   x_curr = current_prt.getX_Position(); 
-   y_curr = current_prt.getY_Position(); 
-
-   for(int k = 0; k < n_particles; k++){
-
-      compare_prt = (*particles)[k]; // assign the comparison particle 
-                                     // comparison particle cannot be current
-      if(compare_prt.getIdentifier() != current_prt.getIdentifier()){
-
-         x_comp = compare_prt.getX_Position();  // assign x,y comparison 
-         y_comp = compare_prt.getY_Position();  // position 
-
-         dist_curr = distance(x_curr,x_comp,y_curr,y_comp); // current distance 
-                                                            // between particles
-	 if(dist_curr < truncDist){                                             
-   	    energy_curr = 1/beta * exp(-.5 * sprConstant * beta * 
-		        pow(dist_curr - restLength,2)); 
-         }
-	 else{
-	    energy_curr = 0; 
-	 }
-
-	 dist_temp = distance(x_temp,x_comp,y_temp,y_comp); // trial distance  
-                                                            // between particles 
-	if(dist_temp < truncDist){
-	   energy_temp = 1/beta * exp(-.5 * sprConstant * beta * 
-		         pow(dist_temp - restLength,2));  
-	} 
-        else{
-	   energy_temp = 0; 
-	}	
-
-	delta_energy = delta_energy + (energy_temp - energy_curr); // running sum of
-      }                                                             // total change in 
-   }                                                                // energy 
-   // std::cout << "the change in energy is: " << delta_energy << std::endl; 
-   return delta_energy;  // returns total change in energy 
-}
-
 ////// DEFAULT CONSTRUCTOR ////////////////
 
-void Interaction::initializeInteraction(std::string yamlFile){
+void Interaction::initializeInteraction(Parameters* p){
 
-   YAML::Node node = YAML::LoadFile(yamlFile);
+   boxLength    = p->getBoxLength(); 
+   n_particles  = p->getNumParticles(); 
+   sigma        = p->getSigma(); 
+   redDens      = p->getRedDens(); 
 
-   LJ_wellDepth = node["wellDepth"].as<double>();
-   sigma        = node["sigma"].as<double>();    
-   restLength   = node["restLength"].as<double>();
-   sprConstant  = node["springConstant"].as<double>(); 
-//   truncDist    = node["truncationDist"].as<double>();
-   beta         = node["beta"].as<double>();   
-   boxLength    = node["boxLength"].as<double>(); 
-   n_particles  = node["totalParticles"].as<int>(); 
+   truncDist = 2.5 * sigma;
+   truncShift = -1 * (pow(sigma/truncDist,12) 
+		    - pow(sigma/truncDist,6));
 
-   truncDist = 2.5 * sigma; 
-   std::cout << "The reduced temperature, T*, of the system is "; 
-   std::cout << 1/(beta * LJ_wellDepth) << std::endl;
-   std::cout << "The reduced density of the system is "; 
-   std::cout << n_particles / pow(2*boxLength,2) * pow(sigma,2);
-   std::cout << std::endl; 
+   tail_corr =  3.141592654 * redDens * (.4 * pow(sigma/truncDist,10) 
+		                 - pow(sigma/truncDist,4)); 
+
+   std::cout << "the shifted potential value is: " << truncShift << std::endl; 
 }
 

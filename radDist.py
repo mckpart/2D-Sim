@@ -14,8 +14,8 @@ def calculate_g():	# compute the number of particles =< a distance
     truncDist = 2.5 * sigma
     fact1 = 1
     fact2 = 1
-    if(n_positions > 2000): 
-        fact1 = 100
+    if(n_positions > 900): 
+        fact1 = 50
 
     if(n_part_tot > 400 or n_positions > 400): 
         fact2 = 2
@@ -72,18 +72,22 @@ with open("params.yaml",'r') as yf:
 
 n_updates = yaml_dict["numberUpdates"]
 n_part_tot  = yaml_dict["totalParticles"]
-beta = yaml_dict["beta"]
+# beta = yaml_dict["beta"]
 boxLength = yaml_dict["boxLength"]
-restLength = yaml_dict["restLength"]
+# restLength = yaml_dict["restLength"]
 sigma = yaml_dict["sigma"]
 radius_1 = yaml_dict["particleRadius_1"]
 LJ = yaml_dict["lennardJones"]
+redDens = yaml_dict["reducedDens"]
 
 ######### initialize lists and read in position data ######
 
-deltaR = boxLength/float(n_part_tot/2.0)
+if(boxLength == 0):
+    boxLength = sigma * math.sqrt(n_part_tot/redDens)
+print "the box length is", boxLength
+deltaR = float(0.5 * boxLength)/float(n_part_tot/2.0)
 position = []
-
+print("deltaR is ",deltaR)
 file = open( "positions.txt", "r" )
 for line in file:
    row = line.split()
@@ -97,16 +101,15 @@ print n_positions
 
 # compute stepsize, initialize arrays #
 
-step = int(boxLength/deltaR) + 1
+step = int(0.5 * boxLength/deltaR) + 1
 
-r = np.linspace(0, boxLength, step)
+r = np.linspace(0, 0.5 * boxLength, step)
 g = np.zeros(step)
 
 if(LJ == 1):        # reduced length for lennard jones system 
    r = [i/(sigma) for i in r]
-   radius_1 = radius_1/sigma
+#   radius_1 = radius_1/sigma
    restLength = 2.0**(1.0/6.0)
-   red_dens = n_part_tot * sigma**2 / (2*boxLength)**2
 
 #### generate densities and plot ###########3
 
@@ -128,8 +131,8 @@ plt.ylabel(r'$g(\frac{r}{\sigma})$')
 plt.legend([r'$g(\frac{r}{\sigma})$', 'rest length', 'diameter'])
 
 txt = "Iterations: " + str(n_updates) + "  Particles: " + str(n_part_tot) + \
-        r'  $\frac{1}{k_BT}: $' + str(beta) + "  Box Length: " + str(2*boxLength) \
-        + r'  $\sigma: $' + str(sigma) + r'  $\rho^*: $' + str(red_dens)
+        "  Box Length: " + str(boxLength) \
+        + r'  $\sigma: $' + str(sigma) + r'  $\rho^*: $' + str(redDens)
 plt.figtext(.5,.013,txt,wrap = True, ha = 'center')
 
 plt.show()

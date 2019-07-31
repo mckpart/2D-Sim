@@ -93,6 +93,8 @@ void Boundary::periodicBoundary(std::vector<Particle>* particles, int index){
    double dist_xwall = 0; 
    double dist_ywall = 0;
 
+   double wallBound = 0.5 * boxLength;
+
    current_prt = (*particles)[index];
 
    x_curr = current_prt.getX_Position(); // sets the current particle's x,y
@@ -110,7 +112,7 @@ void Boundary::periodicBoundary(std::vector<Particle>* particles, int index){
    */
 
    if(x_curr * -1 < 0){               // x > 0, nearest x-wall > 0
-      x_wall = boxLength - rad_temp;  // the 'wall' includes the radius
+      x_wall = wallBound - rad_temp;  // the 'wall' includes the radius
                                       // to make further computations simpler
       if(x_temp - x_wall > 0){
 
@@ -119,7 +121,7 @@ void Boundary::periodicBoundary(std::vector<Particle>* particles, int index){
       }	                                       // the calculated distance
    }
    else{
-      x_wall = -1 * (boxLength - rad_temp);    // x < 0, nearest x-wall < 0
+      x_wall = -1 * (wallBound - rad_temp);    // x < 0, nearest x-wall < 0
 
       if(x_temp - x_wall < 0){
 
@@ -130,7 +132,7 @@ void Boundary::periodicBoundary(std::vector<Particle>* particles, int index){
 
 
    if(y_curr * -1 < 0){	             // y > 0, nearest y-wall > 0
-      y_wall = boxLength - rad_temp; 
+      y_wall = wallBound - rad_temp; 
 
       if(y_temp - y_wall > 0){
 
@@ -139,7 +141,7 @@ void Boundary::periodicBoundary(std::vector<Particle>* particles, int index){
       }
    }
    else{
-      y_wall = -1 * (boxLength - rad_temp);   // y < 0, nearest y-wall < 0
+      y_wall = -1 * (wallBound - rad_temp);   // y < 0, nearest y-wall < 0
 
       if(y_temp - y_wall < 0){
 
@@ -189,8 +191,8 @@ double Boundary::externalWell(std::vector<Particle>* particles, int index){
    return delta_energy; 
 }
 
-void Boundary::initialPosition(std::vector<Particle>* particles, int n_particles, 
-                          KISSRNG randVal){
+void Boundary::initialPosition(std::vector<Particle>* particles, KISSRNG randVal){
+   
    Particle current_prt; 
    Particle compare_prt; 
 
@@ -219,31 +221,31 @@ void Boundary::initialPosition(std::vector<Particle>* particles, int n_particles
            - PROVIDES DIFFERENT 'QUADRANTS' FOR THE PARTICLE TO BE GENERATED IN 
            - ASSIGNS THE NEAREST X,Y 'WALLS'
       */
-
+      double wallBound = 0.5 * boxLength; 
       num = randVal.RandomUniformDbl(); 
 
       if(k % 2 == 0 && num <.5){      // the acceptance presented in 
          x_temp = -1 * x_temp;        // 'check collision' is not implemented here
                                       // since the initial position cannot exceed 1
-         x_wall = -1 * boxLength;
-         y_wall = boxLength;           // randomly assigns a negative/positive
+         x_wall = -1 * wallBound;
+         y_wall = wallBound;           // randomly assigns a negative/positive
       }                                // value to the generated position
       else if(k % 2 == 0 && num >= .5){
          y_temp = -1 * y_temp; 
 
-         x_wall = boxLength; 
-         y_wall = -1 * boxLength; 
+         x_wall = wallBound; 
+         y_wall = -1 * wallBound; 
       }
       else if(k % 2 != 0 && num < .5){
          x_temp = -1 * x_temp; 
          y_temp = -1 * y_temp; 
 
-         x_wall = -1 * boxLength; 
-         y_wall = -1 * boxLength; 
+         x_wall = -1 * wallBound; 
+         y_wall = -1 * wallBound; 
       }
       else{
-         x_wall = boxLength; 
-         y_wall = boxLength; 
+         x_wall = wallBound; 
+         y_wall = wallBound; 
       }
 
       accept = 1;                           // the following statements can only change 
@@ -282,7 +284,8 @@ void Boundary::initialPosition(std::vector<Particle>* particles, int n_particles
    }
 }
 
-int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles){
+int Boundary::initialHexagonal(std::vector<Particle>* particles){
+
    Particle prt; 
    
    int k = 0; 
@@ -316,11 +319,11 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
       x_dist = 2 * radius; 
    } 
    
-   row1_num = (2 * boxLength)/(x_dist); // may be worth adding x_dist as 
-   row2_num = (2 * boxLength - 0.5 * x_dist)/(x_dist); // parameter
+   row1_num = boxLength/x_dist; // may be worth adding x_dist as 
+   row2_num = (boxLength - 0.5 * x_dist)/(x_dist); // parameter
  
    y_dist = x_dist * h;            // distance between rows
-   y_init_dist = boxLength - 0.5 * x_dist; // initial y of the first row
+   y_init_dist = 0.5 * boxLength - 0.5 * x_dist; // initial y of the first row
    
    while(k < n_particles){
       
@@ -339,11 +342,11 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
 
       if(flag == 0){
          curr_row = row1_num;
-	 x_init_dist = -1 * boxLength + 0.5 * x_dist; // the first row
+	 x_init_dist = -.5 * boxLength + 0.5 * x_dist; // the first row
       }                                               // begins at the wall 
       else{                                           // plus .5 unit x-dist
          curr_row = row2_num;
-         x_init_dist = -1 * boxLength + x_dist; // second row begins 
+         x_init_dist = -.5 * boxLength + x_dist; // second row begins 
       }                                         // at wall plus unit x_dist
 
       for(int n = 0; n < curr_row; n++){         
@@ -362,7 +365,7 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
       flag = (flag == 0); // switch the row type
       y_init_dist = y_init_dist - y_dist; 
 
-      if(y_init_dist < -1 * boxLength + 0.5 * x_dist && k < n_particles){
+      if(y_init_dist < -0.5 * boxLength + 0.5 * x_dist && k < n_particles){
 	 return_num = k; 
 	 break;
       } 
@@ -370,7 +373,7 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles,int n_particles)
    return return_num; // returns the number of particles successfully initialized 
 }
 
-int Boundary::initialSquare(std::vector<Particle>* particles, int n_particles){
+int Boundary::initialSquare(std::vector<Particle>* particles){
    Particle prt; 
    
    int k = 0; 
@@ -384,8 +387,7 @@ int Boundary::initialSquare(std::vector<Particle>* particles, int n_particles){
    double radius = 0; // use sigma if LJ is turned on 
    double pi = 0; 
    
-   int row1_num = 0;  
-   int row2_num = 0; 
+//   int row1_num = 0;  
    int curr_row = 0; 
 
    int return_num = 0; 
@@ -400,11 +402,10 @@ int Boundary::initialSquare(std::vector<Particle>* particles, int n_particles){
       x_dist = 2 * prt.getRadius(); 
       y_dist = 2 * prt.getRadius(); 
    }
-
-   curr_row = (2 * boxLength)/x_dist;    // Determines the number of particles 
+   curr_row = boxLength/x_dist;    // Determines the number of particles 
                                          // that fit in one row 
-   x_init_dist = -1 * boxLength + 0.5 * x_dist; 
-   y_init_dist = boxLength - 0.5 * y_dist;   // initial x,y position
+   x_init_dist = -0.5  * boxLength + 0.5 * x_dist; 
+   y_init_dist = 0.5 * boxLength - 0.5 * y_dist;   // initial x,y position
    
    return_num = n_particles; 
 
@@ -425,7 +426,7 @@ int Boundary::initialSquare(std::vector<Particle>* particles, int n_particles){
       }
       y_init_dist = y_init_dist - y_dist;             // set y pos of next row
 
-      if(y_init_dist < -1 * boxLength + 0.5 * y_dist &&  k < n_particles){
+      if(y_init_dist < -0.5 * boxLength + 0.5 * y_dist &&  k < n_particles){
 	 return_num = k;      
 	 break;
       } 
@@ -434,11 +435,12 @@ int Boundary::initialSquare(std::vector<Particle>* particles, int n_particles){
    return return_num;  // returns num of particles successfully initialized
 }
 
-void Boundary::initializeBoundary(std::string yamlFile){
-   
-   YAML::Node node = YAML::LoadFile(yamlFile); 
+void Boundary::initializeBoundary(Parameters* p){
 
-   boxLength = node["boxLength"].as<double>(); 
-   sigma     = node["sigma"].as<double>();  
-   LJ        = node["lennardJones"].as<bool>(); 
+   boxLength   = p->getBoxLength(); 
+   sigma       = p->getSigma(); 
+   LJ          = p->getLenJones(); 
+   n_particles = p->getNumParticles();
+   
+//   std::cout << "in bound sigma is: " << sigma << std::endl;
 }

@@ -1,9 +1,9 @@
 sim
 /build
+/b 
 
-.txt
-.png       
+*.txt
+*.swp     
 
-/data_7_16_19
-/data_7_18_19
-/data_7_23_19
+/prototyping
+/data

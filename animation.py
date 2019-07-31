@@ -19,16 +19,26 @@ n_part_1   = yaml_dict["type1_Particles"]
 n_part_2   = yaml_dict["type2_Particles"]
 n_part_tot = yaml_dict["totalParticles"]
 
+sigma = float(yaml_dict["sigma"])
+LJ = yaml_dict["lennardJones"]
+redDens = yaml_dict["reducedDens"]
+
 # numIter    = yaml_dict["numberUpdates"]
 rigidBC    = yaml_dict["rigidBoundary"]
 periodBC    = yaml_dict["periodicBoundary"]
-c_linkers  = yaml_dict["crosslinkers"]
+# c_linkers  = yaml_dict["crosslinkers"]
 
 boxLength  = yaml_dict["boxLength"]
 pos_file   = yaml_dict["animationFile"]
 
 ######### initialize lists and read in position data ##########
 
+if(LJ == 1):
+    if(sigma == 0):
+        sigma = boxLength * math.sqrt(redDens/n_part_tot)
+    elif(boxLength == 0):
+        boxLength = sigma * math.sqrt(n_part_tot/redDens)
+    radius_1 = 0.5 * sigma
 patches = []
 position = []
 x,y = [],[]
@@ -57,12 +67,12 @@ print numIter
 
 def init():
 
-   if(c_linkers == 1 and rigidBC != 1 and periodBC != 1):
+   if(rigidBC != 1 and periodBC != 1):
       ax.set_xlim(-2,2)
       ax.set_ylim(-2,2)
    else:  
-      ax.set_xlim(-1 * boxLength,boxLength)       
-      ax.set_ylim(-1 * boxLength,boxLength)
+      ax.set_xlim(-.5 * boxLength,.5 * boxLength)       
+      ax.set_ylim(-.5 * boxLength,.5 * boxLength)
         
    for i in range(n_part_tot):
       ax.add_patch(patches[i])

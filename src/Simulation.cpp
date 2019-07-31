@@ -2,8 +2,25 @@
 #include "Simulation.h"
 
 
-double boltzmannFactor(double energy,double beta){
-   return exp(-1 * beta * energy); 
+double Simulation::boltzmannFactor(double energy){
+   return exp(-1 * energy / redTemp);  // energy here is already reduced 
+}
+
+Simulation::Simulation(std::string yf){
+   yamlFile = yf; 
+
+   // add all of the above to the parameter object
+   param.initializeParameters(yamlFile);    // initialize the parameters
+   interact.initializeInteraction(&param);// for the simulation
+   bound.initializeBoundary(&param);
+   prop.initializeProperties(&param);  
+
+   n_particles = param.getNumParticles();   // initialize vector of
+   particles.resize(n_particles);           // particles and set particle
+   setParticleParams();	                    // parameters
+
+   redTemp = param.getRedTemp();
+   std::cout << "in sim the redtemp is " << redTemp << std::endl; 
 }
 
 void Simulation::writePositions(std::ofstream* pos_file){
@@ -23,19 +40,6 @@ void Simulation::writePositions(std::ofstream* pos_file){
    else{
       std::cout << "ERROR: THE .TXT FILE COULD NOT OPEN" << std::endl; 
    }
-}
-
-Simulation::Simulation(std::string yf){
-   yamlFile = yf; 
-
-   param.initializeParameters(yamlFile);    // initialize the parameters
-   interact.initializeInteraction(yamlFile);// for the simulation
-   bound.initializeBoundary(yamlFile);
-   prop.initializeProperties(yamlFile);  
-
-   n_particles = param.getNumParticles();   // initialize vector of
-   particles.resize(n_particles);           // particles and set particle
-   setParticleParams();	                    // parameters
 }
 
 void Simulation::testSimulation(){
@@ -81,10 +85,10 @@ void Simulation::runSimulation(){
 	
    Particle prt; 
 
+   int n_initial = 0; 
    int n_updates = 0;
    int curr_index = 0; 
-
-   double beta = 0; 
+   
    double n_rejects = 0;  
    double perc_rej = 0; 
 
@@ -96,6 +100,9 @@ void Simulation::runSimulation(){
 
    bool accept = 0; 
 
+   std::ofstream rad_dist_file; 
+   rad_dist_file.open("radialDistance.txt"); 
+
    std::ofstream pos_file; 
    pos_file.open("positions.txt"); 
 
@@ -103,24 +110,23 @@ void Simulation::runSimulation(){
    randVal.InitCold(param.getSeed()); 	// warms the RNG
 
    n_updates = param.getUpdates(); 
-   beta = param.getBeta(); 
+//   beta = param.getBeta(); 
 
-   int n_initial = 0;
    n_initial = n_particles;    
    
-   if(param.getInit_Type() == 0){		   
-      bound.initialPosition(&particles,n_particles,randVal); 
+   if(param.getInit_Type() == 0){	// initializing particle positions	   
+      bound.initialPosition(&particles,randVal); 
    }
    else if(param.getInit_Type() == 1){
-      n_initial = bound.initialHexagonal(&particles,n_particles);
+      n_initial = bound.initialHexagonal(&particles);
    }
    else if(param.getInit_Type() == 2){
-      n_initial = bound.initialSquare(&particles,n_particles); 
+      n_initial = bound.initialSquare(&particles); 
    }
 
-   if(n_initial < n_particles){
-      std::cout << "ERROR: TOO MANY PARTICLES. INITIALIZED "
-                << n_initial << " PARTICLES" << std::endl;
+   if(n_initial < n_particles){        // print warning if the system has 
+      std::cout << "ERROR: TOO MANY PARTICLES. INITIALIZED " // too many 
+                << n_initial << " PARTICLES" << std::endl;   // particles
    }
    else{
       std::cout << "SUCCESSFULLY INITIALIZED " 
@@ -128,11 +134,11 @@ void Simulation::runSimulation(){
    }
    for(int sweepNum = 0; sweepNum < n_updates; sweepNum++){
       for(int k = 0; k < n_particles; k++){
- 
-         curr_index = int(randVal.RandomUniformDbl() * n_particles); // choose random   
+	      
+	 curr_index = int(randVal.RandomUniformDbl() * n_particles); // choose random   
          prt = particles[curr_index];                                // particle
-
-         x_trial = prt.x_trial(randVal.RandomUniformDbl());  
+         
+	 x_trial = prt.x_trial(randVal.RandomUniformDbl());  
          y_trial = prt.y_trial(randVal.RandomUniformDbl()); 
 
          prt.setX_TrialPos(x_trial); 	// generate and set the
@@ -141,12 +147,12 @@ void Simulation::runSimulation(){
          particles[curr_index] = prt;  
 
          accept = 1;
-         delta_energy = 0;  		
-
-         if(param.getRigidBC() == 1){        // run sim with hard boundaries
+         delta_energy = 0;  		          // sets change in energy to 0
+         
+         if(param.getRigidBC() == 1){             // run sim with hard boundaries
             accept = bound.rigidBoundary(&particles,curr_index);  
          }
-         else if(param.getPeriodicBC() == 1){     // run simulation with 
+         else if(param.getPeriodicBC() == 1){              // run simulation with 
             bound.periodicBoundary(&particles,curr_index); // periodic boundaries
 
             prt = particles[curr_index]; 
@@ -157,7 +163,8 @@ void Simulation::runSimulation(){
          else if(param.getExtWell() == 1){
             delta_energy = bound.externalWell(&particles,curr_index); 
          }
-
+          
+//	 std::cout << x_trial << " and " << y_trial << std::endl;
      /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
          - HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY 
            IS NOT RETURNED
@@ -171,24 +178,19 @@ void Simulation::runSimulation(){
      */		  
 			  
          if(param.getHardDisk() == 1 && accept == 1){
-            accept = interact.hardDisks(&particles,curr_index);
-         }
-         else if(param.getLenJones() == 1 && accept == 1){
-            delta_energy = delta_energy +  
+            accept = interact.hardDisks(&particles,curr_index); // condense into 
+         }                                                      // int value to 
+         else if(param.getLenJones() == 1 && accept == 1){      // reduce num of 
+            delta_energy = delta_energy +                       // parameters
                            interact.lennardJones(&particles,curr_index); 
          }  
          else if(param.getWCA() == 1 && accept == 1){
             delta_energy = delta_energy +  
                            interact.WCApotential(&particles,curr_index); 
-         }
-
-         if(param.getCrosslinkers() == 1 && accept == 1){  
-            delta_energy = delta_energy +  
-                           interact.crosslinkers(&particles,curr_index); 
-         }         
+         }       
 
          if(accept == 1 && delta_energy > 0){
-            total_prob = boltzmannFactor(delta_energy,beta); // compute acceptance probability
+            total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
 
             if(randVal.RandomUniformDbl() < total_prob){
                accept = 1; 
@@ -201,25 +203,22 @@ void Simulation::runSimulation(){
          if(accept == 1){
             prt.setX_Position(x_trial);  // if trial move is accepted, update the 
             prt.setY_Position(y_trial);  // position of the current particle
-            particles[curr_index] = prt;          // and put back into array
-     
-//            if(k % (n_particles) == 0 && k > 4 * pow(10,4)){
-//               writePositions(&pos_file); 
-//               prop.calcForces(&particles); 		    
-//            }
+            particles[curr_index] = prt;          // and put back into array 
          }
          else{
             n_rejects++;   // keeps count of total moves rejected
-           // k = k - 1;     // reject trial move - will generate new trial 
-         }                 // position for the same particle 	
+         }                  	
       } 
      
-      if(sweepNum > 2500 && sweepNum % 10 == 0){
-         writePositions(&pos_file); 
-         prop.calcForces(&particles); 
+      if(sweepNum > 500 && sweepNum % 50 == 0){
+	 std::cout << "current sweep: " << sweepNum << std::endl; 
+	 writePositions(&pos_file); 
+         prop.calcPeriodicProp
+		 (&particles,&rad_dist_file); 
       }
    }
-   prop.writeProperties();   
+   prop.writeProperties();  
+   std::cout << "The average energy of the system is " << prop.calcAvgEnergy() << std::endl; 
    std::cout << "The pressure of the system is " << prop.calcPressure() << std::endl;     
    perc_rej = n_rejects / (n_updates * n_particles) * 100.0; 
    std::cout << perc_rej << "% of the moves were rejected." << std::endl;
@@ -249,17 +248,23 @@ void Simulation::setParticleParams(){
    radius_1 = node["particleRadius_1"].as<double>(); 
    radius_2 = node["particleRadius_2"].as<double>(); 
 
-   sigma = node["sigma"].as<double>(); 
-   boxLength = node["boxLength"].as<double>(); 
+   sigma = param.getSigma(); 
+   boxLength = param.getBoxLength(); 
 
    Particle prt; 
    // prt.setStepWeight(node["weight"].as<double>());
    
-   redDensity = n_particles * pow(sigma,2) / pow(2 * boxLength,2); 
-   weight = sigma * sqrt(1/redDensity); 
+//   redDensity = n_particles * pow(sigma,2) / pow(2 * boxLength,2); 
+   weight = sigma * sqrt(1/(4 * param.getRedDens()));
+   std::cout << "the stepping weight is: " << weight << std::endl; 
    prt.setStepWeight(weight); 
-
-   prt.setRadius(radius_1);
+   
+   if(param.getLenJones() == 1){
+      prt.setRadius(0.5 * sigma); 
+   }
+   else{
+      prt.setRadius(radius_1);
+   } 
    prt.setType(1); 
 
    for(int k = 0; k < num_part1; k++){	

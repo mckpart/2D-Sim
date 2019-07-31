@@ -3,7 +3,6 @@
 
 #include "Simulation.h"
 
-
 int main(int argc, char *argv[]){
 
    if(argc > 1){	
@@ -16,4 +15,5 @@ int main(int argc, char *argv[]){
    else{
       std::cout << "ERROR: NO .YAML FILE" << std::endl; 
    }
+   return 0; 
 }
