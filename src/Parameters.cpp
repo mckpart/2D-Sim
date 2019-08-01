@@ -13,23 +13,31 @@ void Parameters::initializeParameters(std::string yamlFile){
    sigma       = node["sigma"].as<double>(); 
    boxLength   = node["boxLength"].as<double>();
    n_particles = node["totalParticles"].as<int>();
-   
+
+   LJ_const_1  = node["LJ_constant_1"].as<double>(); 
+   LJ_const_2  = node["LJ_constant_2"].as<double>(); 
+
+   eq_sweep    = node["equilibriate_sweep"].as<int>(); 
+   d_interval  = node["data_collect_interval"].as<int>(); 
+
    if(boxLength == 0){
       boxLength = sigma * sqrt(n_particles/redDensity); 
    }
    else if(sigma == 0){  // add a check such that a bunch of zeros can't be added
       sigma = boxLength * sqrt(redDensity/n_particles); 
    }
+   else if(redDensity == 0){
+      redDensity = n_particles * pow(sigma/boxLength,2);
+   }
 
-   std::cout << "reduced density: " << redDensity << " redTemp: " << redTemp 
-	     << " sigma: " << sigma << " boxLength: " << boxLength << std::endl;
-
+   std::cout << "reduced density: " << redDensity 
+	     << "\n redTemp: " << redTemp 
+	     << "\n sigma: " << sigma 
+	     << "\n boxLength: " << boxLength << std::endl;
 
    seed        = node["seed"].as<long>(); 
    n_updates   = node["numberUpdates"].as<int>(); 
  
-//   beta        = node["beta"].as<double>();
-
    init_type   = node["initializationType"].as<int>(); 
 
    rigidBC     = node["rigidBoundary"].as<bool>(); 
@@ -39,12 +47,16 @@ void Parameters::initializeParameters(std::string yamlFile){
    hardDisk    = node["hardDisks"].as<bool>(); 
    lenJones    = node["lennardJones"].as<bool>(); 	
    WCA         = node["WCA"].as<bool>(); 
-//   c_linkers   = node["crosslinkers"].as<bool>(); 
 }
-
 
 ///// GETTERS ////////////////
 
+int Parameters::getData_interval(){
+   return d_interval; 
+}
+int Parameters::getEq_sweep(){
+   return eq_sweep; 
+}
 int Parameters::getUpdates(){
    return n_updates; 
 } 	
@@ -84,6 +96,13 @@ bool Parameters::getLenJones(){
 }
 bool Parameters::getWCA(){
    return WCA; 
+}
+
+double Parameters::getLJ_const_1(){
+   return LJ_const_1; 
+}
+double Parameters::getLJ_const_2(){
+   return LJ_const_2; 
 }
 
 double Parameters::getSigma(){

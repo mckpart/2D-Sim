@@ -15,9 +15,17 @@ Simulation::Simulation(std::string yf){
    bound.initializeBoundary(&param);
    prop.initializeProperties(&param);  
 
+   randVal.InitCold(param.getSeed()); 
+
    n_particles = param.getNumParticles();   // initialize vector of
    particles.resize(n_particles);           // particles and set particle
    setParticleParams();	                    // parameters
+   
+   Particle prt; 
+   for(int k = 0; k < n_particles; ++k){
+      prt = particles[k]; 
+      std::cout << "k: " << k << " type: " << prt.getType() << std::endl; 
+   }
 
    redTemp = param.getRedTemp();
    std::cout << "in sim the redtemp is " << redTemp << std::endl; 
@@ -106,11 +114,7 @@ void Simulation::runSimulation(){
    std::ofstream pos_file; 
    pos_file.open("positions.txt"); 
 
-   KISSRNG randVal; 
-   randVal.InitCold(param.getSeed()); 	// warms the RNG
-
    n_updates = param.getUpdates(); 
-//   beta = param.getBeta(); 
 
    n_initial = n_particles;    
    
@@ -210,7 +214,7 @@ void Simulation::runSimulation(){
          }                  	
       } 
      
-      if(sweepNum > 500 && sweepNum % 50 == 0){
+      if(sweepNum > param.getEq_sweep() && sweepNum % param.getData_interval() == 0){
 	 std::cout << "current sweep: " << sweepNum << std::endl; 
 	 writePositions(&pos_file); 
          prop.calcPeriodicProp
@@ -228,55 +232,74 @@ void Simulation::runSimulation(){
 
 void Simulation::setParticleParams(){	
 
-   int num_part1 = 0; 
-   int num_part2 = 0; 
+   Particle prt; 
+     
+   int num_part_1 = 0; 
+   int num_part_2 = 0; 
 
-   double radius_1 = 0; 
-   double radius_2 = 0; 
-
+   double radius = 0; 
    double weight = 0; 
    double sigma = 0; 
    double boxLength = 0; 
 
+   double num_1 = 0; 
+   double num_2 = 0; 
+   double n = 0; 
+   int type = 0; 
+
    double redDensity = 0; 
+   
+   std::ofstream type_file; 
+   type_file.open("particle_type.txt");
 
    YAML::Node node = YAML::LoadFile(yamlFile);
 
-   num_part1 = node["type1_Particles"].as<int>(); 
-   num_part2 = node["type2_Particles"].as<int>(); 
+   num_part_1 = node["type1_Particles"].as<int>(); 
+   num_part_2 = node["type2_Particles"].as<int>(); 
 
-   radius_1 = node["particleRadius_1"].as<double>(); 
-   radius_2 = node["particleRadius_2"].as<double>(); 
+   radius = node["particleRadius"].as<double>(); // both particles have the same radius 
 
    sigma = param.getSigma(); 
    boxLength = param.getBoxLength(); 
 
-   Particle prt; 
-   // prt.setStepWeight(node["weight"].as<double>());
-   
-//   redDensity = n_particles * pow(sigma,2) / pow(2 * boxLength,2); 
    weight = sigma * sqrt(1/(4 * param.getRedDens()));
    std::cout << "the stepping weight is: " << weight << std::endl; 
    prt.setStepWeight(weight); 
    
    if(param.getLenJones() == 1){
-      prt.setRadius(0.5 * sigma); 
+      radius = .5 * sigma; 
    }
-   else{
-      prt.setRadius(radius_1);
-   } 
-   prt.setType(1); 
 
-   for(int k = 0; k < num_part1; k++){	
-      prt.setIdentifier(k);   // initialize all particles of type 1
-      particles[k] = prt;     // with specific radius and assign 
-   }                          // unique ID
-
-   prt.setRadius(radius_2); 
-   prt.setType(2); 
-
-   for(int k = 0; k < num_part2; k++ ){  // initialize all particles
-      prt.setIdentifier(k + num_part1);  // of type 2 with specific 
-      particles[k + num_part1] = prt;    // radius and unique ID
+   prt.setRadius(radius); 
+   for(int k = 0; k < n_particles; ++k){
+      if(num_1 < num_part_1 && num_2 < num_part_2){
+         n = randVal.RandomUniformDbl(); 
+//         std::cout << "the random val is: " << n << std::endl; 
+         if(n < 0.5){
+            type = 1; 
+	    ++num_1; 
+         }
+         else{
+            type = 2;
+	    ++num_2;  
+         }
+      }
+      else if(num_1 < num_part_1){
+         type = 1; 
+         ++num_1; 
+      }
+      else if(num_2 < num_part_2){
+         type = 2; 
+         ++num_2; 
+      }
+      else{
+         std::cout << "count again" << std::endl; 
+      }
+      prt.setType(type); 
+      prt.setIdentifier(k);
+      particles[k] = prt;  
+   
+      type_file << type << " "; 
    }
+   type_file.close();    
 }

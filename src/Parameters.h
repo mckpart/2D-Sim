@@ -13,6 +13,12 @@ private:
    double sigma = 0;
    double boxLength = 0; 
 
+   double LJ_const_1 = 0; 
+   double LJ_const_2 = 0; 
+
+   int eq_sweep = 0; 
+   int d_interval = 0; 
+
    int n_updates = 0; 
    int n_particles = 0; 
    long seed = 0; 
@@ -44,6 +50,9 @@ public:
 
    int getInit_Type(); 
 
+   int getEq_sweep(); 
+   int getData_interval(); 
+
    bool getRigidBC(); 		
    bool getPeriodicBC(); 		
    bool getExtWell(); 
@@ -51,6 +60,9 @@ public:
    bool getHardDisk(); 
    bool getLenJones(); 
    bool getWCA(); 
+
+   double getLJ_const_1(); 
+   double getLJ_const_2(); 
 
    double getRedDens(); 
    double getRedTemp();

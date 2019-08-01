@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import cm
 import matplotlib as mpl
 from matplotlib import pyplot as plt 
 from matplotlib.animation import FuncAnimation
@@ -13,8 +14,8 @@ def dist(x1,x2,y1,y2):
 with open("params.yaml",'r') as yf:
    yaml_dict = yaml.safe_load(yf)
 
-radius_1   = float(yaml_dict["particleRadius_1"])
-radius_2   = float(yaml_dict["particleRadius_2"])     
+radius   = float(yaml_dict["particleRadius"])
+# radius_2   = float(yaml_dict["particleRadius_2"])     
 n_part_1   = yaml_dict["type1_Particles"]
 n_part_2   = yaml_dict["type2_Particles"]
 n_part_tot = yaml_dict["totalParticles"]
@@ -38,18 +39,30 @@ if(LJ == 1):
         sigma = boxLength * math.sqrt(redDens/n_part_tot)
     elif(boxLength == 0):
         boxLength = sigma * math.sqrt(n_part_tot/redDens)
-    radius_1 = 0.5 * sigma
+    radius = 0.5 * sigma
 patches = []
 position = []
 x,y = [],[]
 
 fig,ax = plt.subplots()
 
-colors = mpl.cm.rainbow(np.linspace(0,1, n_part_tot))
-for i in range(n_part_1):
-    patches += [plt.Circle((0,0), radius_1, color= colors[i])]
-for i in range(n_part_2):
-    patches += [plt.Circle((0,0), radius_2, color = colors[i + n_part_1])]    
+file_1 = open('particle_type.txt','r')
+types = file_1.read().split(' ')
+types = [float(i) for i in types if i != '']
+print types
+
+for k in range(n_part_tot):
+    if(types[k] == 1):
+        c = 'red'
+    else:
+        c = 'blue'
+    patches += [plt.Circle((0,0), radius, color = c)]
+# color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
+# color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
+# for i in range(n_part_1):
+#     patches += [plt.Circle((0,0), radius, color = 'red')]
+# for i in range(n_part_2):
+#     patches += [plt.Circle((0,0), radius, color = 'blue')]    
 
 file = open(pos_file, "r" )
 for line in file:

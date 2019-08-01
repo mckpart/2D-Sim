@@ -2,35 +2,30 @@
 #include "Properties.h" 
 
 // returns the characteristic length between two particles
-double Properties::radDistance(double x1, double x2, double y1, double y2){
+double Properties::radDistance(double x1, double x2, 
+		               double y1, double y2){
    return sqrt(pow(x2-x1,2) + pow(y2-y1,2)) / sigma;  
 }   
 
-double Properties::lenJonesForce(double r){
-   return 24/sigma * (2 * pow(1/r,13) - pow(1/r,7));  // come back to check this calculation
+double Properties::lenJonesForce(double r, double c){
+   return 24*c/sigma * (2 * pow(1/r,13) - pow(1/r,7));  // r is really r/sigma
 }
 
-double Properties::lenJonesEnergy(double r){
-   return 4 * (pow(1/r,12) - pow(1/r,6) + truncShift); 
+double Properties::lenJonesEnergy(double r, double c){
+   return 4*c * (pow(1/r,12) - pow(1/r,6) + truncShift); // r is really r/sigma 
 }
 
-void Properties::calcEnergy(double r){
-//   std::cout << "\n"; 
-   f_energy = f_energy + lenJonesEnergy(r); 
-//   std::cout << "fenergy is " << f_energy << std::endl;
-}
-void Properties::calcVirial(double r){
-//   std::cout << "\n";
-   f_r = f_r + r * lenJonesForce(r); 
-//   std::cout << "f dot r is " << f_r << std::endl; 
+void Properties::calcEnergy(double r, double c){
+   f_energy = f_energy + lenJonesEnergy(r,c); // sums the energy of the current 
+}                                           // configuration
+void Properties::calcVirial(double r, double c){      // sums the virial of current
+   f_r = f_r + r * lenJonesForce(r,c);        // configuration
 }
 
 void Properties::updateNumDensity(double r){
    int val = r/delta_r;
    int index = 0; 
-   
-//   std::cout << "r is " << r << std::endl; 
-   
+    
    if(r < boxLength/2){
       if(r > (val + 0.5) * delta_r){
          index = val + 1; 
@@ -76,15 +71,11 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
 
    double x_force = 0; 
    double y_force = 0; 
-
+   
+   double LJ_constant = 0; 
    double r_dist = 0; 
    double force_tot = 0; 
-//   double f_r = 0; 
    
-
-   //////////////////////////
-//   sigma = 1; n_particles = 5; truncDist = 2.5; boxLength = 2.5; LJ = 1;  
-//   delta_r = .1; num_density.resize(2 *boxLength/(delta_r) + 1); 
    std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));
    
    f_energy = 0;   // make sure that the free energy previously calculated is reset
@@ -93,49 +84,53 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
    for(int k = 0; k < n_particles; k++){ 
       curr_prt = (*particles)[k]; 
       
-      x_curr = curr_prt.getX_Position(); 
+      x_curr = curr_prt.getX_Position();    // set current x,y position
       y_curr = curr_prt.getY_Position(); 
    
       for(int n = 0; n < n_particles; n++){ // each particle-particle interaction
 	      
 	 comp_prt =(*particles)[n]; 
-         x_comp = comp_prt.getX_Position(); 
+         x_comp = comp_prt.getX_Position(); // set comparison x,y position
 	 y_comp = comp_prt.getY_Position(); 
 
          // the particle cannot interact with itself
-	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){ // if n != k 
+	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){  
 	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
-
 	    updateNumDensity(r_dist);   
 	 }
-	 if(n > k){
-	    if(LJ == 1){ 
-	       if(r_dist > truncDist){
-	          populateCellArray(x_comp,y_comp,&cellPositions);
-                  for(int z = 0; z < 8; z++){
-               
-	             x_comp = cellPositions[z][0]; 
-	             y_comp = cellPositions[z][1];
+         
+         if(curr_prt.getType() == comp_prt.getType()){
+	    LJ_constant = LJ_par; 
+	 }
+	 else if(curr_prt.getType() != comp_prt.getType()){
+	    LJ_constant = LJ_antipar; 
+	 }
 
-		     r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
-//		     std::cout << "in loop rdist is: " << r_dist << std::endl;
-		     for(int j = 0; j < 2; j++){
-                        updateNumDensity(r_dist); 
+	 if(n > k){
+	    if(r_dist > truncDist){
+	       populateCellArray(x_comp,y_comp,&cellPositions);
+               for(int z = 0; z < 8; z++){
+               
+	          x_comp = cellPositions[z][0]; // this is very inefficient but works... 
+	          y_comp = cellPositions[z][1]; // creates the 8 cells surrounding 
+                                                // the reference cell 
+		  r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
+		  for(int j = 0; j < 2; j++){
+                     updateNumDensity(r_dist); 
+		  }
+		  if(r_dist < truncDist){
+	             for(int j = 0; j < 2; j ++){
+		        calcEnergy(r_dist,LJ_constant);  
+		        calcVirial(r_dist,LJ_constant); 
 		     }
-		     if(r_dist < truncDist){
-			for(int j = 0; j < 2; j ++){
-		           calcEnergy(r_dist);  
-		           calcVirial(r_dist); 
-			}
-		     } 
-	          }
-	       }
-	       else{
-	          calcEnergy(r_dist);  
-	          calcVirial(r_dist); 
-	       }
-	    }                          
-         }
+                  } 
+               }
+            }
+            else{
+	       calcEnergy(r_dist,LJ_constant);  
+	       calcVirial(r_dist,LJ_constant); 
+	    }
+	 }                          
       }
    }
    sum_Fdot_r.push_back(f_r); 
@@ -147,12 +142,9 @@ double Properties::calcPressure(){
    double len = 0; 
    double avgEnergy = 0; 
    double redPressure = 0; 
-   double press_corr = 0; 
 
-   len = double(sum_Fdot_r.size());
-   press_corr = 16.75516082 * pow(redDens,2) * 
-	        ((2/3)*pow(sigma/truncDist,9) - pow(sigma/truncDist,3)); 
-   
+   len = double(sum_Fdot_r.size()); // the pressure correction is 
+                                    // added in the analysis code
    for(int k = 0; k < len; k++){
       avgEnergy = avgEnergy + sum_Fdot_r[k];  
    }
@@ -209,11 +201,13 @@ void Properties::initializeProperties(Parameters* p){
    redTemp = p->getRedTemp(); 
 
    LJ = p->getLenJones(); 
+  
+   LJ_par = p->getLJ_const_1(); 
+   LJ_antipar = p->getLJ_const_2(); 
+
+   delta_r = sigma/20; // this might not be the best way to define delta_r
    
-   delta_r = sigma/10;
-   
-//   std::cout << "the number of elements in numdens is: " << num_density.size() << "\n";   
    truncDist = 2.5;                 // really is 2.5 * sigma / sigma 
-   truncShift = -1 * lenJonesEnergy(truncDist); // shifts the cutoff to zero 
+   truncShift = -1 * lenJonesEnergy(truncDist,.25); // shifts the cutoff to zero 
    num_density.resize((boxLength/2)/delta_r + 1);
 }

@@ -25,8 +25,9 @@ private:
 
    std::vector<Particle> particles; 	  
 
-   int n_particles = 0; 
+   KISSRNG randVal; 
 
+   int n_particles = 0; 
    double redTemp = 0; 
 public: 
 

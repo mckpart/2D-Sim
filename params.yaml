@@ -4,21 +4,28 @@ totalParticles  : 256
 type1_Particles : 256
 type2_Particles : 0
 
-particleRadius_1 : .05
-particleRadius_2 : .12
+particleRadius: .05
 
-## DEFINE THE REDUCED PARAMS ###
+# DEFINE THE REDUCED PARAMS ###
 
 reducedTemp : .7  # not measured by the system currently
-reducedDens : .9  # currently user determined, but could be found from sigma,L
+reducedDens : .7  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
-seed   : 20394750231 
+LJ_constant_1 : 1  # thus the well depth for each is equal to 
+LJ_constant_2 : 1.5  # c * KbT
+
+seed   : 90757029382 
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 1500  # each update = 1 sweep = n_part attempted moves 
+numberUpdates  : 30000  # each update = 1 sweep = n_part attempted moves 
 initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
+
+### CHOOSE RUN LENGTH ####
+
+equilibriate_sweep : 15000 
+data_collect_interval : 50
 
 ### CHOOSE INTERACTION TYPE ####
 
@@ -26,12 +33,10 @@ hardDisks    : false
 lennardJones : true
 WCA          : false
 
-# wellDepth : 1    this unit of energy shouldn't be necessary if 
-                 # everything is nondimensionalized properly
-
 ### DEFINE TYPE OF BOUNDARY ######
 
-rigidBoundary    : false 
+rigidBoundary    : false # change these form bool values... should be handled 
+                         # more similarly to the initialization. 
 periodicBoundary : true # primarily working with periodic boundaries for now
 externalWell     : false # so the other BC will need a fair amount of work 
 
