@@ -27,14 +27,16 @@ public:
 
    void initializeInteraction(Parameters* p); 
    void populateCellArray(double x, double y, 
-		   std::vector<std::vector<double>>* cellPositions); 
+		          std::vector<std::vector<double>>* cellPositions); 
 
    double distance(double x1, double x2, double y1, double y2);
+   
    double lenjones_energy(double r, double c); 
-   double WCA_energy(double r, double c); 
+   double WCA_energy     (double r, double c); 
 
-   double periodicInteraction(std::vector<Particle>* particles, int index); 
-   bool hardDisks     (std::vector<Particle>* particles, int index);
+   double nonPeriodicInteraction(std::vector<Particle>* particles, int index); 
+   double periodicInteraction   (std::vector<Particle>* particles, int index); 
+   bool hardDisks               (std::vector<Particle>* particles, int index);
 
 
 };

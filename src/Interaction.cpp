@@ -173,6 +173,91 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
    return delta_energy + tail_corr;      // returns the total change in energy 
 }
 
+double Interaction::nonPeriodicInteraction(std::vector<Particle>* particles, 
+		                           int index){
+   Particle current_prt; 
+   Particle compare_prt; 						
+
+   double x_temp = 0; 
+   double y_temp = 0; 
+   double x_curr = 0; 
+   double y_curr = 0; 
+   double x_comp = 0; 
+   double y_comp = 0; 
+
+   double delta_energy = 0; 
+   double energy_curr = 0; 
+   double energy_temp = 0; 
+
+   double num = 0; 
+   double c = 0; 
+
+   double dist_curr_x = 0;
+   double dist_curr_y = 0;  
+   double dist_temp_x = 0; 	
+   double dist_temp_y = 0; 
+
+   double dist_curr_tot = 0; 
+   double dist_temp_tot = 0; 
+
+//   std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));  
+
+   current_prt = (*particles)[index];    // assign current particle
+ 
+   x_temp = current_prt.getX_TrialPos(); // assign the current and trial
+   y_temp = current_prt.getY_TrialPos(); // positions of the current
+                                         // particle
+   x_curr = current_prt.getX_Position(); 
+   y_curr = current_prt.getY_Position(); 
+   
+   for(int k = 0; k < n_particles; k++){
+      compare_prt = (*particles)[k]; 
+   
+      if(compare_prt.getIdentifier() != current_prt.getIdentifier()){
+
+     	 x_comp = compare_prt.getX_Position(); // set the comparison  
+         y_comp = compare_prt.getY_Position(); // particles position
+
+	 dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
+	 dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp); 
+	   
+	 if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
+	    c = LJ_par; 
+	 }
+         else if(current_prt.getType() != compare_prt.getType()){
+	    c = LJ_antipar; 
+	 }
+
+         if(dist_curr_tot < truncDist){
+	    switch(interact_type){ // case 0 would be the hard disk interaction but that is included elsewhere
+	       case 1: energy_curr = lenjones_energy(dist_curr_tot,c);  
+	               break;
+	       case 2: energy_curr = WCA_energy(dist_curr_tot,c); 
+		       break;
+	    }
+	 }
+         else{
+	    energy_curr = 0; 
+	 }	 
+      
+         if(dist_temp_tot < truncDist){
+	    switch(interact_type){
+	       case 1: energy_temp = lenjones_energy(dist_temp_tot,c); 
+		       break;
+	       case 2: energy_temp = WCA_energy(dist_temp_tot,c); 
+		       break;
+	    }
+	 }
+         else{
+	    energy_temp = 0; 
+	 }
+         
+	 delta_energy = delta_energy + (energy_temp - energy_curr); 
+      }
+   }
+   return delta_energy; 
+}
+
 bool Interaction::hardDisks(std::vector<Particle>* particles, int index){ 
 	
    Particle current_prt; 
@@ -196,7 +281,7 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index){
    rad_temp = current_prt.getRadius();   // particle 
 
    accept = 1; 
-
+//   std::cout << "in hard disk class" << std::endl; 
 //////// CHECK FOR PARTICLE-PARTICLE COLLISION //////////
 		
    for(int k = 0; k < n_particles; k++){

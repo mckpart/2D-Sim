@@ -29,7 +29,7 @@ data_collect_interval : 10
 
 ### CHOOSE INTERACTION TYPE ####
 
-interactionType : 2 # 0 = hard disk, 1 = LJ, 2 = WCA
+interactionType : 1 # 0 = hard disk, 1 = LJ, 2 = WCA
 # hardDisks    : false
 # lennardJones : true
 # WCA          : false

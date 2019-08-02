@@ -156,19 +156,31 @@ void Simulation::runSimulation(){
          if(param.getRigidBC() == 1){             // run sim with hard boundaries
             accept = bound.rigidBoundary(&particles,curr_index);  
          }
-         else if(param.getPeriodicBC() == 1){              // run simulation with 
+         if(param.getPeriodicBC() == 1){              // run simulation with 
             bound.periodicBoundary(&particles,curr_index); // periodic boundaries
 
             prt = particles[curr_index]; 
 
             x_trial = prt.getX_TrialPos();   // updates trial position in function
             y_trial = prt.getY_TrialPos();   // then particle - particle 
-         
-	    delta_energy = interact.periodicInteraction(&particles,curr_index); 
+            
+	    if(param.getInteract_Type() != 0){ 
+	       delta_energy = interact.periodicInteraction(&particles,curr_index); 
+	    }
 	 }                                   // interactions are checked
-         else if(param.getExtWell() == 1){
-            delta_energy = bound.externalWell(&particles,curr_index); 
-         }
+         else{
+            if(param.getRigidBC() == 1){
+	       accept = bound.rigidBoundary(&particles,curr_index);
+	    }
+	    else if(param.getExtWell() == 1){
+	       delta_energy = bound.externalWell(&particles,curr_index);	    
+	    } 
+            
+	    if(param.getInteract_Type() != 0){
+	       delta_energy = delta_energy 
+	                    + interact.nonPeriodicInteraction(&particles,curr_index);
+	    }     
+	 }
           
 //	 std::cout << x_trial << " and " << y_trial << std::endl;
      /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
@@ -182,7 +194,9 @@ void Simulation::runSimulation(){
            MOVE IS ACCEPTED. ELSE A RANDOM NUMBER IS GENERATED TO 
            DETERMINE WHETHER THE MOVE IS TO BE ACCEPTED
      */		  
-			  
+         if(param.getInteract_Type() == 0 && accept == 1){
+	    accept = interact.hardDisks(&particles,curr_index); 
+	 }	 
 //         if(param.getInteract_Type() == 0 && accept == 1){
 //            accept = interact.hardDisks(&particles,curr_index); // condense into 
 //         }                                                      // int value to 
@@ -199,7 +213,8 @@ void Simulation::runSimulation(){
          if(accept == 1 && delta_energy > 0){
             total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
 
-            if(randVal.RandomUniformDbl() < total_prob){
+            if(randVal.RandomUniformDbl
+() < total_prob){
                accept = 1; 
             }
             else{
