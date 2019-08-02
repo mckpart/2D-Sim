@@ -15,6 +15,8 @@ private:
    double LJ_par = 0; 
    double LJ_antipar = 0; 
 
+   int interact_type = 0; 
+
    double tail_corr = 0; 
    double truncDist = 0;
    double truncShift = 0; 
@@ -29,10 +31,9 @@ public:
 
    double distance(double x1, double x2, double y1, double y2);
    double lenjones_energy(double r, double c); 
+   double WCA_energy(double r, double c); 
 
-   double lennardJones(std::vector<Particle>* particles, int index); 
-   double WCApotential(std::vector<Particle>* particles, int index);
-   double crosslinkers(std::vector<Particle>* particles, int index); 
+   double periodicInteraction(std::vector<Particle>* particles, int index); 
    bool hardDisks     (std::vector<Particle>* particles, int index);
 
 

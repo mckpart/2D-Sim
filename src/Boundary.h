@@ -12,10 +12,10 @@ class Boundary{
 private:
    double boxLength = 0; 
    double sigma = 0; 
-
+   int interact_type = 0; 
    int n_particles = 0; 
 
-   bool LJ = 0; 
+//   bool LJ = 0; 
 public:
 
    void initializeBoundary(Parameters *p); 	

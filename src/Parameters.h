@@ -27,6 +27,7 @@ private:
    double beta = 0; 
 
    int init_type = 0; 
+   int interact_type = 0; 
 
    bool rigidBC = 0; 
    bool periodicBC = 0; 
@@ -49,6 +50,7 @@ public:
    double getBeta(); 
 
    int getInit_Type(); 
+   int getInteract_Type(); 
 
    int getEq_sweep(); 
    int getData_interval(); 
@@ -56,10 +58,10 @@ public:
    bool getRigidBC(); 		
    bool getPeriodicBC(); 		
    bool getExtWell(); 
-
-   bool getHardDisk(); 
-   bool getLenJones(); 
-   bool getWCA(); 
+//
+//   bool getHardDisk(); 
+//   bool getLenJones(); 
+//   bool getWCA(); 
 
    double getLJ_const_1(); 
    double getLJ_const_2(); 

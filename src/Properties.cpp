@@ -200,8 +200,9 @@ void Properties::initializeProperties(Parameters* p){
    redDens = p->getRedDens(); 
    redTemp = p->getRedTemp(); 
 
-   LJ = p->getLenJones(); 
-  
+//   LJ = p->getLenJones(); 
+   interact_type = p->getInteract_Type(); 
+
    LJ_par = p->getLJ_const_1(); 
    LJ_antipar = p->getLJ_const_2(); 
 

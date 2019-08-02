@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "Interaction.h"
 #include <cmath>
 
@@ -11,85 +12,8 @@ double Interaction::lenjones_energy(double r, double c){
    return 4*c*(pow(1/r,12) - pow(1/r,6) + truncShift);
 }
 
-double Interaction::WCApotential(std::vector<Particle>* particles, int index){
-
-   Particle current_prt; 
-   Particle compare_prt; 						
-
-   double x_temp = 0; 
-   double y_temp = 0; 
-   double x_curr = 0; 
-   double y_curr = 0; 
-   double x_comp = 0; 
-   double y_comp = 0; 
-
-   double sigma = 0; 
-
-   double delta_energy = 0;  
-   double energy_curr = 0; 
-   double energy_temp = 0; 
-
-   double rad_curr = 0; 
-   double rad_comp = 0; 
-   double num = 0; 
-
-   double dist_curr = 0; 
-   double dist_temp = 0; 	
-
-   current_prt = (*particles)[index];  // assign current particle
-
-   x_temp = current_prt.getX_TrialPos(); // assign the current and trial
-   y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
-                                         // the current particle
-   x_curr = current_prt.getX_Position(); 
-   y_curr = current_prt.getY_Position(); 
-   rad_curr = current_prt.getRadius(); 
-
-   for(int k = 0; k < n_particles; k++){  // the O(N^2)... think about 
-                                          // implementing neighbor lists here
-      compare_prt = (*particles)[k];      // assign comparison particle
-
-
-      /*   - CHECK THAT THE COMPARISON PARTICLE IS NOT THE CURRENT PARTICLE 
-           - SET THE COMPARISON POSITION AND RADIUS
-           - IF THE DISTANCE BETWEEN PARTICLES IS > SIGMA * 2^(1/6), THE CHANGE
-             IN ENERGY IS ZERO
-           - IF LESS THAN SIGMA * 2^(1/6), THE LENNARD JONES REPULSION IS USED
-           - SUM THE TOTAL CHANGE IN ENERGY
-      */	 
-
-      if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
-
-         x_comp = compare_prt.getX_Position(); 
-         y_comp = compare_prt.getY_Position(); 
-         rad_comp = compare_prt.getRadius(); 
-
-         dist_curr = distance(x_curr,x_comp,y_curr,y_comp); 
-         dist_temp = distance(x_temp,x_comp,y_temp,y_comp); 
-
-         sigma = (rad_curr + rad_comp); 				
-
-         if(dist_curr > pow(2,1/6) * sigma){  // the potential does not extend past 
-            energy_curr = 0;                  // this maximum distance - there is no
-         }                                    // change in energy beyond this distance
-         else{
-            energy_curr = 4 *  
-            (pow(sigma/dist_curr,12) - pow(sigma/dist_curr,6) + .25); 
-         }
-
-         if(dist_temp > pow(2,1/6) * sigma){
-            energy_temp = 0; 
-         }
-         else{
-            energy_temp = 4 * 
-            (pow(sigma/dist_temp,12) - pow(sigma/dist_temp,6) + .25); 								
-         }
-
-         delta_energy = delta_energy + (energy_temp - energy_curr); 
-      }
-   }
-
-   return delta_energy;  // returns the total change in energy associated with this move
+double Interaction::WCA_energy(double r, double c){
+   return 4*c*(pow(1/r,12) - pow(1/r,6) + .25);
 }
 
 void Interaction::populateCellArray(double x,
@@ -109,8 +33,8 @@ void Interaction::populateCellArray(double x,
 
 }
 
-double Interaction::lennardJones(std::vector<Particle>* particles, 
-		                 int index){
+double Interaction::periodicInteraction(std::vector<Particle>* particles, 
+		                        int index){
    Particle current_prt; 
    Particle compare_prt; 						
 
@@ -198,15 +122,29 @@ double Interaction::lennardJones(std::vector<Particle>* particles,
 	       dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
                dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp);  
                    
-     	       if(dist_curr_tot < truncDist){
-                  energy_curr = lenjones_energy(dist_curr_tot,c);  
-     	       }
+     	       if(dist_curr_tot < truncDist){ // maybe have a different truncation dist for different 
+		  switch(interact_type){      // types of interactions...
+		     case 0: std::cout << "mehhh" << std::endl;	  // also different energy corrections should
+                             break;                               // be included for the different interaction
+		     case 1: energy_curr = lenjones_energy(dist_curr_tot,c); // types
+			     break;
+	             case 2: energy_curr = WCA_energy(dist_curr_tot,c);
+			     break;  
+	          }
+	       }
                else{
                   energy_curr = 0; 
 	       }
 		  
 	       if(dist_temp_tot < truncDist){
-                  energy_temp = lenjones_energy(dist_temp_tot,c); 			   				
+                  switch(interact_type){   
+		     case 0: std::cout << "mehhh" << std::endl;	  
+                             break;                               
+		     case 1: energy_temp = lenjones_energy(dist_temp_tot,c); 
+			     break;
+	             case 2: energy_temp = WCA_energy(dist_temp_tot,c); 
+			     break;
+		  }
 	       }
 	       else{
 		 energy_temp = 0; 
@@ -216,10 +154,19 @@ double Interaction::lennardJones(std::vector<Particle>* particles,
 	    }
 	 }
 	 else{
-	    energy_curr = lenjones_energy(dist_curr_tot,c); 
-	    energy_temp = lenjones_energy(dist_temp_tot,c); 
-	    
+
+            switch(interact_type){      // types of interactions...
+	       case 0: std::cout << "mehhh" << std::endl;	  // also different energy corrections should
+                       break;                               // be included for the different interaction
+	       case 1: energy_curr = lenjones_energy(dist_curr_tot,c); // types
+                       energy_temp = lenjones_energy(dist_temp_tot,c); 
+		       break;
+	       case 2: energy_curr = WCA_energy(dist_curr_tot,c);
+		       energy_temp = WCA_energy(dist_temp_tot,c); 
+		       break;
+	    }
 	    delta_energy = delta_energy + (energy_temp - energy_curr); 
+	    
 	 }
       }                                                                
    }
@@ -279,6 +226,8 @@ void Interaction::initializeInteraction(Parameters* p){
    n_particles  = p->getNumParticles();        // used in this class
    sigma        = p->getSigma(); 
    redDens      = p->getRedDens(); 
+  
+   interact_type = p->getInteract_Type();
    
    LJ_par       = p->getLJ_const_1(); 
    LJ_antipar   = p->getLJ_const_2(); 

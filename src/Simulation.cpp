@@ -163,7 +163,9 @@ void Simulation::runSimulation(){
 
             x_trial = prt.getX_TrialPos();   // updates trial position in function
             y_trial = prt.getY_TrialPos();   // then particle - particle 
-         }                                   // interactions are checked
+         
+	    delta_energy = interact.periodicInteraction(&particles,curr_index); 
+	 }                                   // interactions are checked
          else if(param.getExtWell() == 1){
             delta_energy = bound.externalWell(&particles,curr_index); 
          }
@@ -181,17 +183,18 @@ void Simulation::runSimulation(){
            DETERMINE WHETHER THE MOVE IS TO BE ACCEPTED
      */		  
 			  
-         if(param.getHardDisk() == 1 && accept == 1){
-            accept = interact.hardDisks(&particles,curr_index); // condense into 
-         }                                                      // int value to 
-         else if(param.getLenJones() == 1 && accept == 1){      // reduce num of 
-            delta_energy = delta_energy +                       // parameters
-                           interact.lennardJones(&particles,curr_index); 
-         }  
-         else if(param.getWCA() == 1 && accept == 1){
-            delta_energy = delta_energy +  
-                           interact.WCApotential(&particles,curr_index); 
-         }       
+//         if(param.getInteract_Type() == 0 && accept == 1){
+//            accept = interact.hardDisks(&particles,curr_index); // condense into 
+//         }                                                      // int value to 
+//         else if(param.getInteract_Type() == 1 && accept == 1){      // reduce num of 
+//            delta_energy = delta_energy +                       // parameters
+//                           interact.periodicInteraction(&particles,curr_index); 
+////            std::cout << "in here" << std::endl;
+//	 }  
+//         else if(param.getInteract_Type() == 2 && accept == 1){
+//            delta_energy = delta_energy +  
+//                           interact.WCApotential(&particles,curr_index); 
+//         }       
 
          if(accept == 1 && delta_energy > 0){
             total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
@@ -266,7 +269,7 @@ void Simulation::setParticleParams(){
    std::cout << "the stepping weight is: " << weight << std::endl; 
    prt.setStepWeight(weight); 
    
-   if(param.getLenJones() == 1){
+   if(param.getInteract_Type() != 0){ // applies to the LJ and WCA potentials
       radius = .5 * sigma; 
    }
 

@@ -1,14 +1,14 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 256 
-type1_Particles : 256
+totalParticles  : 100 
+type1_Particles : 100
 type2_Particles : 0
 
 particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
-reducedTemp : .7  # not measured by the system currently
+reducedTemp : .4  # not measured by the system currently
 reducedDens : .7  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
@@ -19,19 +19,20 @@ LJ_constant_2 : 1.5  # c * KbT
 seed   : 90757029382 
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 30000  # each update = 1 sweep = n_part attempted moves 
+numberUpdates  : 2400  # each update = 1 sweep = n_part attempted moves 
 initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
 
 ### CHOOSE RUN LENGTH ####
 
-equilibriate_sweep : 15000 
-data_collect_interval : 50
+equilibriate_sweep : 1200 
+data_collect_interval : 10
 
 ### CHOOSE INTERACTION TYPE ####
 
-hardDisks    : false
-lennardJones : true
-WCA          : false
+interactionType : 2 # 0 = hard disk, 1 = LJ, 2 = WCA
+# hardDisks    : false
+# lennardJones : true
+# WCA          : false
 
 ### DEFINE TYPE OF BOUNDARY ######
 

@@ -38,15 +38,15 @@ void Parameters::initializeParameters(std::string yamlFile){
    seed        = node["seed"].as<long>(); 
    n_updates   = node["numberUpdates"].as<int>(); 
  
-   init_type   = node["initializationType"].as<int>(); 
-
+   init_type     = node["initializationType"].as<int>(); 
+   interact_type = node["interactionType"].as<int>(); 
    rigidBC     = node["rigidBoundary"].as<bool>(); 
    periodicBC  = node["periodicBoundary"].as<bool>(); 
    extWell     = node["externalWell"].as<bool>(); 
 
-   hardDisk    = node["hardDisks"].as<bool>(); 
-   lenJones    = node["lennardJones"].as<bool>(); 	
-   WCA         = node["WCA"].as<bool>(); 
+//   hardDisk    = node["hardDisks"].as<bool>(); 
+//   lenJones    = node["lennardJones"].as<bool>(); 	
+//   WCA         = node["WCA"].as<bool>(); 
 }
 
 ///// GETTERS ////////////////
@@ -77,6 +77,9 @@ double Parameters::getBeta(){
 int Parameters::getInit_Type(){
    return init_type; 
 }
+int Parameters::getInteract_Type(){
+   return interact_type;
+}
 
 bool Parameters::getRigidBC(){
    return rigidBC; 
@@ -88,15 +91,15 @@ bool Parameters::getExtWell(){
    return extWell; 
 }
 
-bool Parameters::getHardDisk(){
-   return hardDisk; 
-}
-bool Parameters::getLenJones(){
-   return lenJones; 
-}
-bool Parameters::getWCA(){
-   return WCA; 
-}
+//bool Parameters::getHardDisk(){
+//   return hardDisk; 
+//}
+//bool Parameters::getLenJones(){
+//   return lenJones; 
+//}
+//bool Parameters::getWCA(){
+//   return WCA; 
+//}
 
 double Parameters::getLJ_const_1(){
    return LJ_const_1; 

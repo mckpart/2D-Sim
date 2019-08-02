@@ -184,7 +184,7 @@ double Boundary::externalWell(std::vector<Particle>* particles, int index){
    y_curr = current_prt.getY_Position(); 
 
    energy_curr = 4 * (pow(x_curr,2) + pow(y_curr,2)); // treat the constants as 1 for now.. change later
-   energy_temp = 4 * (pow(x_temp,2) + pow(x_temp,2)); 
+   energy_temp = 4 * (pow(x_temp,2) + pow(y_temp,2)); 
 
    delta_energy = energy_temp - energy_curr; 
 
@@ -214,8 +214,8 @@ void Boundary::initialPosition(std::vector<Particle>* particles, KISSRNG randVal
       current_prt = (*particles)[k];
       rad_temp = current_prt.getRadius();  
 
-      x_temp = randVal.RandomUniformDbl() * boxLength; 
-      y_temp = randVal.RandomUniformDbl() * boxLength; 
+      x_temp = randVal.RandomUniformDbl() * boxLength; // this may need to be  
+      y_temp = randVal.RandomUniformDbl() * boxLength; // .5 * boxL 
 
       /*   - GENERATE A RANDOM NUMBER FROM [0,1)
            - PROVIDES DIFFERENT 'QUADRANTS' FOR THE PARTICLE TO BE GENERATED IN 
@@ -310,7 +310,7 @@ int Boundary::initialHexagonal(std::vector<Particle>* particles){
 
    h = 0.8660254038; // sin(pi/3)
 
-   if(LJ == 1){
+   if(interact_type != 0){ // this should be true for WCA and LJ 
       x_dist = sigma; 
    }
    else{
@@ -392,7 +392,7 @@ int Boundary::initialSquare(std::vector<Particle>* particles){
 
    int return_num = 0; 
 
-   if(LJ == 1){
+   if(interact_type != 0){ // should be true for LJ and WCA
       x_dist = sigma; 
       y_dist = sigma; 
    }
@@ -437,10 +437,10 @@ int Boundary::initialSquare(std::vector<Particle>* particles){
 
 void Boundary::initializeBoundary(Parameters* p){
 
-   boxLength   = p->getBoxLength(); 
-   sigma       = p->getSigma(); 
-   LJ          = p->getLenJones(); 
-   n_particles = p->getNumParticles();
+   boxLength     = p->getBoxLength(); 
+   sigma         = p->getSigma(); 
+   interact_type = p->getInteract_Type(); 
+   n_particles   = p->getNumParticles();
    
 //   std::cout << "in bound sigma is: " << sigma << std::endl;
 }

@@ -23,7 +23,8 @@ private:
    double truncDist = 0; 
    double truncShift = 0; 
 
-   bool LJ = 0;
+   double interact_type = 0; 
+//   bool LJ = 0;
 
    double LJ_par = 0; 
    double LJ_antipar = 0; 

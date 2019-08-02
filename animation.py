@@ -21,7 +21,7 @@ n_part_2   = yaml_dict["type2_Particles"]
 n_part_tot = yaml_dict["totalParticles"]
 
 sigma = float(yaml_dict["sigma"])
-LJ = yaml_dict["lennardJones"]
+interact_type = yaml_dict["interactionType"]
 redDens = yaml_dict["reducedDens"]
 
 # numIter    = yaml_dict["numberUpdates"]
@@ -34,7 +34,7 @@ pos_file   = yaml_dict["animationFile"]
 
 ######### initialize lists and read in position data ##########
 
-if(LJ == 1):
+if(interact_type != 0):
     if(sigma == 0):
         sigma = boxLength * math.sqrt(redDens/n_part_tot)
     elif(boxLength == 0):
@@ -51,18 +51,18 @@ types = file_1.read().split(' ')
 types = [float(i) for i in types if i != '']
 print types
 
-for k in range(n_part_tot):
-    if(types[k] == 1):
-        c = 'red'
-    else:
-        c = 'blue'
-    patches += [plt.Circle((0,0), radius, color = c)]
-# color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
+#for k in range(n_part_tot):
+#    if(types[k] == 1):
+#        c = 'red'
+#    else:
+#        c = 'blue'
+#    patches += [plt.Circle((0,0), radius, color = c)]
+color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
 # color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
-# for i in range(n_part_1):
-#     patches += [plt.Circle((0,0), radius, color = 'red')]
-# for i in range(n_part_2):
-#     patches += [plt.Circle((0,0), radius, color = 'blue')]    
+for i in range(n_part_1):
+    patches += [plt.Circle((0,0), radius, color = color_1[i])]
+#for i in range(n_part_2):
+#    patches += [plt.Circle((0,0), radius, color = 'blue')]    
 
 file = open(pos_file, "r" )
 for line in file:
