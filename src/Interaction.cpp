@@ -19,7 +19,6 @@ double Interaction::WCA_energy(double r, double c){
 void Interaction::populateCellArray(double x,
 		                    double y, 
 				    std::vector<std::vector<double>>* cellPositions){
-   // creates the cell images of the comparison particle... should be cleaned up
  
    (*cellPositions)[0][0] = x;             (*cellPositions)[0][1] = y; 
    (*cellPositions)[1][0] = x;             (*cellPositions)[1][1] = y + boxLength; 
@@ -319,9 +318,9 @@ void Interaction::initializeInteraction(Parameters* p){
 
    truncDist = 2.5;    // this is really 2.5 * sigma / sigma
    truncShift = -1 * (pow(1/truncDist,12) 
-		    - pow(1/truncDist,6));
-
-   tail_corr =  3.141592654 * redDens * (.4 * pow(1/truncDist,10) 
-		                 - pow(1/truncDist,4)); 
+		    - pow(1/truncDist,6)); // this shifted potential is only true
+                                           // for the Lennard-Jones potential
+   tail_corr =  3.141592654 * redDens * (.4 * pow(1/truncDist,10) // the same 
+		                 - pow(1/truncDist,4)); // applies to the tail corr
 }
 

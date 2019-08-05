@@ -16,7 +16,13 @@ private:
 
    std::vector<double> sum_Fdot_r; 
    std::vector<double> sum_energy; 
+   
    std::vector<double> num_density; 
+   std::vector<double> par_num_density; 
+   std::vector<double> antp_num_density; 
+   
+   std::vector<double> x_difference; // maybe make this into a number density as well? 
+   std::vector<double> y_difference; 
 
    double delta_r = 0; 
    double sigma = 0; 
@@ -42,7 +48,7 @@ public:
    double lenJonesEnergy(double r, double c);  
    double lenJonesForce(double r, double c);   
 
-   void updateNumDensity(double r);
+   void updateNumDensity(double r, int ID);
 
    void calcPeriodicProp(std::vector<Particle>* particles,std::ofstream* r_dist_file); 
    

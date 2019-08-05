@@ -22,7 +22,7 @@ void Properties::calcVirial(double r, double c){      // sums the virial of curr
    f_r = f_r + r * lenJonesForce(r,c);        // configuration
 }
 
-void Properties::updateNumDensity(double r){
+void Properties::updateNumDensity(double r, int ID){ // this could always return the index to increase... 
    int val = r/delta_r;
    int index = 0; 
     
@@ -33,7 +33,15 @@ void Properties::updateNumDensity(double r){
       else{
          index = val; // come back to check this... 
       } 
-      num_density[index] = num_density[index] + 1;
+
+      switch(ID){
+         case 0: num_density[index] = num_density[index] + 1; 
+                 break;
+	 case 1: par_num_density[index] = par_num_density[index] + 1; 
+		 break;
+	 case 2: antp_num_density[index] = antp_num_density[index] + 1; 
+		 break;
+      }
    }
 }
 void Properties::populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions){
@@ -74,7 +82,9 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
    
    double LJ_constant = 0; 
    double r_dist = 0; 
-   double force_tot = 0; 
+   double force_tot = 0;
+
+   int temp = 0;  
    
    std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));
    
@@ -96,16 +106,18 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
          // the particle cannot interact with itself
 	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){  
 	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
-	    updateNumDensity(r_dist);   
-	 }
+	    updateNumDensity(r_dist,0);    
+	 
          
-         if(curr_prt.getType() == comp_prt.getType()){
-	    LJ_constant = LJ_par; 
+            if(curr_prt.getType() == comp_prt.getType()){
+	       LJ_constant = LJ_par;
+	       updateNumDensity(r_dist,1);  
+	    }
+	    else if(curr_prt.getType() != comp_prt.getType()){
+	       LJ_constant = LJ_antipar; 
+	       updateNumDensity(r_dist,2); 
+	    }
 	 }
-	 else if(curr_prt.getType() != comp_prt.getType()){
-	    LJ_constant = LJ_antipar; 
-	 }
-
 	 if(n > k){
 	    if(r_dist > truncDist){
 	       populateCellArray(x_comp,y_comp,&cellPositions);
@@ -116,7 +128,13 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
                                                 // the reference cell 
 		  r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
 		  for(int j = 0; j < 2; j++){
-                     updateNumDensity(r_dist); 
+                     updateNumDensity(r_dist,0); 
+	             if(curr_prt.getType() == comp_prt.getType()){
+	                updateNumDensity(r_dist,1);  
+	             }
+	             else if(curr_prt.getType() != comp_prt.getType()){
+	                updateNumDensity(r_dist,2); 
+	             }	  
 		  }
 		  if(r_dist < truncDist){
 	             for(int j = 0; j < 2; j ++){
@@ -172,10 +190,14 @@ void Properties::writeProperties(){
    std::ofstream virial_file; 
    std::ofstream energy_file; 
    std::ofstream n_dens_file; 
+   std::ofstream par_dens_file; 
+   std::ofstream antp_dens_file; 
 
-   virial_file.open("forces.txt");  // open each file that will be written to
-   energy_file.open("energies.txt"); 
-   n_dens_file.open("numDensity.txt");
+   virial_file.open("forces.txt");//,std::ofstream::out | std::ofstream::trunc);  // open each file that will be written to
+   energy_file.open("energies.txt");//,std::ofstream::out | std::ofstream::trunc); 
+   n_dens_file.open("numDensity.txt");//,std::ofstream::out | std::ofstream::trunc);
+   par_dens_file.open("par_numDensity.txt");//,std::ofstream::out | std::ofstream::trunc);
+   antp_dens_file.open("antp_numDensity.txt");//,std::ofstream::out | std::ofstream::trunc); 
 
    len = double(sum_Fdot_r.size()); // the force and energy vector are the same                                    
    for(int k = 0; k < len; k++){    // size hence are put into one for-loop
@@ -190,6 +212,18 @@ void Properties::writeProperties(){
       n_dens_file << num_density[k] << " ";
    }
    n_dens_file.close();             // close all files written to 
+
+   len = double(par_num_density.size());
+   for(int k = 0; k < len; k++){
+      par_dens_file << par_num_density[k] << " "; 
+   }
+   par_dens_file.close(); 
+
+   len = double(antp_num_density.size());
+   for(int k = 0; k < len; k++){
+      antp_dens_file << antp_num_density[k] << " "; 
+   }
+   antp_dens_file.close(); 
 }
 
 void Properties::initializeProperties(Parameters* p){
@@ -200,7 +234,6 @@ void Properties::initializeProperties(Parameters* p){
    redDens = p->getRedDens(); 
    redTemp = p->getRedTemp(); 
 
-//   LJ = p->getLenJones(); 
    interact_type = p->getInteract_Type(); 
 
    LJ_par = p->getLJ_const_1(); 
@@ -211,4 +244,6 @@ void Properties::initializeProperties(Parameters* p){
    truncDist = 2.5;                 // really is 2.5 * sigma / sigma 
    truncShift = -1 * lenJonesEnergy(truncDist,.25); // shifts the cutoff to zero 
    num_density.resize((boxLength/2)/delta_r + 1);
+   par_num_density.resize((boxLength/2)/delta_r + 1);
+   antp_num_density.resize((boxLength/2)/delta_r + 1);
 }

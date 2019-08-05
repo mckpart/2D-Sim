@@ -153,10 +153,10 @@ void Simulation::runSimulation(){
          accept = 1;
          delta_energy = 0;  		          // sets change in energy to 0
          
-         if(param.getRigidBC() == 1){             // run sim with hard boundaries
-            accept = bound.rigidBoundary(&particles,curr_index);  
-         }
-         if(param.getPeriodicBC() == 1){              // run simulation with 
+//         if(param.getRigidBC() == 1){             // run sim with hard boundaries
+//            accept = bound.rigidBoundary(&particles,curr_index);  
+//         }
+         if(param.getBound_Type() == 1){              // run simulation with 
             bound.periodicBoundary(&particles,curr_index); // periodic boundaries
 
             prt = particles[curr_index]; 
@@ -169,10 +169,10 @@ void Simulation::runSimulation(){
 	    }
 	 }                                   // interactions are checked
          else{
-            if(param.getRigidBC() == 1){
+            if(param.getBound_Type() == 0){
 	       accept = bound.rigidBoundary(&particles,curr_index);
 	    }
-	    else if(param.getExtWell() == 1){
+	    else if(param.getBound_Type() == 2){
 	       delta_energy = bound.externalWell(&particles,curr_index);	    
 	    } 
             
@@ -182,7 +182,6 @@ void Simulation::runSimulation(){
 	    }     
 	 }
           
-//	 std::cout << x_trial << " and " << y_trial << std::endl;
      /*  - RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
          - HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY 
            IS NOT RETURNED
@@ -197,24 +196,11 @@ void Simulation::runSimulation(){
          if(param.getInteract_Type() == 0 && accept == 1){
 	    accept = interact.hardDisks(&particles,curr_index); 
 	 }	 
-//         if(param.getInteract_Type() == 0 && accept == 1){
-//            accept = interact.hardDisks(&particles,curr_index); // condense into 
-//         }                                                      // int value to 
-//         else if(param.getInteract_Type() == 1 && accept == 1){      // reduce num of 
-//            delta_energy = delta_energy +                       // parameters
-//                           interact.periodicInteraction(&particles,curr_index); 
-////            std::cout << "in here" << std::endl;
-//	 }  
-//         else if(param.getInteract_Type() == 2 && accept == 1){
-//            delta_energy = delta_energy +  
-//                           interact.WCApotential(&particles,curr_index); 
-//         }       
 
          if(accept == 1 && delta_energy > 0){
             total_prob = boltzmannFactor(delta_energy); // compute acceptance probability
 
-            if(randVal.RandomUniformDbl
-() < total_prob){
+            if(randVal.RandomUniformDbl() < total_prob){
                accept = 1; 
             }
             else{
@@ -235,13 +221,12 @@ void Simulation::runSimulation(){
       if(sweepNum > param.getEq_sweep() && sweepNum % param.getData_interval() == 0){
 	 std::cout << "current sweep: " << sweepNum << std::endl; 
 	 writePositions(&pos_file); 
-         prop.calcPeriodicProp
-		 (&particles,&rad_dist_file); 
+         prop.calcPeriodicProp(&particles,&rad_dist_file); 
       }
    }
    prop.writeProperties();  
-   std::cout << "The average energy of the system is " << prop.calcAvgEnergy() << std::endl; 
-   std::cout << "The pressure of the system is " << prop.calcPressure() << std::endl;     
+//   std::cout << "The average energy of the system is " << prop.calcAvgEnergy() << std::endl; 
+//   std::cout << "The pressure of the system is " << prop.calcPressure() << std::endl;     
    perc_rej = n_rejects / (n_updates * n_particles) * 100.0; 
    std::cout << perc_rej << "% of the moves were rejected." << std::endl;
 }
@@ -292,7 +277,6 @@ void Simulation::setParticleParams(){
    for(int k = 0; k < n_particles; ++k){
       if(num_1 < num_part_1 && num_2 < num_part_2){
          n = randVal.RandomUniformDbl(); 
-//         std::cout << "the random val is: " << n << std::endl; 
          if(n < 0.5){
             type = 1; 
 	    ++num_1; 

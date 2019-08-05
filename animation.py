@@ -81,8 +81,8 @@ print numIter
 def init():
 
    if(rigidBC != 1 and periodBC != 1):
-      ax.set_xlim(-2,2)
-      ax.set_ylim(-2,2)
+      ax.set_xlim(-1 * boxLength,boxLength)
+      ax.set_ylim(-1 * boxLength,boxLength)
    else:  
       ax.set_xlim(-.5 * boxLength,.5 * boxLength)       
       ax.set_ylim(-.5 * boxLength,.5 * boxLength)

@@ -31,15 +31,17 @@ void Parameters::initializeParameters(std::string yamlFile){
    }
 
    std::cout << "reduced density: " << redDensity 
-	     << "\n redTemp: " << redTemp 
-	     << "\n sigma: " << sigma 
-	     << "\n boxLength: " << boxLength << std::endl;
+	     << "\nredTemp: " << redTemp 
+	     << "\nsigma: " << sigma 
+	     << "\nboxLength: " << boxLength << std::endl;
 
    seed        = node["seed"].as<long>(); 
    n_updates   = node["numberUpdates"].as<int>(); 
  
    init_type     = node["initializationType"].as<int>(); 
    interact_type = node["interactionType"].as<int>(); 
+   bound_type    = node["boundaryType"].as<int>(); 
+   
    rigidBC     = node["rigidBoundary"].as<bool>(); 
    periodicBC  = node["periodicBoundary"].as<bool>(); 
    extWell     = node["externalWell"].as<bool>(); 
@@ -79,6 +81,9 @@ int Parameters::getInit_Type(){
 }
 int Parameters::getInteract_Type(){
    return interact_type;
+}
+int Parameters::getBound_Type(){
+   return bound_type; 
 }
 
 bool Parameters::getRigidBC(){

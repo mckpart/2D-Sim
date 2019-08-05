@@ -34,14 +34,14 @@ bool Boundary::rigidBoundary(std::vector<Particle>* particles, int index){
    accept = 1; 
 
    if(x_temp * -1 < 0){		
-      x_wall = boxLength;  // x_temp > 0, closest x_wall > 0
+      x_wall = 0.5 * boxLength;  // x_temp > 0, closest x_wall > 0
 
       if(x_temp - x_wall > 0){ // the particle moved past the wall 
          accept = 0;           // along the x-boundary
       }
    }
    else{
-      x_wall = -1 * boxLength; //x_temp < 0, closest wall < 0 
+      x_wall = -0.5 * boxLength; //x_temp < 0, closest wall < 0 
 
       if(x_temp - x_wall < 0){
          accept = 0; 
@@ -49,14 +49,14 @@ bool Boundary::rigidBoundary(std::vector<Particle>* particles, int index){
    }
 
    if(y_temp * -1 < 0){			
-      y_wall = boxLength;   // y_temp > 0, closest y_wall > 0
+      y_wall = 0.5 * boxLength;   // y_temp > 0, closest y_wall > 0
 
       if(y_temp - y_wall > 0){  // the particle moved past the wall 
          accept = 0;            // along the y-boundary
       }
    }
    else{
-      y_wall = -1 * boxLength; 
+      y_wall = -0.5 * boxLength; 
 
       if(y_temp - y_wall < 0){
          accept = 0;
@@ -118,7 +118,7 @@ void Boundary::periodicBoundary(std::vector<Particle>* particles, int index){
 
          dist_xwall = dist_wall(x_temp,x_wall); // distance from x trial position to nearest x-wall
          x_temp = -1 * x_wall + dist_xwall;     // moves to opposite wall and travels	 
-      }	                                       // the calculated distance
+      }	                                        // the calculated distance
    }
    else{
       x_wall = -1 * (wallBound - rad_temp);    // x < 0, nearest x-wall < 0
@@ -175,7 +175,7 @@ double Boundary::externalWell(std::vector<Particle>* particles, int index){
    double dist_curr = 0; 
    double dist_temp = 0; 	
 
-   current_prt = (*particles)[index];   // assign current particle
+   current_prt = (*particles)[index];    // assign current particle
 
    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
    y_temp = current_prt.getY_TrialPos(); // positions and the radius of 
@@ -183,8 +183,8 @@ double Boundary::externalWell(std::vector<Particle>* particles, int index){
    x_curr = current_prt.getX_Position(); 
    y_curr = current_prt.getY_Position(); 
 
-   energy_curr = 4 * (pow(x_curr,2) + pow(y_curr,2)); // treat the constants as 1 for now.. change later
-   energy_temp = 4 * (pow(x_temp,2) + pow(y_temp,2)); 
+   energy_curr = 0.2 * (pow(x_curr,2) + pow(y_curr,2)); // treat the constants as 1 for now.. change later
+   energy_temp = 0.2 * (pow(x_temp,2) + pow(y_temp,2)); 
 
    delta_energy = energy_temp - energy_curr; 
 
@@ -214,8 +214,8 @@ void Boundary::initialPosition(std::vector<Particle>* particles, KISSRNG randVal
       current_prt = (*particles)[k];
       rad_temp = current_prt.getRadius();  
 
-      x_temp = randVal.RandomUniformDbl() * boxLength; // this may need to be  
-      y_temp = randVal.RandomUniformDbl() * boxLength; // .5 * boxL 
+      x_temp = randVal.RandomUniformDbl() * 0.5 * boxLength; // this may need to be  
+      y_temp = randVal.RandomUniformDbl() * 0.5 * boxLength; // .5 * boxL 
 
       /*   - GENERATE A RANDOM NUMBER FROM [0,1)
            - PROVIDES DIFFERENT 'QUADRANTS' FOR THE PARTICLE TO BE GENERATED IN 
@@ -387,7 +387,6 @@ int Boundary::initialSquare(std::vector<Particle>* particles){
    double radius = 0; // use sigma if LJ is turned on 
    double pi = 0; 
    
-//   int row1_num = 0;  
    int curr_row = 0; 
 
    int return_num = 0; 
@@ -442,5 +441,4 @@ void Boundary::initializeBoundary(Parameters* p){
    interact_type = p->getInteract_Type(); 
    n_particles   = p->getNumParticles();
    
-//   std::cout << "in bound sigma is: " << sigma << std::endl;
 }

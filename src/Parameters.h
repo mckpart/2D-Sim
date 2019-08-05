@@ -28,15 +28,16 @@ private:
 
    int init_type = 0; 
    int interact_type = 0; 
+   int bound_type = 0; 
 
    bool rigidBC = 0; 
    bool periodicBC = 0; 
    bool extWell = 0; 
  
-   bool hardDisk = 0;  
-   bool lenJones = 0;  			
-   bool WCA = 0; 
-   bool c_linkers = 0; 
+//   bool hardDisk = 0;  
+//   bool lenJones = 0;  			
+//   bool WCA = 0; 
+//   bool c_linkers = 0; 
 
 public: 
 		
@@ -51,6 +52,7 @@ public:
 
    int getInit_Type(); 
    int getInteract_Type(); 
+   int getBound_Type(); 
 
    int getEq_sweep(); 
    int getData_interval(); 
