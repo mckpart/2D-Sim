@@ -30,15 +30,6 @@ private:
    int interact_type = 0; 
    int bound_type = 0; 
 
-   bool rigidBC = 0; 
-   bool periodicBC = 0; 
-   bool extWell = 0; 
- 
-//   bool hardDisk = 0;  
-//   bool lenJones = 0;  			
-//   bool WCA = 0; 
-//   bool c_linkers = 0; 
-
 public: 
 		
    void initializeParameters(std::string yamlFile); // may need to add a default constructor
@@ -56,14 +47,6 @@ public:
 
    int getEq_sweep(); 
    int getData_interval(); 
-
-   bool getRigidBC(); 		
-   bool getPeriodicBC(); 		
-   bool getExtWell(); 
-//
-//   bool getHardDisk(); 
-//   bool getLenJones(); 
-//   bool getWCA(); 
 
    double getLJ_const_1(); 
    double getLJ_const_2(); 

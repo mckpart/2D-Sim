@@ -49,44 +49,6 @@ void Properties::updateNumDensity(double r, int ID){ // this could always return
    }
 }
 
-
-// This chunk should probably be deleted. ///
-
-//void Properties::update_xy_corr(double x, double y, int ID){
-//   double r = 0; 
-//   int val = 0; 
-//   int index = 0; 
-//   
-//   if(ID == 0){
-//      r = x; 
-//   }
-//   else{
-//      r = y; 
-//   }
-//
-//   val = r/delta_r; 
-//   if(x < boxLength/2 && y < boxLength/2){ // or if the r_dist < boxLength/2 .. 
-//      if(r > (val + 0.5) * delta_r){   // come back to this condition to check
-//         index = val + 1; 
-//      }
-//      else{
-//         index = val; 
-//      }
-////      std::cout << "del y is: " << y << std::endl;
-//      // ID == 0 then the change in y is added to the index 
-//      //    that corresponds to the x position
-//      // ID == 1 then the change in x is added to the index
-//      //    that corresponds to the y position
-//   
-//      if(ID == 0){
-//         y_relate_x[index] = y_relate_x[index] + y; // y = delta y
-//      }    // might be better to average in here to avoid the huge numbers
-//      else{
-//         x_relate_y[index] = x_relate_y[index] + x; // x = delta x
-//      }
-//   }
-//}
-
 void Properties::calc_xy_dens(double x, double y){
    int ind_1 = 0; 
    int ind_2 = 0; 
@@ -168,11 +130,6 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
 	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
 	    updateNumDensity(r_dist,0);   // updates overall number density
 	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr); 
-//	    updateNumDensity(fabs(x_comp-x_curr)/sigma,3); // updates x n.density
-//	    updateNumDensity(fabs(y_comp-y_curr)/sigma,4); // updates y n.density
-            
-//            update_xy_corr(fabs(x_curr-x_comp),fabs(y_curr-y_comp),0);
-//	    update_xy_corr(fabs(x_curr-x_comp),fabs(y_curr-y_comp),1); 
 
 	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
 	       LJ_constant = LJ_par;                // parallel microtubules
@@ -195,11 +152,6 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
 		  for(int j = 0; j < 2; j++){
                      updateNumDensity(r_dist,0); 
 		     calc_xy_dens(x_comp - x_curr, y_comp - y_curr);
-//	             updateNumDensity(fabs(x_comp-x_curr)/sigma,3); 
-//	             updateNumDensity(fabs(y_comp-y_curr)/sigma,4);
-                     
-//		     update_xy_corr(fabs(x_curr-x_comp),fabs(y_curr-y_comp),0); 
-//		     update_xy_corr(fabs(x_curr-x_comp),fabs(y_curr-y_comp),1);
 		     
 		     if(curr_prt.getType() == comp_prt.getType()){
 	                updateNumDensity(r_dist,1);  
@@ -266,10 +218,6 @@ void Properties::writeProperties(){
    std::ofstream par_dens_file; 
    std::ofstream antp_dens_file;
    std::ofstream xy_dens_file;  
-//   std::ofstream xn_dens_file; 
-//   std::ofstream yn_dens_file; 
-//   std::ofstream delta_y_file; 
-//   std::ofstream delta_x_file; 
 
    virial_file.open("forces.txt"); // open each file that will be written to
    energy_file.open("energies.txt"); 
@@ -278,11 +226,6 @@ void Properties::writeProperties(){
    par_dens_file.open("par_numDensity.txt");
    antp_dens_file.open("antp_numDensity.txt");
    xy_dens_file.open("xy_numDensity.txt"); 
-//   xn_dens_file.open("x_numDensity.txt"); 
-//   yn_dens_file.open("y_numDensity.txt"); 
-//
-//   delta_y_file.open("delta_y.txt");
-//   delta_x_file.open("delta_x.txt"); 
 
    len = double(sum_Fdot_r.size()); // the force and energy vector are the same                                    
    for(int k = 0; k < len; k++){    // size hence are put into one for-loop
@@ -297,16 +240,10 @@ void Properties::writeProperties(){
       n_dens_file << num_density[k] << " "; // vectors are the same length 
       antp_dens_file << antp_num_density[k] << " "; 
       par_dens_file << par_num_density[k] << " "; 
-//      xn_dens_file << x_num_density[k] << " ";
-//      yn_dens_file << y_num_density[k] << " ";
-//      delta_y_file << y_relate_x[k] << " "; 
    }
    n_dens_file.close();             // close all files written to 
    par_dens_file.close(); 
    antp_dens_file.close(); 
-//   xn_dens_file.close();
-//   yn_dens_file.close(); 
-//   delta_y_file.close(); 
    len = double(xy_num_density.size()); 
    for(int k = 0; k < len; ++k){
       for(int n = 0; n < len; ++n){
@@ -342,10 +279,4 @@ void Properties::initializeProperties(Parameters* p){ // maybe make this into a
    int val = sqrt(2)*boxLength/cell_L + 1;
    std::cout << "the size of the vector is " << val << std::endl; 
    xy_num_density.resize(val,std::vector<double>(val,0)); 
-// define the x,y RDF vector (independent of r)
-//   x_num_density.resize((boxLength/2)/delta_r + 1); 
-//   y_num_density.resize((boxLength/2)/delta_r + 1); 
-//   x_relate_y.resize((boxLength/2)/delta_r + 1);
-//   y_relate_x.resize((boxLength/2)/delta_r + 1);
-
 }

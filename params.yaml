@@ -19,12 +19,12 @@ LJ_constant_2 : 5  # c * KbT
 seed   : 90757029382 
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 10000  # each update = 1 sweep = n_part attempted moves 
+numberUpdates  : 3000  # each update = 1 sweep = n_part attempted moves 
 initializationType : 0 # 0 = random, 1 = hexagonal, 2 = square
 
 ### CHOOSE RUN LENGTH ####
 
-equilibriate_sweep : 5000 
+equilibriate_sweep : 1000 
 data_collect_interval : 20
 
 ### CHOOSE INTERACTION TYPE ####
@@ -34,9 +34,5 @@ interactionType : 1 # 0 = hard disk, 1 = LJ, 2 = WCA
 ### DEFINE TYPE OF BOUNDARY ######
 
 boundaryType : 1 # 0 = rigid, 1 = periodic, 2 = external well 
-rigidBoundary    : false # change these form bool values... should be handled 
-                         # more similarly to the initialization. 
-periodicBoundary : true # primarily working with periodic boundaries for now
-externalWell     : false # so the other BC will need a fair amount of work 
 
 animationFile : positions.txt

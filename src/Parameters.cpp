@@ -41,14 +41,6 @@ void Parameters::initializeParameters(std::string yamlFile){
    init_type     = node["initializationType"].as<int>(); 
    interact_type = node["interactionType"].as<int>(); 
    bound_type    = node["boundaryType"].as<int>(); 
-   
-   rigidBC     = node["rigidBoundary"].as<bool>(); 
-   periodicBC  = node["periodicBoundary"].as<bool>(); 
-   extWell     = node["externalWell"].as<bool>(); 
-
-//   hardDisk    = node["hardDisks"].as<bool>(); 
-//   lenJones    = node["lennardJones"].as<bool>(); 	
-//   WCA         = node["WCA"].as<bool>(); 
 }
 
 ///// GETTERS ////////////////
@@ -85,26 +77,6 @@ int Parameters::getInteract_Type(){
 int Parameters::getBound_Type(){
    return bound_type; 
 }
-
-bool Parameters::getRigidBC(){
-   return rigidBC; 
-}
-bool Parameters::getPeriodicBC(){
-   return periodicBC; 
-}
-bool Parameters::getExtWell(){
-   return extWell; 
-}
-
-//bool Parameters::getHardDisk(){
-//   return hardDisk; 
-//}
-//bool Parameters::getLenJones(){
-//   return lenJones; 
-//}
-//bool Parameters::getWCA(){
-//   return WCA; 
-//}
 
 double Parameters::getLJ_const_1(){
    return LJ_const_1; 

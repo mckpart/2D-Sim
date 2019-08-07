@@ -114,10 +114,10 @@ t = np.linspace(0,numIter - 1,numIter)
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 
-# i = input("Would you like to save the movie?")
-# if(i == 'y'):
-#     anim.save('trial.mp4',writer=writer)
-# else:
-#     print("movie not saved")
+i = input("Would you like to save the movie?")
+if(i == 'y'):
+    anim.save('trial.mp4',writer=writer)
+else:
+    print("movie not saved")
 plt.show()
 
