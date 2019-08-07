@@ -23,11 +23,12 @@ n_part_tot = yaml_dict["totalParticles"]
 
 sigma = float(yaml_dict["sigma"])
 interact_type = yaml_dict["interactionType"]
+bound_type = yaml_dict["boundaryType"]
 redDens = yaml_dict["reducedDens"]
 
 # numIter    = yaml_dict["numberUpdates"]
-rigidBC    = yaml_dict["rigidBoundary"]
-periodBC    = yaml_dict["periodicBoundary"]
+# rigidBC    = yaml_dict["rigidBoundary"]
+# periodBC    = yaml_dict["periodicBoundary"]
 # c_linkers  = yaml_dict["crosslinkers"]
 
 boxLength  = yaml_dict["boxLength"]
@@ -82,7 +83,7 @@ writer = ani_obj.FFMpegWriter(fps=4, metadata=dict(artist='Me'), bitrate=1800)
 
 def init():
 
-   if(rigidBC != 1 and periodBC != 1):
+   if(bound_type == 2):
       ax.set_xlim(-1 * boxLength,boxLength)
       ax.set_ylim(-1 * boxLength,boxLength)
    else:  

@@ -1,8 +1,8 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 150 
-type1_Particles : 75
-type2_Particles : 75
+totalParticles  : 100 
+type1_Particles : 50
+type2_Particles : 50
 
 particleRadius: .05
 

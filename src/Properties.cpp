@@ -41,15 +41,15 @@ void Properties::updateNumDensity(double r, int ID){ // this could always return
 		 break;
 	 case 2: antp_num_density[index] = antp_num_density[index] + 1; 
 		 break;
-         case 3: x_num_density[index] = x_num_density[index] + 1; 
-		 break;	
-	 case 4: y_num_density[index] = y_num_density[index] + 1; 
-		 break;
+//         case 3: x_num_density[index] = x_num_density[index] + 1; 
+//		 break;	
+//	 case 4: y_num_density[index] = y_num_density[index] + 1; 
+//		 break;
       }
    }
 }
 
-void Properties::calc_xy_dens(double x, double y){
+void Properties::calc_xy_dens(double x, double y, int ID){
    int ind_1 = 0; 
    int ind_2 = 0; 
 
@@ -64,7 +64,15 @@ void Properties::calc_xy_dens(double x, double y){
       if(y > (ind_2 + 0.5) * cell_L - sqrt(2)*boxLength/2){
          ++ind_2; 
       }
-      xy_num_density[ind_1][ind_2] = xy_num_density[ind_1][ind_2] + 1; // increment the value here. 
+      
+      switch(ID){
+         case 0: xy_num_density[ind_1][ind_2] = xy_num_density[ind_1][ind_2] + 1; // increment the value here. 
+	         break;
+	 case 1: par_xy_density[ind_1][ind_2] = par_xy_density[ind_1][ind_2] + 1; // increment the value here. 
+	         break;
+	 case 2: antp_xy_density[ind_1][ind_2] = antp_xy_density[ind_1][ind_2] + 1; // increment the value here. 
+                 break;
+      }
    }
 }
 void Properties::populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions){
@@ -129,16 +137,18 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
 	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){  
 	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
 	    updateNumDensity(r_dist,0);   // updates overall number density
-	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr); 
+	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr,0); 
 
 	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
 	       LJ_constant = LJ_par;                // parallel microtubules
-	       updateNumDensity(r_dist,1);     // updates number density for 
-	    }                                  // parallel interactions
+	       updateNumDensity(r_dist,1);          // updates number density 
+	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,1); //for parallel
+	    }                                       // interactions
 	    else if(curr_prt.getType() != comp_prt.getType()){ // interaction
 	       LJ_constant = LJ_antipar;       // of antiparallel microtubules
 	       updateNumDensity(r_dist,2);     // updates number density for
-	    }                                  // antiparallel interactions
+	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); // antiparallel
+	    }                                               // interactions
 	 }
 	 if(n > k){
 	    if(r_dist > truncDist){
@@ -151,14 +161,16 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles,
 		  r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
 		  for(int j = 0; j < 2; j++){
                      updateNumDensity(r_dist,0); 
-		     calc_xy_dens(x_comp - x_curr, y_comp - y_curr);
+		     calc_xy_dens(x_comp-x_curr,y_comp-y_curr,0);
 		     
 		     if(curr_prt.getType() == comp_prt.getType()){
 	                updateNumDensity(r_dist,1);  
-	             }
+	                calc_xy_dens(x_comp-x_curr,y_comp-y_curr,1); 
+		     }
 	             else if(curr_prt.getType() != comp_prt.getType()){
 	                updateNumDensity(r_dist,2); 
-	             }	  
+	                calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); 
+		     }	  
 		  }
 		  if(r_dist < truncDist){
 	             for(int j = 0; j < 2; j ++){
@@ -214,10 +226,14 @@ void Properties::writeProperties(){
 
    std::ofstream virial_file; 
    std::ofstream energy_file; 
+   
    std::ofstream n_dens_file; 
    std::ofstream par_dens_file; 
    std::ofstream antp_dens_file;
+   
    std::ofstream xy_dens_file;  
+   std::ofstream par_xy_file; 
+   std::ofstream antp_xy_file; 
 
    virial_file.open("forces.txt"); // open each file that will be written to
    energy_file.open("energies.txt"); 
@@ -225,7 +241,10 @@ void Properties::writeProperties(){
    n_dens_file.open("numDensity.txt");
    par_dens_file.open("par_numDensity.txt");
    antp_dens_file.open("antp_numDensity.txt");
+   
    xy_dens_file.open("xy_numDensity.txt"); 
+   par_xy_file.open("par_xy_numDensity.txt");
+   antp_xy_file.open("antp_xy_numDensity.txt"); 
 
    len = double(sum_Fdot_r.size()); // the force and energy vector are the same                                    
    for(int k = 0; k < len; k++){    // size hence are put into one for-loop
@@ -247,10 +266,14 @@ void Properties::writeProperties(){
    len = double(xy_num_density.size()); 
    for(int k = 0; k < len; ++k){
       for(int n = 0; n < len; ++n){
-         xy_dens_file << xy_num_density[k][n] << " "; 
+         xy_dens_file << xy_num_density[k][n]  << " "; 
+         par_xy_file  << par_xy_density[k][n]  << " "; 
+         antp_xy_file << antp_xy_density[k][n] << " "; 
       }
    }
-   xy_dens_file.close(); 
+   xy_dens_file.close();
+   par_xy_file.close(); 
+   antp_xy_file.close();  
 }
 
 void Properties::initializeProperties(Parameters* p){ // maybe make this into a 
@@ -279,4 +302,6 @@ void Properties::initializeProperties(Parameters* p){ // maybe make this into a
    int val = sqrt(2)*boxLength/cell_L + 1;
    std::cout << "the size of the vector is " << val << std::endl; 
    xy_num_density.resize(val,std::vector<double>(val,0)); 
+   par_xy_density.resize(val,std::vector<double>(val,0)); 
+   antp_xy_density.resize(val,std::vector<double>(val,0)); 
 }

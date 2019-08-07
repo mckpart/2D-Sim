@@ -21,14 +21,16 @@ private:
    std::vector<double> par_num_density; 
    std::vector<double> antp_num_density; 
    
-   std::vector<double> x_num_density; // maybe make this into a number density as well? 
-   std::vector<double> y_num_density; 
+//   std::vector<double> x_num_density; // maybe make this into a number density as well? 
+//   std::vector<double> y_num_density; 
 
-   std::vector<double> y_relate_x;
-   std::vector<double> x_relate_y; 
+//   std::vector<double> y_relate_x;
+//   std::vector<double> x_relate_y; 
 
-   std::vector<std::vector<double>> xy_num_density; // 2D array used for calculating 
-                                                 // the pair correlation function
+   std::vector<std::vector<double>> xy_num_density; // 2D arrays used for calculating 
+   std::vector<std::vector<double>> par_xy_density; // the pair correlation functions
+   std::vector<std::vector<double>> antp_xy_density; 
+   
    double delta_r = 0;
    double cell_L = 0;  
    double sigma = 0; 
@@ -55,7 +57,7 @@ public:
 
    void updateNumDensity(double r, int ID);
 //   void update_xy_corr(double x, double y, int ID); 
-   void calc_xy_dens(double x, double y); 
+   void calc_xy_dens(double x, double y, int ID); 
 
    void calcPeriodicProp(std::vector<Particle>* particles,std::ofstream* r_dist_file); 
    

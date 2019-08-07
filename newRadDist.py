@@ -106,7 +106,6 @@ for k in range(num):
     axs[0,k].plot(r_iter,G)
     axs[0,k].axvline(x = 2.0**(1.0/6.0),color = 'r', linestyle = '--')
     axs[0,k].axvline(x = 2.0**(7.0/6.0),linestyle = '--')
-#     axs[0,k].axvline(x = 1.5 * 2.0**(7.0/6.0),color = 'orange',linestyle = '--')
     axs[0,k].axhline(y = 1, linestyle = '--')
 
     axs[0,k].set_title(titles[k])
@@ -120,8 +119,8 @@ for k in range(num):
     axs[0,k].set_ylim([0,max_y])
 
 
-saveImage()
-plt.show()  
+# saveImage()
+# plt.show()  
 
 def init_pos_matrix(val,cell_L): # this creates a 3D matrix that is 
     s_2 = math.sqrt(2)
@@ -134,61 +133,100 @@ def init_pos_matrix(val,cell_L): # this creates a 3D matrix that is
     return M 
 
 def format_xy_dens(val,data):
-    data = [x/(n_particles*numberTrials) for x in data]
-    M = np.zeros(shape=(val,val))
-    flg = 0
-    for k in range(val):
-        for n in range(val): 
-            M[k][n] = data[flg]
-            flg = flg + 1
-    return M    
+    matrices = []
+    for z in range(len(data)): 
+        d = data[z]
+        d = [x/(n_particles*numberTrials) for x in d]
+        M = np.zeros(shape=(val,val))
+        flg = 0
+        for k in range(val):
+            for n in range(val): 
+                M[k][n] = d[flg]
+                flg = flg + 1
+        matrices.append(M)
+#     matrices = np.asarray(matrices)
+    return matrices
 
-def display_PCF(val,n):
+def display_PCF(val,dens):
+    num = len(dens)
+    if(num == 1): 
+        f = (5,5)
+    else:
+        f = (12,3)
+    fig,axs = plt.subplots(1,num, figsize = f, \
+              facecolor='w', edgecolor='k',squeeze = False)
+
     x = np.linspace(-boxL/2,boxL/2,val)
     y = x
-    h = plt.contourf(x,y,n)
+    for k in range(num): 
+        print(k)
+        axs[0][k].contourf(x,y,dens[k])
+    
     saveImage();
     plt.show()
 
 def create_1D_num_dens(dens_2D,pos,val,delta_r):
     r_vec = np.linspace(0,boxL/2.0,boxL/(2.0 * delta_r) + 1.0)
     dens_1D = np.zeros(len(r_vec))
-    for k in range(val):
-        for n in range(val): 
-            x = pos[k][n][0]
-            y = pos[k][n][1]
-            r = math.sqrt(x**2 + y**2)
-            if(r < boxL/2.0 - delta_r):
-                index = int(r/delta_r)
-                if(r > (index + .5) * delta_r):
-                    index = index + 1
-                dens_1D[index] = dens_1D[index] + dens_2D[k][n]
-    return r_vec,dens_1D
+    M = []
+    for z in range(len(dens_2D)): 
+        d = dens_2D[z]
+        dens_1D = np.zeros(len(r_vec))
+        for k in range(val):
+            for n in range(val): 
+                x = pos[k][n][0]
+                y = pos[k][n][1]
+                r = math.sqrt(x**2 + y**2)
+                if(r < boxL/2.0 - delta_r):
+                    index = int(r/delta_r)
+                    if(r > (index + .5) * delta_r):
+                        index = index + 1
+                    dens_1D[index] = dens_1D[index] + d[k][n]
+        M.append(dens_1D)
+    return r_vec,M
 
 def calc_RDF(r_vec,dens_1D,delta_r):
     total_dens = n_particles/boxL**2
-    for k in range(len(r_vec)): 
-        if(k == 0): 
-            area = math.pi*delta_r**2*.25
-        else: 
-            area = 2.0*math.pi*r_vec[k]*delta_r
+    for z in range(len(dens_1D)): 
+        d = dens_1D[z]
+        for k in range(len(r_vec)): 
+            if(k == 0): 
+                area = math.pi*delta_r**2*.25
+            else: 
+                area = 2.0*math.pi*r_vec[k]*delta_r
 
-        dens_1D[k] = dens_1D[k] / area
-
-    dens_1D = [i/total_dens for i in dens_1D]
+            d[k] = d[k] / area
+        d = [i/total_dens for i in d]
+        dens_1D[z] = d
     return dens_1D
 
-def plot_RDF(r_vec,RDF,delta_r):
-    plt.plot(r_vec,RDF)
-    plt.axvline(x = 2.0**(1.0/6.0),color = 'red',linestyle = '--')
-    plt.axhline(y = 1,color = 'orange',linestyle = '--')
+def plot_RDF(r_vec,RDF,delta_r): 
+    num = len(RDF)
+    if(num == 1): 
+        f = (7,5)
+    else:
+        f = (12,3)
+    fig,axs = plt.subplots(1,num, figsize = f, \
+              facecolor='w', edgecolor='k',squeeze = False)
+    txt = 'RDF from the Pair Correlation Function'
+    if(num != 1): 
+        fig.tight_layout()
+        fig.subplots_adjust(top = .8,bottom =.18)
+        fig.suptitle(txt)
+        titles = ['Parallel and Antiparallel','Parallel','Antiparallel']
+    else:
+        titles = [txt]
+    for k in range(num): 
+        axs[0][k].plot(r_vec,RDF[k])
+        axs[0][k].axvline(x = 2.0**(1.0/6.0),color = 'red',linestyle = '--')
+        axs[0][k].axhline(y = 1,color = 'orange',linestyle = '--')
 
-    plt.title('RDF from the Pair Correlation Function')
-    plt.xlabel(r'$\frac{r}{\sigma}$')
-    plt.ylabel(r'$g(\frac{r}{\sigma})$')
+        axs[0][k].set_title(titles[k])
+        axs[0][k].set_xlabel(r'$\frac{r}{\sigma}$')
+        axs[0][k].set_ylabel(r'$g(\frac{r}{\sigma})$')
 
-    plt.xlim([0,boxL/2 - delta_r])
-    plt.ylim([0,max(RDF)*1.1])
+        axs[0][k].set_xlim([0,boxL/2 - 2*delta_r])
+        axs[0][k].set_ylim([0,max(RDF[0])*1.1])
     
     saveImage() 
     plt.show()
@@ -196,23 +234,35 @@ def plot_RDF(r_vec,RDF,delta_r):
 def run_pcf():
     
     # read in data and set parameters
-    n = readData("xy_numDensity.txt")
+    n      = readData("xy_numDensity.txt")
+    par_n  = readData("par_xy_numDensity.txt")
+    antp_n = readData("antp_xy_numDensity.txt")
+    
+    c = input("Would you like all of the plots?(y/n) ")
+    if(c == 'y'):
+        densities = [n,par_n,antp_n]
+    else:
+        densities = [n]
+    
     cell_L = sigma/20.0
-    delta_r = sigma/10.0
+    delta_r = sigma/15.0
+
+    # create a matrix of the different x,y
+    # coordinate positions
+    val = int(math.sqrt(2)*boxL/cell_L) + 1
+    pos = init_pos_matrix(val,cell_L)
     
     # normalize the number density data
-    val = int(math.sqrt(2)*boxL/cell_L) + 1
-    n = format_xy_dens(val,n)
-    
+    densities = format_xy_dens(val,densities)
+
     # plot the pair correlation function
-    display_PCF(val,n)   
+    display_PCF(val,densities)   
     
     # create a matrix of the different x,y 
     # coordinate positions and create 
     # a 1D number density vector
-    pos = init_pos_matrix(val,cell_L)
-    r_vec,dens_1D = create_1D_num_dens(n,pos,val,delta_r); 
-    
+    r_vec,dens_1D = create_1D_num_dens(densities,pos,\
+                                        val,delta_r); 
     # calculate and plot the radial 
     # distribution function
     RDF = calc_RDF(r_vec,dens_1D,delta_r)
