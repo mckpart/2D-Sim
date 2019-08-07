@@ -21,16 +21,21 @@ private:
    std::vector<double> par_num_density; 
    std::vector<double> antp_num_density; 
    
-   std::vector<double> x_difference; // maybe make this into a number density as well? 
-   std::vector<double> y_difference; 
+   std::vector<double> x_num_density; // maybe make this into a number density as well? 
+   std::vector<double> y_num_density; 
 
-   double delta_r = 0; 
+   std::vector<double> y_relate_x;
+   std::vector<double> x_relate_y; 
+
+   std::vector<std::vector<double>> xy_num_density; // 2D array used for calculating 
+                                                 // the pair correlation function
+   double delta_r = 0;
+   double cell_L = 0;  
    double sigma = 0; 
    double truncDist = 0; 
    double truncShift = 0; 
 
    double interact_type = 0; 
-//   bool LJ = 0;
 
    double LJ_par = 0; 
    double LJ_antipar = 0; 
@@ -40,8 +45,8 @@ private:
 
    double redDens = 0; 
    double redTemp = 0;  
-public: 
 
+public: 
    void initializeProperties(Parameters* p); 
 
    void populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions); 
@@ -49,6 +54,8 @@ public:
    double lenJonesForce(double r, double c);   
 
    void updateNumDensity(double r, int ID);
+//   void update_xy_corr(double x, double y, int ID); 
+   void calc_xy_dens(double x, double y); 
 
    void calcPeriodicProp(std::vector<Particle>* particles,std::ofstream* r_dist_file); 
    

@@ -2,7 +2,6 @@ import numpy as np
 from matplotlib import cm
 import matplotlib as mpl
 from matplotlib import pyplot as plt 
-import matplotlib.animation as ani_obj
 from matplotlib.animation import FuncAnimation
 import yaml
 import math
@@ -50,7 +49,7 @@ fig,ax = plt.subplots()
 file_1 = open('particle_type.txt','r')
 types = file_1.read().split(' ')
 types = [float(i) for i in types if i != '']
-print(types)
+print types
 
 for k in range(n_part_tot):
     if(types[k] == 1):
@@ -72,13 +71,12 @@ for line in file:
     position.append(row)
 
 position = np.asarray(position)
-print(position)
+print position
 
 numIter = len(position[:,0]) 
-print(numIter)
-
-Writer = ani_obj.writers['ffmpeg']
-writer = ani_obj.FFMpegWriter(fps=4, metadata=dict(artist='Me'), bitrate=1800)
+print numIter
+#Writer = FuncAnimation.writers['ffmpeg']
+#writer = FuncAnimation.FFMpegWriter(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
 def init():
 
@@ -97,7 +95,7 @@ def init():
 def update(frame):
 
    frame = int(frame)
-   print("frame is ", frame)
+   print "frame is ", frame
    
    for k in range(n_part_tot):
       x = position[frame][k * 2]
@@ -113,11 +111,6 @@ def update(frame):
 t = np.linspace(0,numIter - 1,numIter) 
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
-
-# i = input("Would you like to save the movie?")
-# if(i == 'y'):
-#     anim.save('trial.mp4',writer=writer)
-# else:
-#     print("movie not saved")
 plt.show()
+
 

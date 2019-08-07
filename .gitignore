@@ -2,6 +2,7 @@ sim
 /build
 /b 
 
+*.txt
 *.swp     
 
 /prototyping
