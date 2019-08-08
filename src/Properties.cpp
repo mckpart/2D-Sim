@@ -75,6 +75,109 @@ void Properties::calc_xy_dens(double x, double y, int ID){
       }
    }
 }
+
+void Properties::calcNonPerProp(std::vector<Particle>* particles){
+
+   Particle curr_prt; 
+   Particle comp_prt; 
+
+   double x_curr = 0;
+   double y_curr = 0; 
+   double x_comp = 0; 
+   double y_comp = 0; 
+
+   double d_curr_wall_x = 0; 
+   double d_curr_wall_y = 0; 
+   double d_comp_wall_x = 0; 
+   double d_comp_wall_y = 0;
+
+   double dist_curr_x = 0; 
+   double dist_curr_y = 0; 
+
+   double x_force = 0; 
+   double y_force = 0; 
+   
+   double LJ_constant = 0; 
+   double r_dist = 0; 
+   double force_tot = 0;
+
+   int temp = 0;  
+   
+   std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));
+   
+   f_energy = 0;   // make sure that the free energy previously calculated is reset
+   f_r = 0;        // the free energy is only the energy that comes from the positions  
+                   // within the configuration 
+   for(int k = 0; k < n_particles; k++){ 
+      curr_prt = (*particles)[k]; 
+      
+      x_curr = curr_prt.getX_Position();    // set current x,y position
+      y_curr = curr_prt.getY_Position(); 
+   
+      for(int n = 0; n < n_particles; n++){ // each particle-particle interaction
+	      
+	 comp_prt =(*particles)[n]; 
+         x_comp = comp_prt.getX_Position(); // set comparison x,y position
+	 y_comp = comp_prt.getY_Position(); 
+
+         // the particle cannot interact with itself
+	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){  
+	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
+	    updateNumDensity(r_dist,0);   // updates overall number density
+	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr,0); 
+
+	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
+	       LJ_constant = LJ_par;                // parallel microtubules
+	       updateNumDensity(r_dist,1);          // updates number density 
+	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,1); //for parallel
+	    }                                       // interactions
+	    else if(curr_prt.getType() != comp_prt.getType()){ // interaction
+	       LJ_constant = LJ_antipar;       // of antiparallel microtubules
+	       updateNumDensity(r_dist,2);     // updates number density for
+	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); // antiparallel
+	    }                                               // interactions
+	 }
+	 if(n > k){
+//	    if(r_dist > truncDist){
+//	       populateCellArray(x_comp,y_comp,&cellPositions);
+//               for(int z = 0; z < 8; z++){
+//               
+//	          x_comp = cellPositions[z][0]; // this is very inefficient but works... 
+//	          y_comp = cellPositions[z][1]; // creates the 8 cells surrounding 
+//                                                // the reference cell 
+//		  r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
+//		  for(int j = 0; j < 2; j++){
+//                     updateNumDensity(r_dist,0); 
+//		     calc_xy_dens(x_comp-x_curr,y_comp-y_curr,0);
+//		     
+//		     if(curr_prt.getType() == comp_prt.getType()){
+//	                updateNumDensity(r_dist,1);  
+//	                calc_xy_dens(x_comp-x_curr,y_comp-y_curr,1); 
+//		     }
+//	             else if(curr_prt.getType() != comp_prt.getType()){
+//	                updateNumDensity(r_dist,2); 
+//	                calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); 
+//		     }	  
+//		  }
+//		  if(r_dist < truncDist){
+//	             for(int j = 0; j < 2; j ++){
+//		        calcEnergy(r_dist,LJ_constant);  
+//		        calcVirial(r_dist,LJ_constant); 
+//		     }
+//                  } 	  
+//               }
+//            }
+//            else{
+            if(r_dist < truncDist){
+	       calcEnergy(r_dist,LJ_constant);  
+	       calcVirial(r_dist,LJ_constant); 
+	    }
+	 }                          
+      }
+   }
+   sum_Fdot_r.push_back(f_r); 
+   sum_energy.push_back(f_energy);
+}
 void Properties::populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions){
    
    // defines the 8 images of the comparison particle's position
@@ -89,8 +192,7 @@ void Properties::populateCellArray(double x,double y, std::vector<std::vector<do
 
 }
 
-void Properties::calcPeriodicProp(std::vector<Particle>* particles, 
-		                  std::ofstream* r_dist_file){ // this needs to be reorganized
+void Properties::calcPeriodicProp(std::vector<Particle>* particles){ // this needs to be reorganized
    Particle curr_prt; 
    Particle comp_prt; 
 

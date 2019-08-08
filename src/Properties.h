@@ -59,8 +59,8 @@ public:
 //   void update_xy_corr(double x, double y, int ID); 
    void calc_xy_dens(double x, double y, int ID); 
 
-   void calcPeriodicProp(std::vector<Particle>* particles,std::ofstream* r_dist_file); 
-   
+   void calcPeriodicProp(std::vector<Particle>* particles); 
+   void calcNonPerProp(std::vector<Particle>* particles);  
    void calcEnergy(double r, double c);
    void calcVirial(double r, double c); 
    

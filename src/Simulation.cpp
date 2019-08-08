@@ -221,7 +221,12 @@ void Simulation::runSimulation(){
       if(sweepNum > param.getEq_sweep() && sweepNum % param.getData_interval() == 0){
 	 std::cout << "current sweep: " << sweepNum << std::endl; 
 	 writePositions(&pos_file); 
-         prop.calcPeriodicProp(&particles,&rad_dist_file); 
+         if(param.getBound_Type() == 1){
+	    prop.calcPeriodicProp(&particles); 
+	 }
+         else{
+	    prop.calcNonPerProp(&particles); 
+	 }
       }
    }
    prop.writeProperties();  

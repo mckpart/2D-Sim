@@ -12,8 +12,8 @@ interact_type = yaml_dict["interactionType"]
 red_dens = yaml_dict["reducedDens"]
 red_temp = yaml_dict["reducedTemp"]
 
-rigidBC    = yaml_dict["rigidBoundary"]
-periodBC    = yaml_dict["periodicBoundary"]
+# rigidBC    = yaml_dict["rigidBoundary"]
+# periodBC    = yaml_dict["periodicBoundary"]
 
 boxLength  = yaml_dict["boxLength"]
 

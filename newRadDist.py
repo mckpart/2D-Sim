@@ -144,23 +144,35 @@ def format_xy_dens(val,data):
                 M[k][n] = d[flg]
                 flg = flg + 1
         matrices.append(M)
-#     matrices = np.asarray(matrices)
-    return matrices
+    return matrices # returns a list of 3 2D arrays
 
 def display_PCF(val,dens):
     num = len(dens)
     if(num == 1): 
         f = (5,5)
     else:
-        f = (12,3)
+        f = (12,4)
     fig,axs = plt.subplots(1,num, figsize = f, \
               facecolor='w', edgecolor='k',squeeze = False)
+    txt = '2D Histogram of the Pair Correlation Function'
 
+    if(num != 1): 
+        fig.tight_layout()
+        fig.subplots_adjust(top = .85,bottom = .12,left=.05,wspace=.22)
+        fig.suptitle(txt)
+        titles = ['Parallel and Antiparallel','Parallel','Antiparallel']
+    else:
+        titles = [txt]
+    
     x = np.linspace(-boxL/2,boxL/2,val)
     y = x
     for k in range(num): 
         print(k)
         axs[0][k].contourf(x,y,dens[k])
+        axs[0][k].set_title(titles[k])
+        
+        axs[0][k].set_xlabel('x Position')
+        axs[0][k].set_ylabel('y Position')
     
     saveImage();
     plt.show()
@@ -206,12 +218,14 @@ def plot_RDF(r_vec,RDF,delta_r):
         f = (7,5)
     else:
         f = (12,3)
+    
     fig,axs = plt.subplots(1,num, figsize = f, \
               facecolor='w', edgecolor='k',squeeze = False)
     txt = 'RDF from the Pair Correlation Function'
+    
     if(num != 1): 
         fig.tight_layout()
-        fig.subplots_adjust(top = .8,bottom =.18)
+        fig.subplots_adjust(top = .8,bottom =.18,left=.05,wspace=.22)
         fig.suptitle(txt)
         titles = ['Parallel and Antiparallel','Parallel','Antiparallel']
     else:
