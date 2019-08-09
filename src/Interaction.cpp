@@ -14,8 +14,8 @@ double Interaction::lenjones_energy(double r, double c){
 
 double Interaction::WCA_energy(double r){ // binding affinity should
    double val = 0;                                  // not be attached to the 
-   if(r <= pow(2,1/6)){                             // WCA potential
-      val = 4*(pow(1/r,12) - pow(1/r,6) + .25);
+   if(r <= pow(2.0,1.0/6.0)){                             // WCA potential
+      val = 4*(pow(1.0/r,12) - pow(1.0/r,6) + .25);
    }
    return val;
 }
@@ -24,7 +24,8 @@ double Interaction::WCA_energy(double r){ // binding affinity should
 // be multiplied by the reduced temperature. explanation will be 
 // typed up in later document
 double Interaction::simple_spring_energy(double r, double a){ 
-   return -a*red_temp* exp(k_spring/2*pow(r-rest_L,2)); // add the spring constant later
+//   return -a*red_temp**exp(-k_spring/2.0*pow(r-rest_L,2.0)); // add the spring constant later
+   return -a*red_temp*k_spring/2*pow(r-rest_L,2)*exp(-k_spring/2.0*pow(r-rest_L,2.0)); // add the spring constant later
 }                                    // NOTE: KbT = 1 so beta = 1
 
 void Interaction::populateCellArray(double x,
