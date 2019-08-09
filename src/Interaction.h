@@ -11,7 +11,14 @@ class Interaction{
 	
 private:
    double sigma = 0; 
+   double sigma_par = 0; 
+   
+   double rest_L = 0;   // these two quantities are for the 
+   double k_spring = 0; // spring like potential
+   
    double redDens = 0; 
+   double red_temp = 0; 
+
    double LJ_par = 0; 
    double LJ_antipar = 0; 
 
@@ -29,10 +36,11 @@ public:
    void populateCellArray(double x, double y, 
 		          std::vector<std::vector<double>>* cellPositions); 
 
-   double distance(double x1, double x2, double y1, double y2);
+   double distance(double x1, double x2, double y1, double y2, int type);
    
-   double lenjones_energy(double r, double c); 
-   double WCA_energy     (double r, double c); 
+   double lenjones_energy(double r, double a); 
+   double WCA_energy(double r); 
+   double simple_spring_energy(double r, double a); 
 
    double nonPeriodicInteraction(std::vector<Particle>* particles, int index); 
    double periodicInteraction   (std::vector<Particle>* particles, int index); 

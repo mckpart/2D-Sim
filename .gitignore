@@ -5,5 +5,5 @@ sim
 *.txt
 *.swp     
 
-/prototyping
 /data
+/temp

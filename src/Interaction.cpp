@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-double Interaction::distance(double x1,double x2,double y1, double y2){
+double Interaction::distance(double x1,double x2,double y1, double y2,int type){
    return sqrt(pow(x2 - x1,2) + pow(y2 - y1,2))/sigma; // returns the characteristic length 	
 }
 
@@ -12,9 +12,20 @@ double Interaction::lenjones_energy(double r, double c){
    return 4*c*(pow(1/r,12) - pow(1/r,6) + truncShift);
 }
 
-double Interaction::WCA_energy(double r, double c){
-   return 4*c*(pow(1/r,12) - pow(1/r,6) + .25);
+double Interaction::WCA_energy(double r){ // binding affinity should
+   double val = 0;                                  // not be attached to the 
+   if(r <= pow(2,1/6)){                             // WCA potential
+      val = 4*(pow(1/r,12) - pow(1/r,6) + .25);
+   }
+   return val;
 }
+
+// NOTE: in order for this to be in 'reduced form' the energy must
+// be multiplied by the reduced temperature. explanation will be 
+// typed up in later document
+double Interaction::simple_spring_energy(double r, double a){ 
+   return -a*red_temp* exp(k_spring/2*pow(r-rest_L,2)); // add the spring constant later
+}                                    // NOTE: KbT = 1 so beta = 1
 
 void Interaction::populateCellArray(double x,
 		                    double y, 
@@ -49,7 +60,8 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
    double energy_temp = 0; 
 
    double num = 0; 
-   double c = 0; 
+   double a = 0; // a is the binding affinity associated with 
+   int s = 0;    // the two different possible interactions
 
    double dist_curr_x = 0;
    double dist_curr_y = 0;  
@@ -88,18 +100,21 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
 
       if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
 
-         x_comp = compare_prt.getX_Position(); // set the comparison  
-         y_comp = compare_prt.getY_Position(); // particles position
-
-	 dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
-	 dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp); 
-	   
 	 if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
-	    c = LJ_par; 
+	    a = LJ_par; 
+	    s = 0; 
 	 }
          else if(current_prt.getType() != compare_prt.getType()){
-	    c = LJ_antipar; 
+	    a = LJ_antipar; 
+	    s = 1; 
 	 }	 
+         
+	 x_comp = compare_prt.getX_Position(); // set the comparison  
+         y_comp = compare_prt.getY_Position(); // particles position
+
+	 dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp,s); 
+	 dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp,s); 
+	   
          /* IF THE SUMMATION OF THE X DISTANCES FROM THE WALL IS WITHIN THE 
 	  *    DISTANCE OF INTERACTION AND THE PARTICLES ARE NOT ON THE SAME SIDE
 	  *    OF THE BOX, UPDATE THE X DISTANCE BETWEEN THE PARTICLES
@@ -118,17 +133,20 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
 	       x_comp = cellPositions[z][0];  // creates the 'phantom' particles 
 	       y_comp = cellPositions[z][1];  // in the other cell images
 
-	       dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
-               dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp);  
+	       dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp,s); 
+               dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp,s);  
                    
      	       if(dist_curr_tot < truncDist){ // maybe have a different truncation dist for different 
 		  switch(interact_type){      // types of interactions...
 		     case 0: std::cout << "mehhh" << std::endl;	  // also different energy corrections should
                              break;                               // be included for the different interaction
-		     case 1: energy_curr = lenjones_energy(dist_curr_tot,c); // types
+		     case 1: energy_curr = lenjones_energy(dist_curr_tot,a); // types
 			     break;
-	             case 2: energy_curr = WCA_energy(dist_curr_tot,c);
+	             case 2: energy_curr = WCA_energy(dist_curr_tot);
 			     break;  
+	             case 3: energy_curr = WCA_energy(dist_curr_tot) +
+		                simple_spring_energy(dist_curr_tot,a); 
+	                     break;
 	          }
 	       }
                else{
@@ -139,10 +157,13 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
                   switch(interact_type){   
 		     case 0: std::cout << "mehhh" << std::endl;	  
                              break;                               
-		     case 1: energy_temp = lenjones_energy(dist_temp_tot,c); 
+		     case 1: energy_temp = lenjones_energy(dist_temp_tot,a); 
 			     break;
-	             case 2: energy_temp = WCA_energy(dist_temp_tot,c); 
+	             case 2: energy_temp = WCA_energy(dist_temp_tot); 
 			     break;
+	             case 3: energy_temp = WCA_energy(dist_temp_tot) +
+		                simple_spring_energy(dist_temp_tot,a); 
+	                     break;
 		  }
 	       }
 	       else{
@@ -157,15 +178,19 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
             switch(interact_type){      // types of interactions...
 	       case 0: std::cout << "mehhh" << std::endl;	  // also different energy corrections should
                        break;                               // be included for the different interaction
-	       case 1: energy_curr = lenjones_energy(dist_curr_tot,c); // types
-                       energy_temp = lenjones_energy(dist_temp_tot,c); 
+	       case 1: energy_curr = lenjones_energy(dist_curr_tot,a); // types
+                       energy_temp = lenjones_energy(dist_temp_tot,a); 
 		       break;
-	       case 2: energy_curr = WCA_energy(dist_curr_tot,c);
-		       energy_temp = WCA_energy(dist_temp_tot,c); 
+	       case 2: energy_curr = WCA_energy(dist_curr_tot);
+		       energy_temp = WCA_energy(dist_temp_tot); 
 		       break;
+	       case 3: energy_curr = WCA_energy(dist_curr_tot) +
+		          simple_spring_energy(dist_curr_tot,a); 
+		       energy_temp = WCA_energy(dist_temp_tot) + 
+			  simple_spring_energy(dist_temp_tot,a); 
+	               break;
 	    }
-	    delta_energy = delta_energy + (energy_temp - energy_curr); 
-	    
+	    delta_energy = delta_energy + (energy_temp - energy_curr);  
 	 }
       }                                                                
    }
@@ -189,7 +214,8 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle>* particles,
    double energy_temp = 0; 
 
    double num = 0; 
-   double c = 0; 
+   double a = 0; // a is the binding affinity associated with the  
+   int s = 0;    // different interactions
 
    double dist_curr_x = 0;
    double dist_curr_y = 0;  
@@ -214,25 +240,30 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle>* particles,
    
       if(compare_prt.getIdentifier() != current_prt.getIdentifier()){
 
-     	 x_comp = compare_prt.getX_Position(); // set the comparison  
-         y_comp = compare_prt.getY_Position(); // particles position
-
-	 dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp); 
-	 dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp); 
-	   
 	 if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
-	    c = LJ_par; 
+	    a = LJ_par; 
+	    s = 0; 
 	 }
          else if(current_prt.getType() != compare_prt.getType()){
-	    c = LJ_antipar; 
+	    a = LJ_antipar; 
+	    s = 1; 
 	 }
+     	 
+	 x_comp = compare_prt.getX_Position(); // set the comparison  
+         y_comp = compare_prt.getY_Position(); // particles position
+
+	 dist_curr_tot = distance(x_curr,x_comp,y_curr,y_comp,s); 
+	 dist_temp_tot = distance(x_temp,x_comp,y_temp,y_comp,s);   
 
          if(dist_curr_tot < truncDist){
 	    switch(interact_type){ // case 0 would be the hard disk interaction but that is included elsewhere
-	       case 1: energy_curr = lenjones_energy(dist_curr_tot,c);  
+	       case 1: energy_curr = lenjones_energy(dist_curr_tot,a);  
 	               break;
-	       case 2: energy_curr = WCA_energy(dist_curr_tot,c); 
+	       case 2: energy_curr = WCA_energy(dist_curr_tot); 
 		       break;
+	       case 3: energy_curr = WCA_energy(dist_curr_tot) +
+		          simple_spring_energy(dist_curr_tot,a); 
+	               break;
 	    }
 	 }
          else{
@@ -241,10 +272,13 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle>* particles,
       
          if(dist_temp_tot < truncDist){
 	    switch(interact_type){
-	       case 1: energy_temp = lenjones_energy(dist_temp_tot,c); 
+	       case 1: energy_temp = lenjones_energy(dist_temp_tot,a); 
 		       break;
-	       case 2: energy_temp = WCA_energy(dist_temp_tot,c); 
+	       case 2: energy_temp = WCA_energy(dist_temp_tot); 
 		       break;
+	       case 3: energy_temp = WCA_energy(dist_temp_tot) +
+		          simple_spring_energy(dist_temp_tot,a); 
+	               break;
 	    }
 	 }
          else{
@@ -293,7 +327,7 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index){
          y_comp = compare_prt.getY_Position(); 
          rad_comp = compare_prt.getRadius(); 
 
-         if(distance(x_temp,x_comp,y_temp,y_comp) // if current particle's center
+         if(distance(x_temp,x_comp,y_temp,y_comp,0) // if current particle's center
                      < rad_comp + rad_temp){      // is closer than the radius of
             accept = 0;                           // current partice plus the radius
             break;                                // of comparison particle, reject move
@@ -306,13 +340,17 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index){
 
 void Interaction::initializeInteraction(Parameters* p){
 
-   boxLength    = p->getBoxLength();           // assign all private variables
-   n_particles  = p->getNumParticles();        // used in this class
+   boxLength    = p->getBoxLength();     // assign all private variables
+   n_particles  = p->getNumParticles();  // used in this class
    sigma        = p->getSigma(); 
-   redDens      = p->getRedDens(); 
-  
+   sigma_par    = p->getSigmaPar();      // sigma parallel is used for
+   redDens      = p->getRedDens();       // parallel interactions
+   red_temp     = p->getRedTemp(); 
+   rest_L       = p->getRestLength(); 
+   k_spring     = p->getSprConst(); 
+
    interact_type = p->getInteract_Type();
-   
+   std::cout << "sigma is " << sigma << " and sigmapar is " << sigma_par << "\n";   
    LJ_par       = p->getLJ_const_1(); 
    LJ_antipar   = p->getLJ_const_2(); 
 

@@ -8,15 +8,15 @@ particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
-reducedTemp : .7  # not measured by the system currently
-reducedDens : .82  # currently user determined, but could be found from sigma,L
+reducedTemp : 1  # not measured by the system currently
+reducedDens : .7  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 LJ_constant_1 : 1  # thus the well depth for each is equal to 
 LJ_constant_2 : 1.5  # c * KbT
 
-seed   : 98465029847 
+seed   : 90757029382  
 weight : .06 # weight is being calculated inside the program
 
 numberUpdates  : 30000  # each update = 1 sweep = n_part attempted moves 

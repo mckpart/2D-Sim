@@ -1,38 +1,40 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 30 
-type1_Particles : 15
-type2_Particles : 15
+totalParticles  : 256 
+type1_Particles : 256
+type2_Particles : 0
 
 particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
-reducedTemp : 2  # not measured by the system currently
-reducedDens : .5  # currently user determined, but could be found from sigma,L
+reducedTemp : .7  # not measured by the system currently
+reducedDens : .7  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 LJ_constant_1 : 1  # thus the well depth for each is equal to 
-LJ_constant_2 : 5  # c * KbT
+LJ_constant_2 : 1  # c * KbT
 
-seed   : 90757029382 
+seed   : 12498702932 
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 3000  # each update = 1 sweep = n_part attempted moves 
-initializationType : 0 # 0 = random, 1 = hexagonal, 2 = square
+numberUpdates  : 10000  # each update = 1 sweep = n_part attempted moves 
+initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
 
 ### CHOOSE RUN LENGTH ####
 
-equilibriate_sweep : 1000 
+equilibriate_sweep : 5000 
 data_collect_interval : 20
 
 ### CHOOSE INTERACTION TYPE ####
 
 interactionType : 1 # 0 = hard disk, 1 = LJ, 2 = WCA
+                    # 3 = WCA + spring energy
+springConstant : 0.3
 
 ### DEFINE TYPE OF BOUNDARY ######
 
-boundaryType : 2 # 0 = rigid, 1 = periodic, 2 = external well 
+boundaryType : 1 # 0 = rigid, 1 = periodic, 2 = external well 
 
 animationFile : positions.txt

@@ -12,8 +12,7 @@ interact_type = yaml_dict["interactionType"]
 red_dens = yaml_dict["reducedDens"]
 red_temp = yaml_dict["reducedTemp"]
 
-# rigidBC    = yaml_dict["rigidBoundary"]
-# periodBC    = yaml_dict["periodicBoundary"]
+trunc = 2.5 * sigma
 
 boxLength  = yaml_dict["boxLength"]
 
@@ -21,13 +20,20 @@ f = open('forces.txt','r')
 vir = f.read().split(' ')
 vir = [float(i) for i in vir if(i != '' and i != '\n')]
 
+def pressure_corr_LJ(d): 
+    t = trunc/sigma
+    c = 6*math.pi* d**2 * (.8*(1/t)**10.0 - (1/t)**4.0)
+    return c 
+
 def calcPressure(d,t,n_part,vir):
    avg_virial = 0
    for k in range(len(vir)): 
        avg_virial = avg_virial + vir[k]
    avg_virial = avg_virial/len(vir)
    p = d * (t + avg_virial/(2 * n_part))
-   return p
+   if(interact_type == 1): 
+       corr = pressure_corr_LJ(d)
+   return p + corr 
 
 pressure = calcPressure(red_dens,red_temp,n_part,vir)
 print("reduced pressure: ",pressure)

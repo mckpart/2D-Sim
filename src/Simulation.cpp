@@ -22,10 +22,10 @@ Simulation::Simulation(std::string yf){
    setParticleParams();	                    // parameters
    
    Particle prt; 
-   for(int k = 0; k < n_particles; ++k){
-      prt = particles[k]; 
-      std::cout << "k: " << k << " type: " << prt.getType() << std::endl; 
-   }
+//   for(int k = 0; k < n_particles; ++k){
+//      prt = particles[k]; 
+//      std::cout << "k: " << k << " type: " << prt.getType() << std::endl; 
+//   }
 
    redTemp = param.getRedTemp();
    std::cout << "in sim the redtemp is " << redTemp << std::endl; 
@@ -244,7 +244,7 @@ void Simulation::setParticleParams(){
      
    int num_part_1 = 0; 
    int num_part_2 = 0; 
-
+   
    double radius = 0; 
    double weight = 0; 
    double sigma = 0; 
@@ -252,6 +252,7 @@ void Simulation::setParticleParams(){
 
    double num_1 = 0; 
    double num_2 = 0; 
+   double ratio = 0; 
    double n = 0; 
    int type = 0; 
 
@@ -269,7 +270,8 @@ void Simulation::setParticleParams(){
 
    sigma = param.getSigma(); 
    boxLength = param.getBoxLength(); 
-
+   ratio = (double)num_part_1/n_particles; 
+   std::cout << "the ratio is: " << ratio << "\n"; 
    weight = sigma * sqrt(1/(4 * param.getRedDens()));
    std::cout << "the stepping weight is: " << weight << std::endl; 
    prt.setStepWeight(weight); 
@@ -282,7 +284,7 @@ void Simulation::setParticleParams(){
    for(int k = 0; k < n_particles; ++k){
       if(num_1 < num_part_1 && num_2 < num_part_2){
          n = randVal.RandomUniformDbl(); 
-         if(n < 0.5){
+         if(n < ratio){
             type = 1; 
 	    ++num_1; 
          }

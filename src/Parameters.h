@@ -11,7 +11,10 @@ private:
    double redDensity = 0; 
    double redTemp = 0; 
    double sigma = 0;
+   double sigma_par = 0; 
    double boxLength = 0; 
+   double rest_L = 0; 
+   double k_spring = 0; 
 
    double LJ_const_1 = 0; 
    double LJ_const_2 = 0; 
@@ -51,9 +54,12 @@ public:
    double getLJ_const_1(); 
    double getLJ_const_2(); 
 
+   double getSprConst(); 
+   double getRestLength(); 
    double getRedDens(); 
    double getRedTemp();
    double getSigma();
+   double getSigmaPar(); 
    double getBoxLength(); 
 
    // NOTE: THE SETTERS ARE NOT NECESSARY
