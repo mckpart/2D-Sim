@@ -15,7 +15,9 @@ void Parameters::initializeParameters(std::string yamlFile){
    sigma_par = sigma; // BAD, COME BACK TO FIX
    k_spring    = node["springConstant"].as<double>(); 
 //   rest_L      = node["rest_length"].as<double>(); 
-   rest_L = pow(2.0,1.0/6.0)*sigma; // this is temporary
+//   rest_L = pow(2.0,1.0/6.0)*sigma; // this is temporary
+   rest_L = pow(2.0,4.0/6.0)*sigma; 
+//   rest_L = 32.0/25.0*pow(2.0,1.0/6.0);
    std::cout << "the rest length is: " << rest_L << "\n";
    LJ_const_1  = node["LJ_constant_1"].as<double>(); 
    LJ_const_2  = node["LJ_constant_2"].as<double>(); 

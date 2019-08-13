@@ -222,7 +222,7 @@ def plot_RDF(r_vec,RDF,delta_r):
     fig,axs = plt.subplots(1,num, figsize = f, \
               facecolor='w', edgecolor='k',squeeze = False)
     txt = 'RDF from the Pair Correlation Function'
-    
+    leg = ['RDF',r'$2^{1/6}$',r'$2^{2/3}$']
     if(num != 1): 
         fig.tight_layout()
         fig.subplots_adjust(top = .8,bottom =.18,left=.05,wspace=.22)
@@ -233,14 +233,16 @@ def plot_RDF(r_vec,RDF,delta_r):
     for k in range(num): 
         axs[0][k].plot(r_vec,RDF[k])
         axs[0][k].axvline(x = 2.0**(1.0/6.0),color = 'red',linestyle = '--')
-        axs[0][k].axhline(y = 1,color = 'orange',linestyle = '--')
-        axs[0][k].axvline(x = 2.0**(2.0/3.0),color = 'yellow',linestyle = '--')
+        axs[0][k].axvline(x = 2.0**(2.0/3.0),color = 'green',linestyle = '--')
+        axs[0][k].axvline(x = 1.5 *2.0**(1.0/6.0))
 #         axs[0][k].axvline(x = 1,color = 'red',linestyle = '--')
 #         axs[0][k].axvline(x = math.sqrt(2),color = 'orange',linestyle = '--')
         axs[0][k].set_title(titles[k])
         axs[0][k].set_xlabel(r'$\frac{r}{\sigma}$')
         axs[0][k].set_ylabel(r'$g(\frac{r}{\sigma})$')
+        axs[0][k].legend(leg)
 
+        axs[0][k].axhline(y = 1,color = 'orange',linestyle = '--')
         axs[0][k].set_xlim([0,boxL/2 - 2*delta_r])
         axs[0][k].set_ylim([0,max(RDF[0])*1.1])
     

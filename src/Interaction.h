@@ -36,6 +36,7 @@ public:
    void populateCellArray(double x, double y, 
 		          std::vector<std::vector<double>>* cellPositions); 
 
+   void truncation_values(); 
    double distance(double x1, double x2, double y1, double y2, int type);
    
    double lenjones_energy(double r, double a); 

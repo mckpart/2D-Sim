@@ -24,8 +24,7 @@ double Interaction::WCA_energy(double r){ // binding affinity should
 // be multiplied by the reduced temperature. explanation will be 
 // typed up in later document
 double Interaction::simple_spring_energy(double r, double a){ 
-//   return -a*red_temp**exp(-k_spring/2.0*pow(r-rest_L,2.0)); // add the spring constant later
-   return -a*red_temp*k_spring/2*pow(r-rest_L,2)*exp(-k_spring/2.0*pow(r-rest_L,2.0)); // add the spring constant later
+   return a*red_temp*k_spring/2*pow(r-rest_L,2)*exp(-k_spring/2.0*pow(r-rest_L,2.0)); // add the spring constant later
 }                                    // NOTE: KbT = 1 so beta = 1
 
 void Interaction::populateCellArray(double x,
@@ -226,8 +225,6 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle>* particles,
    double dist_curr_tot = 0; 
    double dist_temp_tot = 0; 
 
-//   std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));  
-
    current_prt = (*particles)[index];    // assign current particle
  
    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
@@ -338,6 +335,24 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index){
    return accept;     // returns 1 if trial move is accepted 
 }
 
+void Interaction::truncation_values(){
+   switch(interact_type){
+//      case 1:  
+	       
+//              break;
+//      case 2: break;  
+      case 3: truncDist = boxLength/2.0;
+	      break;
+      default:  truncDist = 2.5;
+                truncShift = -1*(pow(1/truncDist,12)
+			        -pow(1/truncDist,6));
+                tail_corr =  3.141592654*redDens
+			    *(.4 * pow(1/truncDist,10) // the same 
+		                 - pow(1/truncDist,4)); // applies to the tail corr
+                break;
+   }
+   std::cout << "the tail correction term is " << tail_corr << std::endl;
+}
 
 void Interaction::initializeInteraction(Parameters* p){
 
@@ -354,12 +369,12 @@ void Interaction::initializeInteraction(Parameters* p){
    std::cout << "sigma is " << sigma << " and sigmapar is " << sigma_par << "\n";   
    LJ_par       = p->getLJ_const_1(); 
    LJ_antipar   = p->getLJ_const_2(); 
-
-   truncDist = 2.5;    // this is really 2.5 * sigma / sigma
-   truncShift = -1 * (pow(1/truncDist,12) 
-		    - pow(1/truncDist,6)); // this shifted potential is only true
+   truncation_values(); 
+//   truncDist = 2.5;    // this is really 2.5 * sigma / sigma
+//   truncShift = -1 * (pow(1/truncDist,12) 
+//		    - pow(1/truncDist,6)); // this shifted potential is only true
                                            // for the Lennard-Jones potential
-   tail_corr =  3.141592654 * redDens * (.4 * pow(1/truncDist,10) // the same 
-		                 - pow(1/truncDist,4)); // applies to the tail corr
+//   tail_corr =  3.141592654 * redDens * (.4 * pow(1/truncDist,10) // the same 
+//		                 - pow(1/truncDist,4)); // applies to the tail corr
 }
 

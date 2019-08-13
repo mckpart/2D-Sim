@@ -20,21 +20,46 @@ double Properties::lenJonesEnergy(double r, double a){
 // NOTE: THE BINDING AFFINITY SHOULD NOT BE ATTACHED TO THE 
 // WCA POTENTIAL SINCE THE WCA POTENTIAL IS SERVING THE 
 // PURPOSE OF A SOFT DISK INTERACTION
+double Properties::WCA_force(double r){
+   double val = 0; 
+   if(r <= pow(2.0,1.0/6.0)){
+      val = 24/sigma * (2*pow(1/r,13) - pow(1/r,7)); 
+   }
+   return val; // if the particles are further than sigma * 2^(1/6)
+}              // apart then there is no force/potential energy
+
 double Properties::WCA_energy(double r){ // a behaves as the
-   double val = 0;                                 // binding affinity
-   if(r<= pow(2,1/6)){
+   double val = 0;                       // binding affinity
+   if(r<= pow(2.0,1.0/6.0)){
       val = 4*(pow(1/r,12)-pow(1/r,6) + .25); // WCA is more of a piecewise
-   }                                            // potential 
+   }                                          // potential 
    return val; 
 }
 
-double Properties::simple_spring_energy(double r, double a){
-   return -a * exp(pow(r-rest_L,2)); // come back to add the spring constant here   
+double Properties::simple_spring_force(double r, double a){
+   return a*red_temp*k_spring*(r-rest_L)*
+	  exp(-k_spring/2*pow(r-rest_L,2))*
+          (k_spring/2*pow(r-rest_L,2)-1); 
 }
 
-void Properties::calcEnergy(double r, double c){
-   f_energy = f_energy + lenJonesEnergy(r,c);    // sums the energy of the current 
-}                                                // configuration
+double Properties::simple_spring_energy(double r, double a){
+   return a*red_temp*k_spring/2*pow(r-rest_L,2)
+	   *exp(-k_spring/2.0*pow(r-rest_L,2.0)); // add the spring constant later
+}
+
+void Properties::calcEnergy(double r, double a){
+   double val = 0;
+   switch(interact_type){
+      case 1: val = lenJonesEnergy(r,a); 
+	      break; 
+      case 2: val = WCA_energy(r); 
+	      break;
+      case 3: val = WCA_energy(r) + 
+	      simple_spring_energy(r,a); 
+	      break;
+   }
+   f_energy = f_energy + val; // calculates energy of current 
+}                             // configuration
 void Properties::calcVirial(double r, double c){ // sums the virial of current
    f_r = f_r + r * lenJonesForce(r,c);           // configuration
 }
@@ -289,7 +314,7 @@ double Properties::calcPressure(){
       avgEnergy = avgEnergy + sum_Fdot_r[k];  
    }
    avgEnergy = avgEnergy/len;
-   redPressure = redDens * (redTemp + avgEnergy / (2 * n_particles));  
+   redPressure = redDens * (red_temp + avgEnergy / (2 * n_particles));  
    return redPressure; 
 }
 
@@ -361,13 +386,30 @@ void Properties::writeProperties(){
    antp_xy_file.close();  
 }
 
+void Properties::truncation_dist(){
+   switch(interact_type){
+//      case 1:  
+	       
+//              break;
+//      case 2: break;  
+      case 3: truncDist = boxLength/2.0;
+	      break;
+      default:  truncDist = 2.5;
+                truncShift = -1*(pow(1/truncDist,12)
+			        -pow(1/truncDist,6));
+                break;
+   }
+}
+
 void Properties::initializeProperties(Parameters* p){ // maybe make this into a 
                                                       // constructor
    boxLength = p->getBoxLength();      // assign private variables used in 
    n_particles = p->getNumParticles(); // class
    sigma = p->getSigma(); 
    redDens = p->getRedDens(); 
-   redTemp = p->getRedTemp(); 
+   red_temp = p->getRedTemp(); 
+
+   k_spring = p->getSprConst(); 
 
    interact_type = p->getInteract_Type(); 
    rest_L = p->getRestLength(); 
@@ -377,9 +419,9 @@ void Properties::initializeProperties(Parameters* p){ // maybe make this into a
 
    delta_r = sigma/20; // this might not be the best way to define delta_r
    cell_L = sigma/20; 
-   truncDist = 2.5;                 // really is 2.5 * sigma / sigma 
-   truncShift = -1 * lenJonesEnergy(truncDist,.25); // shifts the cutoff to zero 
-   
+//   truncDist = 2.5;                 // really is 2.5 * sigma / sigma 
+//   truncShift = -1 * lenJonesEnergy(truncDist,.25); // shifts the cutoff to zero 
+   truncation_dist();   
    // define the various RDF vectors (dependent upon r)
    num_density.resize((boxLength/2)/delta_r + 1);
    par_num_density.resize((boxLength/2)/delta_r + 1);

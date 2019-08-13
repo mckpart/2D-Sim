@@ -33,11 +33,14 @@ private:
    
    double delta_r = 0;
    double cell_L = 0;  
+   
    double sigma = 0; 
    double truncDist = 0; 
    double truncShift = 0; 
+   int interact_type = 0; 
+ 
+   double k_spring = 0; 
    double rest_L = 0; 
-   double interact_type = 0; 
 
    double LJ_par = 0; 
    double LJ_antipar = 0; 
@@ -46,20 +49,23 @@ private:
    int n_particles = 0; 
 
    double redDens = 0; 
-   double redTemp = 0;  
+   double red_temp = 0;  
 
 public: 
    void initializeProperties(Parameters* p); 
+   void truncation_dist(); 
+
 
    void populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions); 
    double lenJonesEnergy(double r, double a);  
    double lenJonesForce(double r, double a);   
 
    double WCA_energy(double r);
+   double WCA_force(double r); 
    double simple_spring_energy(double r, double a);   
+   double simple_spring_force(double r, double a); 
 
    void updateNumDensity(double r, int ID);
-//   void update_xy_corr(double x, double y, int ID); 
    void calc_xy_dens(double x, double y, int ID); 
 
    void calcPeriodicProp(std::vector<Particle>* particles); 
