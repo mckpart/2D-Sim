@@ -33,6 +33,8 @@ def calcPressure(d,t,n_part,vir):
    p = d * (t + avg_virial/(2 * n_part))
    if(interact_type == 1): 
        corr = pressure_corr_LJ(d)
+   else:
+       corr = 0
    return p + corr 
 
 pressure = calcPressure(red_dens,red_temp,n_part,vir)

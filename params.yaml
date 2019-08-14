@@ -1,19 +1,19 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 100 
-type1_Particles : 50
-type2_Particles : 50
+totalParticles  : 150 
+type1_Particles : 75
+type2_Particles : 75
 
 particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
-reducedTemp : 1.05  # not measured by the system currently
-reducedDens : .56  # currently user determined, but could be found from sigma,L
+reducedTemp : 1.1  # not measured by the system currently
+reducedDens : .4  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
-LJ_constant_1 : 10  # thus the well depth for each is equal to 
+LJ_constant_1 : 8  # thus the well depth for each is equal to 
 LJ_constant_2 : 1 # c * KbT
 
 seed   : 59137498751 
@@ -31,10 +31,10 @@ data_collect_interval : 20
 
 interactionType : 3 # 0 = hard disk, 1 = LJ, 2 = WCA
                     # 3 = WCA + spring energy
-springConstant : 5
+springConstant : 4
 
 ### DEFINE TYPE OF BOUNDARY ######
 
-boundaryType : 1 # 0 = rigid, 1 = periodic, 2 = external well 
+boundaryType : 0 # 0 = rigid, 1 = periodic, 2 = external well 
 
 animationFile : positions.txt

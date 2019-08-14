@@ -337,10 +337,6 @@ bool Interaction::hardDisks(std::vector<Particle>* particles, int index){
 
 void Interaction::truncation_values(){
    switch(interact_type){
-//      case 1:  
-	       
-//              break;
-//      case 2: break;  
       case 3: truncDist = boxLength/2.0;
 	      break;
       default:  truncDist = 2.5;

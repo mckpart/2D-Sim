@@ -60,8 +60,19 @@ void Properties::calcEnergy(double r, double a){
    }
    f_energy = f_energy + val; // calculates energy of current 
 }                             // configuration
-void Properties::calcVirial(double r, double c){ // sums the virial of current
-   f_r = f_r + r * lenJonesForce(r,c);           // configuration
+void Properties::calcVirial(double r, double a){ // sums the virial of current
+//   f_r = f_r + r * lenJonesForce(r,a);           // configuration
+   double val = 0; 
+   switch(interact_type){
+      case 1: val = lenJonesForce(r,a);
+	      break;
+      case 2: val = WCA_force(r); 
+	      break; 
+      case 3: val = WCA_energy(r) + 
+	      simple_spring_force(r,a); 
+	      break;
+   }
+   f_r = f_r + r * val; 
 }
 
 void Properties::updateNumDensity(double r, int ID){ // this could always return the index to increase... 

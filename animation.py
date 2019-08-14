@@ -36,7 +36,7 @@ if(interact_type != 0):
         sigma = boxLength * math.sqrt(redDens/n_part_tot)
     elif(boxLength == 0):
         boxLength = sigma * math.sqrt(n_part_tot/redDens)
-    radius = 0.5 * sigma
+    radius = 0.5 * sigma * 2.0**(1.0/6.0)
 patches = []
 position = []
 x,y = [],[]

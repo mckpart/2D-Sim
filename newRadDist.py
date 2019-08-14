@@ -234,7 +234,7 @@ def plot_RDF(r_vec,RDF,delta_r):
         axs[0][k].plot(r_vec,RDF[k])
         axs[0][k].axvline(x = 2.0**(1.0/6.0),color = 'red',linestyle = '--')
         axs[0][k].axvline(x = 2.0**(2.0/3.0),color = 'green',linestyle = '--')
-        axs[0][k].axvline(x = 1.5 *2.0**(1.0/6.0))
+#         axs[0][k].axvline(x = 1.5 *2.0**(1.0/6.0))
 #         axs[0][k].axvline(x = 1,color = 'red',linestyle = '--')
 #         axs[0][k].axvline(x = math.sqrt(2),color = 'orange',linestyle = '--')
         axs[0][k].set_title(titles[k])
@@ -263,7 +263,7 @@ def run_pcf():
         densities = [n]
     
     cell_L = sigma/20.0
-    delta_r = sigma/15.0
+    delta_r = sigma/10.0
 
     # create a matrix of the different x,y
     # coordinate positions
