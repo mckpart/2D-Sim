@@ -73,8 +73,8 @@ print(position)
 numIter = len(position[:,0]) 
 print(numIter)
 
-# Writer = ani_obj.writers['ffmpeg']
-# writer = ani_obj.FFMpegWriter(fps=4, metadata=dict(artist='Me'), bitrate=1800)
+Writer = ani_obj.writers['ffmpeg']
+writer = ani_obj.FFMpegWriter(fps=4, metadata=dict(artist='Me'), bitrate=1800)
 
 def init():
 
@@ -110,10 +110,10 @@ t = np.linspace(0,numIter - 1,numIter)
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 
-# i = input("Would you like to save the movie?")
-# if(i == 'y'):
-#     anim.save('trial.mp4',writer=writer)
-# else:
-#     print("movie not saved")
+i = input("Would you like to save the movie?")
+if(i == 'y'):
+    anim.save('movie.mp4',writer=writer)
+else:
+    print("movie not saved")
 plt.show()
 

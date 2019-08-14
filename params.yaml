@@ -1,22 +1,22 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 150 
-type1_Particles : 75
-type2_Particles : 75
+totalParticles  : 100 
+type1_Particles : 50
+type2_Particles : 50
 
 particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
 reducedTemp : 1.1  # not measured by the system currently
-reducedDens : .4  # currently user determined, but could be found from sigma,L
+reducedDens : .6  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 LJ_constant_1 : 8  # thus the well depth for each is equal to 
 LJ_constant_2 : 1 # c * KbT
 
-seed   : 59137498751 
+seed   : 24397523049520
 weight : .06 # weight is being calculated inside the program
 
 numberUpdates  : 16000  # each update = 1 sweep = n_part attempted moves 

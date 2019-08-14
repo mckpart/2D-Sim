@@ -36,7 +36,7 @@ if(interact_type != 0):
         sigma = boxLength * math.sqrt(redDens/n_part_tot)
     elif(boxLength == 0):
         boxLength = sigma * math.sqrt(n_part_tot/redDens)
-    radius = 0.5 * sigma
+    radius = 0.5 * sigma * 2.0**(1.0/6.0)
 patches = []
 position = []
 x,y = [],[]
@@ -48,18 +48,18 @@ types = file_1.read().split(' ')
 types = [float(i) for i in types if i != '']
 print(types)
 
-# for k in range(n_part_tot):
-#     if(types[k] == 1):
-#         c = 'red'
-#     else:
-#         c = 'blue'
-#     patches += [plt.Circle((0,0), radius, color = c)]
-color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
-# color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
-for i in range(n_part_1):
-    patches += [plt.Circle((0,0), radius, color = color_1[i])]
-# for i in range(n_part_2):
-#     patches += [plt.Circle((0,0), radius, color = color_2[i])]    
+for k in range(n_part_tot):
+    if(types[k] == 1):
+        c = 'red'
+    else:
+        c = 'blue'
+    patches += [plt.Circle((0,0), radius, color = c)]
+#color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
+#color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
+#for i in range(n_part_1):
+#    patches += [plt.Circle((0,0), radius, color = color_1[i])]
+#for i in range(n_part_2):
+#    patches += [plt.Circle((0,0), radius, color = color_2[i])]    
 
 file = open(pos_file, "r" )
 for line in file:
@@ -112,7 +112,7 @@ anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 
 i = input("Would you like to save the movie?")
 if(i == 'y'):
-    anim.save('trial.mp4',writer=writer)
+    anim.save('movie.mp4',writer=writer)
 else:
     print("movie not saved")
 plt.show()

@@ -19,12 +19,17 @@ if not os.path.exists(dir_name):
     os.makedirs(dir_name)
 else:
     print("The file ",name," already exists.")
-pos_copy = "pos_" + name + ".txt"
-rad_copy = "r_dist_" + name + ".txt"
-eng_copy = "energy_" + name + ".txt"
-vir_copy = "vir_" + name + ".txt"
-yaml_copy = name + ".yaml"
+# pos_copy = "pos_" + name + ".txt"
+# rad_copy = "r_dist_" + name + ".txt"
+# eng_copy = "energy_" + name + ".txt"
+# vir_copy = "vir_" + name + ".txt"
+# yaml_copy = name + ".yaml"
 
+pos_copy = "pos.txt"
+rad_copy = "r_dist_.txt"
+eng_copy = "energy_.txt"
+vir_copy = "vir_.txt"
+yaml_copy = "p.yaml"
 new = [pos_copy,rad_copy,eng_copy,vir_copy,yaml_copy]
 #print(new)
 
