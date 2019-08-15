@@ -25,6 +25,7 @@ double Properties::WCA_force(double r){
    if(r <= pow(2.0,1.0/6.0)){
       val = 24/sigma * (2*pow(1/r,13) - pow(1/r,7)); 
    }
+//   std::cout << "in wca force: " << val << std::endl;
    return val; // if the particles are further than sigma * 2^(1/6)
 }              // apart then there is no force/potential energy
 
@@ -68,7 +69,7 @@ void Properties::calcVirial(double r, double a){ // sums the virial of current
 	      break;
       case 2: val = WCA_force(r); 
 	      break; 
-      case 3: val = WCA_energy(r) + 
+      case 3: val = WCA_force(r) + 
 	      simple_spring_force(r,a); 
 	      break;
    }
@@ -126,7 +127,8 @@ void Properties::calc_xy_dens(double x, double y, int ID){
 }
 
 void Properties::calcNonPerProp(std::vector<Particle>* particles){
-
+//   boxLength = 3; sigma = 1; red_temp = 1; interact_type = 3;
+//   LJ_par = 1; n_particles = 2; k_spring =1; rest_L = .75;   
    Particle curr_prt; 
    Particle comp_prt; 
 
@@ -168,13 +170,13 @@ void Properties::calcNonPerProp(std::vector<Particle>* particles){
 	 comp_prt =(*particles)[n]; 
          x_comp = comp_prt.getX_Position(); // set comparison x,y position
 	 y_comp = comp_prt.getY_Position(); 
-
+//         std::cout << comp_prt.getIdentifier() << " " << curr_prt.getIdentifier() << "\n";
          // the particle cannot interact with itself
 	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){  
 	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
 	    updateNumDensity(r_dist,0);   // updates overall number density
 	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr,0); 
-
+//
 	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
 	       LJ_constant = LJ_par;                // parallel microtubules
 	       updateNumDensity(r_dist,1);          // updates number density 
@@ -185,17 +187,18 @@ void Properties::calcNonPerProp(std::vector<Particle>* particles){
 	       updateNumDensity(r_dist,2);     // updates number density for
 	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); // antiparallel
 	    }                                               // interactions
+//	    std::cout << "rdist: " << r_dist << "n and k: " << n << " " << k << "\n"; 
 	 }
 	 if(n > k && r_dist < truncDist){
-//            if(r_dist < truncDist){
-	       calcEnergy(r_dist,LJ_constant);  
-	       calcVirial(r_dist,LJ_constant); 
-//	    }
+//	    std::cout << "in here" << std::endl;
+            calcEnergy(r_dist,LJ_constant);  
+	    calcVirial(r_dist,LJ_constant); 
 	 }                          
       }
    }
    sum_Fdot_r.push_back(f_r); 
    sum_energy.push_back(f_energy);
+//   std::cout << "virial: " << f_r << " energy: " << f_energy << "\n"; 
 }
 void Properties::populateCellArray(double x,double y, std::vector<std::vector<double>>* cellPositions){
    
@@ -398,7 +401,8 @@ void Properties::writeProperties(){
 }
 
 void Properties::truncation_dist(){
-   switch(interact_type){
+//      interact_type = 3;boxLength =3 ; 
+      switch(interact_type){
 //      case 1:  
 	       
 //              break;
@@ -410,6 +414,7 @@ void Properties::truncation_dist(){
 			        -pow(1/truncDist,6));
                 break;
    }
+//   std::cout << "trunc dist is: " << truncDist << std::endl;
 }
 
 void Properties::initializeProperties(Parameters* p){ // maybe make this into a 

@@ -35,6 +35,7 @@ def calcPressure(d,t,n_part,vir):
        corr = pressure_corr_LJ(d)
    else:
        corr = 0
+   print(p)
    return p + corr 
 
 pressure = calcPressure(red_dens,red_temp,n_part,vir)

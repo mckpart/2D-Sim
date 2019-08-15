@@ -4,11 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
-# y = lambda x: 1
-# 
-# result  = integrate.quad(y,-1,1)
-# print(result)
-
 # Normalizes the set based on the total 
 #   number of trials in the set
 # Returns the radial distribution function
@@ -87,11 +82,11 @@ numberTrials = (n_updates-n_eq)/interval - 1  # this needs to be added to the ya
 deltaR = sigma/20.0 
 r_iter = np.linspace(0,.5*boxL,(.5 * boxL)/deltaR + 1.0)
 
-##### PLOT DATA ###################
+# ##### PLOT DATA ###################
 # choice = input("Do you want all of the plots?(y/n)")
-
-# 'y' will create an image with the regular RDF, parallel RDF, and antiparallel RDF
-# anything else will create an image with the regular RDF
+# 
+# # 'y' will create an image with the regular RDF, parallel RDF, and antiparallel RDF
+# # anything else will create an image with the regular RDF
 # if(choice == 'y'):  
 #     fig, axs = plt.subplots(1,3, figsize=(12, 3), 
 #                facecolor='w', edgecolor='k',squeeze = False)
@@ -121,10 +116,14 @@ r_iter = np.linspace(0,.5*boxL,(.5 * boxL)/deltaR + 1.0)
 #     if(k == 0):
 #         axs[0,k].set_ylabel(r'$g(\frac{r}{\sigma})$')
 #         max_y = max(G) * 1.1
+#         
+#         RDF = G
+#         r_vec = r_iter
 #     axs[0,k].set_ylim([0,max_y])
-
-
-# saveImage()
+#     
+# 
+# 
+# # saveImage()
 # plt.show()  
 
 def init_pos_matrix(val,cell_L): # this creates a 3D matrix that is 
@@ -268,7 +267,7 @@ def run_pcf():
         densities = [n]
     
     cell_L = sigma/20.0
-    delta_r = sigma/22.5
+    delta_r = sigma/20.0
 
     # create a matrix of the different x,y
     # coordinate positions
@@ -290,20 +289,28 @@ def run_pcf():
     # distribution function
     RDF = calc_RDF(r_vec,dens_1D,delta_r)
     plot_RDF(r_vec,RDF,delta_r)
+    
     return RDF[0],r_vec
+
 RDF,r_vec = run_pcf()
-# print(RDF)
-# print(r_vec)
-# print("length of RDF",len(RDF))
 plt.show();
 
 # definitely put this into a different file or put the other pressure 
 # calculation code into this file... ORGANIZE
 
+# Note: this was a pressure calculation using the RDF 
+# in good agreement when applied to LJ periodic system
+# Not the best for the pressure calculation though since
+# the result and error is highly dependent upon method
+# as well as step size. Computing the virial from the 
+# forces seems to be far more reliable. 
+
 a0 = yaml_dict["LJ_constant_1"]
 a1 = yaml_dict["LJ_constant_2"]
 k_spring = yaml_dict["springConstant"]
 r_L = math.sqrt(2) * 2.0**(1.0/6.0)
+# print("rest length is",r_L)
+
 def WCA_force(r):
     val = 0
     if(r <= 2.0**(1.0/6.0)):
@@ -314,32 +321,26 @@ def WCA_force(r):
 def simple_force(r,a):
     val = a*red_temp*k_spring/2.0*(r-r_L) \
           *math.exp(-k_spring/2.0*(r-r_L)**2.0) \
-          *(k_spring/2.0*(r-r_L)**2-1)
+          *(k_spring/2.0*(r-r_L)**2-1.0)
     return val
 
 def int_func(f,r,g): # f = forces, r = position, g = RDF
-#     print(f)
     vec = np.zeros(len(f))
     for k in range(len(f)): 
         vec[k] = r[k+1]**2 * f[k] * g[k+1]
     return vec    
-#     val = r[k+1]**2 * f[k] * g[k+1]
-# 
+
 f1 = [WCA_force(i) for i in r_vec[1:len(r_vec)]]
-print("length of f1", len(f1))
+
 # the .5 comes from the ratio of particles. Since there is a 50/50
 # ratio of the two species of particle, the overall interactions
 # should be 50% parallel and 50% antiparallel 
-temp1 = [0.5*simple_force(i,a0) for i in r_vec[1:len(r_vec)]]
-temp2 = [0.5*simple_force(i,a1) for i in r_vec[1:len(r_vec)]]
-print("length of temp",temp1)
+
+temp1 = [simple_force(i,a0) for i in r_vec[1:len(r_vec)]]
+temp2 = [simple_force(i,a1) for i in r_vec[1:len(r_vec)]]
 f2 = [temp1[i]+temp2[i] for i in range(len(temp1))]
-print("length of f2",len(f2))
 f_tot = [f1[i]+f2[i] for i in range(len(f1))] # this is the force from the simplified potential
-print(f_tot)       # and the WCA potential
-print(len(f_tot),len(r_vec),len(RDF))
 v = int_func(f_tot,r_vec,RDF)
-# print(v)
 # func = lambda i: v[i]
 # def lj_force(r): 
 #     val = 24.0/sigma*(2*(1/r)**13-(1/r)**7)
@@ -350,9 +351,13 @@ v = int_func(f_tot,r_vec,RDF)
 
 plt.plot(r_vec[1:len(r_vec)],v)
 plt.show()
+
+# test the two different numerical integration functions 
+# included in the scipy.integrate package
 virial1 = integrate.simps(v,r_vec[1:len(r_vec)]) # try this with trapz as well 
 virial2 = integrate.trapz(v,r_vec[1:len(r_vec)])
-print(virial1)                                   # maybe implement simplsons 3/8 rule
+
+# compare the pressures from the different integrations
 pressure1 = red_dens*red_temp + math.pi/2.0*red_dens**2.0/sigma**2.0 * virial1
 pressure2 = red_dens*red_temp + math.pi/2.0*red_dens**2.0/sigma**2.0 * virial2
 
