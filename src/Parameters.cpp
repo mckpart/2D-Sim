@@ -12,13 +12,10 @@ void Parameters::initializeParameters(std::string yamlFile){
    redTemp     = node["reducedTemp"].as<double>(); 
    sigma       = node["sigma"].as<double>(); 
    n_particles = node["totalParticles"].as<int>(); 
-   sigma_par = sigma; // BAD, COME BACK TO FIX
    k_spring    = node["springConstant"].as<double>(); 
-//   rest_L      = node["rest_length"].as<double>(); 
-//   rest_L = pow(2.0,1.0/6.0)*sigma; // this is temporary
-   rest_L = pow(2.0,4.0/6.0)*sigma; 
-//   rest_L = 32.0/25.0*pow(2.0,1.0/6.0);
-   std::cout << "the rest length is: " << rest_L << "\n";
+//   rest_L = 5.0/3.0; // center-center microtbules dist = 50 num, D = 30 nm = sigma
+//   rest_L = sqrt(2); // sigma = 1 = 40 nm.  
+   rest_L = 4.0/3.0;
    LJ_const_1  = node["LJ_constant_1"].as<double>(); 
    LJ_const_2  = node["LJ_constant_2"].as<double>(); 
 
@@ -34,11 +31,11 @@ void Parameters::initializeParameters(std::string yamlFile){
    else if(redDensity == 0){
       redDensity = n_particles * pow(sigma/boxLength,2);
    }
-//   sigma_par = sqrt(2)*sigma; 
    std::cout << "reduced density: " << redDensity 
-	     << "\nredTemp: " << redTemp 
+	     << "\nreduced temp: " << redTemp 
 	     << "\nsigma: " << sigma 
-	     << "\nboxLength: " << boxLength << std::endl;
+	     << "\nbox length: " << boxLength 
+	     << "\nrest length: " << rest_L << std::endl;
 
    seed        = node["seed"].as<long>(); 
    n_updates   = node["numberUpdates"].as<int>(); 
@@ -56,9 +53,6 @@ int Parameters::getUpdates(){      return n_updates;}
 int Parameters::getNumParticles(){ return n_particles;}
 long Parameters::getSeed(){        return seed;}
 
-double Parameters::getWeight(){    return weight;}
-double Parameters::getBeta(){      return beta;} // come back to remove
-
 int Parameters::getInit_Type(){    return init_type;}
 int Parameters::getInteract_Type(){return interact_type;}
 int Parameters::getBound_Type(){   return bound_type;}
@@ -67,7 +61,7 @@ double Parameters::getLJ_const_1(){return LJ_const_1;}
 double Parameters::getLJ_const_2(){return LJ_const_2;}
 
 double Parameters::getSigma(){     return sigma;}
-double Parameters::getSigmaPar(){  return sigma_par;}
+//double Parameters::getSigmaPar(){  return sigma_par;}
 double Parameters::getRedDens(){   return redDensity;}
 double Parameters::getRedTemp(){   return redTemp;}
 double Parameters::getBoxLength(){ return boxLength;}

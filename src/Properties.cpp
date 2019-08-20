@@ -25,7 +25,6 @@ double Properties::WCA_force(double r){
    if(r <= pow(2.0,1.0/6.0)){
       val = 24/sigma * (2*pow(1/r,13) - pow(1/r,7)); 
    }
-//   std::cout << "in wca force: " << val << std::endl;
    return val; // if the particles are further than sigma * 2^(1/6)
 }              // apart then there is no force/potential energy
 
@@ -62,7 +61,6 @@ void Properties::calcEnergy(double r, double a){
    f_energy = f_energy + val; // calculates energy of current 
 }                             // configuration
 void Properties::calcVirial(double r, double a){ // sums the virial of current
-//   f_r = f_r + r * lenJonesForce(r,a);           // configuration
    double val = 0; 
    switch(interact_type){
       case 1: val = lenJonesForce(r,a);
@@ -105,8 +103,6 @@ void Properties::calc_xy_dens(double x, double y, int ID){
 
    ind_1 = (x + sqrt(2)*boxLength/2)/cell_L; // cell_L = delta x = delta y 
    ind_2 = (y + sqrt(2)*boxLength/2)/cell_L;
-//   std::cout << "ind_1 " << ind_1 << " ind_2 " << ind_2 << std::endl;   
-//   std::cout << "x " << x << " y " << y << std::endl;
    if(fabs(x) < sqrt(2)*boxLength/2 - cell_L && fabs(y) < sqrt(2)*boxLength/2 - cell_L){
       if(x > (ind_1 + 0.5) * cell_L - sqrt(2)*boxLength/2){
          ++ind_1; 
@@ -127,8 +123,6 @@ void Properties::calc_xy_dens(double x, double y, int ID){
 }
 
 void Properties::calcNonPerProp(std::vector<Particle>* particles){
-//   boxLength = 3; sigma = 1; red_temp = 1; interact_type = 3;
-//   LJ_par = 1; n_particles = 2; k_spring =1; rest_L = .75;   
    Particle curr_prt; 
    Particle comp_prt; 
 
@@ -154,8 +148,6 @@ void Properties::calcNonPerProp(std::vector<Particle>* particles){
 
    int temp = 0;  
    
-//   std::vector<std::vector<double>> cellPositions(9,std::vector<double>(2,0));
-   
    f_energy = 0;   // make sure that the free energy previously calculated is reset
    f_r = 0;        // the free energy is only the energy that comes from the positions  
                    // within the configuration 
@@ -170,13 +162,13 @@ void Properties::calcNonPerProp(std::vector<Particle>* particles){
 	 comp_prt =(*particles)[n]; 
          x_comp = comp_prt.getX_Position(); // set comparison x,y position
 	 y_comp = comp_prt.getY_Position(); 
-//         std::cout << comp_prt.getIdentifier() << " " << curr_prt.getIdentifier() << "\n";
-         // the particle cannot interact with itself
+         
+	 // the particle cannot interact with itself
 	 if(curr_prt.getIdentifier() != comp_prt.getIdentifier()){  
 	    r_dist = radDistance(x_curr,x_comp,y_curr,y_comp);
 	    updateNumDensity(r_dist,0);   // updates overall number density
 	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr,0); 
-//
+
 	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
 	       LJ_constant = LJ_par;                // parallel microtubules
 	       updateNumDensity(r_dist,1);          // updates number density 
@@ -187,10 +179,8 @@ void Properties::calcNonPerProp(std::vector<Particle>* particles){
 	       updateNumDensity(r_dist,2);     // updates number density for
 	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); // antiparallel
 	    }                                               // interactions
-//	    std::cout << "rdist: " << r_dist << "n and k: " << n << " " << k << "\n"; 
 	 }
 	 if(n > k && r_dist < truncDist){
-//	    std::cout << "in here" << std::endl;
             calcEnergy(r_dist,LJ_constant);  
 	    calcVirial(r_dist,LJ_constant); 
 	 }                          
@@ -401,12 +391,7 @@ void Properties::writeProperties(){
 }
 
 void Properties::truncation_dist(){
-//      interact_type = 3;boxLength =3 ; 
       switch(interact_type){
-//      case 1:  
-	       
-//              break;
-//      case 2: break;  
       case 3: truncDist = boxLength/2.0;
 	      break;
       default:  truncDist = 2.5;
@@ -414,7 +399,6 @@ void Properties::truncation_dist(){
 			        -pow(1/truncDist,6));
                 break;
    }
-//   std::cout << "trunc dist is: " << truncDist << std::endl;
 }
 
 void Properties::initializeProperties(Parameters* p){ // maybe make this into a 
@@ -435,9 +419,8 @@ void Properties::initializeProperties(Parameters* p){ // maybe make this into a
 
    delta_r = sigma/20; // this might not be the best way to define delta_r
    cell_L = sigma/20; 
-//   truncDist = 2.5;                 // really is 2.5 * sigma / sigma 
-//   truncShift = -1 * lenJonesEnergy(truncDist,.25); // shifts the cutoff to zero 
-   truncation_dist();   
+   truncation_dist();  // determines truncation distance
+                       // dependent on interaction type 
    // define the various RDF vectors (dependent upon r)
    num_density.resize((boxLength/2)/delta_r + 1);
    par_num_density.resize((boxLength/2)/delta_r + 1);

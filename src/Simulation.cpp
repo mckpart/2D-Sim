@@ -3,7 +3,7 @@
 
 
 double Simulation::boltzmannFactor(double energy){
-   return exp(-1 * energy / redTemp);  // energy here is already reduced 
+   return exp(-1 * energy / red_temp);  // energy here is already reduced 
 }
 
 Simulation::Simulation(std::string yf){
@@ -22,13 +22,8 @@ Simulation::Simulation(std::string yf){
    setParticleParams();	                    // parameters
    
    Particle prt; 
-//   for(int k = 0; k < n_particles; ++k){
-//      prt = particles[k]; 
-//      std::cout << "k: " << k << " type: " << prt.getType() << std::endl; 
-//   }
 
-   redTemp = param.getRedTemp();
-   std::cout << "in sim the redtemp is " << redTemp << std::endl; 
+   red_temp = param.getRedTemp();
 }
 
 void Simulation::writePositions(std::ofstream* pos_file){
@@ -151,23 +146,20 @@ void Simulation::runSimulation(){
          particles[curr_index] = prt;  
 
          accept = 1;
-         delta_energy = 0;  		          // sets change in energy to 0
+         delta_energy = 0;  // sets change in energy to 0
          
-//         if(param.getRigidBC() == 1){             // run sim with hard boundaries
-//            accept = bound.rigidBoundary(&particles,curr_index);  
-//         }
-         if(param.getBound_Type() == 1){              // run simulation with 
+         if(param.getBound_Type() == 1){                   // run simulation with 
             bound.periodicBoundary(&particles,curr_index); // periodic boundaries
 
             prt = particles[curr_index]; 
 
             x_trial = prt.getX_TrialPos();   // updates trial position in function
             y_trial = prt.getY_TrialPos();   // then particle - particle 
-            
+                                             // interactions 
 	    if(param.getInteract_Type() != 0){ 
 	       delta_energy = interact.periodicInteraction(&particles,curr_index); 
 	    }
-	 }                                   // interactions are checked
+	 }                                   
          else{
             if(param.getBound_Type() == 0){
 	       accept = bound.rigidBoundary(&particles,curr_index);
@@ -231,7 +223,7 @@ void Simulation::runSimulation(){
    }
    prop.writeProperties();  
 //   std::cout << "The average energy of the system is " << prop.calcAvgEnergy() << std::endl; 
-//   std::cout << "The pressure of the system is " << prop.calcPressure() << std::endl;     
+//   std::cout << "The pressure of the system is " << prop.c alcPressure() << std::endl;     
    perc_rej = n_rejects / (n_updates * n_particles) * 100.0; 
    std::cout << perc_rej << "% of the moves were rejected." << std::endl;
 }

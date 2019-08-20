@@ -1,31 +1,31 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 150 
-type1_Particles : 75
-type2_Particles : 75
+totalParticles  : 256 
+type1_Particles : 128
+type2_Particles : 128
 
 particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
-reducedTemp : 1.1  # not measured by the system currently
-reducedDens : .6  # currently user determined, but could be found from sigma,L
+reducedTemp : 4  # not measured by the system currently
+reducedDens : .5  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 LJ_constant_1 : 8  # thus the well depth for each is equal to 
 LJ_constant_2 : 1 # c * KbT
 
-seed   : 34950232509832
+seed   : 3498572039453023985
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 16000  # each update = 1 sweep = n_part attempted moves 
+numberUpdates  : 80000  # each update = 1 sweep = n_part attempted moves 
 initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
 
 ### CHOOSE RUN LENGTH ####
 
-equilibriate_sweep : 8000  
-data_collect_interval : 20
+equilibriate_sweep : 40000  
+data_collect_interval : 50
 
 ### CHOOSE INTERACTION TYPE ####
 

@@ -28,7 +28,7 @@ private:
    KISSRNG randVal; 
 
    int n_particles = 0; 
-   double redTemp = 0; 
+   double red_temp = 0; 
 public: 
 
    Simulation(std::string yf); 

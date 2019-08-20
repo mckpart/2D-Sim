@@ -8,30 +8,30 @@ particleRadius: .05
 
 # DEFINE THE REDUCED PARAMS ###
 
-reducedTemp : 1.1  # not measured by the system currently
-reducedDens : .45  # currently user determined, but could be found from sigma,L
+reducedTemp : 1.5  # not measured by the system currently
+reducedDens : .6  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
-LJ_constant_1 : 8  # thus the well depth for each is equal to 
-LJ_constant_2 : 1 # c * KbT
+LJ_constant_1 : 3  # thus the well depth for each is equal to 
+LJ_constant_2 : 27 # c * KbT
 
-seed   : 135981735918
+seed   : 4234509346304896
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 16000  # each update = 1 sweep = n_part attempted moves 
+numberUpdates  : 20000  # each update = 1 sweep = n_part attempted moves 
 initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
 
 ### CHOOSE RUN LENGTH ####
 
-equilibriate_sweep : 8000  
-data_collect_interval : 20
+equilibriate_sweep : 10000  
+data_collect_interval : 50
 
 ### CHOOSE INTERACTION TYPE ####
 
 interactionType : 3 # 0 = hard disk, 1 = LJ, 2 = WCA
                     # 3 = WCA + spring energy
-springConstant : 4
+springConstant : 5.5
 
 ### DEFINE TYPE OF BOUNDARY ######
 

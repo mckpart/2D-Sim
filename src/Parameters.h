@@ -26,8 +26,8 @@ private:
    int n_particles = 0; 
    long seed = 0; 
 
-   double weight = 0; 
-   double beta = 0; 
+//   double weight = 0; 
+//   double beta = 0; 
 
    int init_type = 0; 
    int interact_type = 0; 
@@ -41,8 +41,8 @@ public:
    int getNumParticles(); 
    long getSeed(); 
 
-   double getWeight(); 
-   double getBeta(); 
+//   double getWeight(); 
+//   double getBeta(); 
 
    int getInit_Type(); 
    int getInteract_Type(); 
@@ -59,7 +59,7 @@ public:
    double getRedDens(); 
    double getRedTemp();
    double getSigma();
-   double getSigmaPar(); 
+//   double getSigmaPar(); 
    double getBoxLength(); 
 
    // NOTE: THE SETTERS ARE NOT NECESSARY

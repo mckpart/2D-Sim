@@ -16,7 +16,6 @@ with open("params.yaml",'r') as yf:
    yaml_dict = yaml.safe_load(yf)
 
 radius   = float(yaml_dict["particleRadius"])
-# radius_2   = float(yaml_dict["particleRadius_2"])     
 n_part_1   = yaml_dict["type1_Particles"]
 n_part_2   = yaml_dict["type2_Particles"]
 n_part_tot = yaml_dict["totalParticles"]
@@ -25,24 +24,25 @@ sigma = float(yaml_dict["sigma"])
 interact_type = yaml_dict["interactionType"]
 bound_type = yaml_dict["boundaryType"]
 redDens = yaml_dict["reducedDens"]
-
+red_temp = yaml_dict["reducedTemp"]
 boxLength  = yaml_dict["boxLength"]
 pos_file   = yaml_dict["animationFile"]
-
+k_spring = yaml_dict["springConstant"]
 ######### initialize lists and read in position data ##########
-
+# 0 corresponds to a hard disk interaction
 if(interact_type != 0):
     if(sigma == 0):
         sigma = boxLength * math.sqrt(redDens/n_part_tot)
     elif(boxLength == 0):
         boxLength = sigma * math.sqrt(n_part_tot/redDens)
-    radius = 0.5 * sigma * 2.0**(1.0/6.0)
+    radius = 0.5 * sigma
 patches = []
 position = []
 x,y = [],[]
 
 fig,ax = plt.subplots()
-
+plot_title = r'$T^* =$' + str(red_temp) # currently needs to be manually changed
+                                  # to match the value being altered
 file_1 = open('particle_type.txt','r')
 types = file_1.read().split(' ')
 types = [float(i) for i in types if i != '']
@@ -54,12 +54,12 @@ for k in range(n_part_tot):
     else:
         c = 'blue'
     patches += [plt.Circle((0,0), radius, color = c)]
-#color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
+# color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
 #color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
-#for i in range(n_part_1):
-#    patches += [plt.Circle((0,0), radius, color = color_1[i])]
-#for i in range(n_part_2):
-#    patches += [plt.Circle((0,0), radius, color = color_2[i])]    
+# for i in range(n_part_1):
+#     patches += [plt.Circle((0,0), radius, color = color_1[i])]
+# for i in range(n_part_2):
+#     patches += [plt.Circle((0,0), radius, color = color_1[i])]    
 
 file = open(pos_file, "r" )
 for line in file:
@@ -68,11 +68,13 @@ for line in file:
     position.append(row)
 
 position = np.asarray(position)
-print(position)
+# print(position)
 
 numIter = len(position[:,0]) 
-print(numIter)
+# print(numIter)
 
+# creates writing object to allow the movie to be
+# saved as an .mp4 file
 Writer = ani_obj.writers['ffmpeg']
 writer = ani_obj.FFMpegWriter(fps=4, metadata=dict(artist='Me'), bitrate=1800)
 
@@ -87,7 +89,8 @@ def init():
         
    for i in range(n_part_tot):
       ax.add_patch(patches[i])
-
+   
+   ax.set_title(plot_title)
    return patches
 
 def update(frame):
@@ -105,14 +108,14 @@ def update(frame):
 
    return patches
 
-
 t = np.linspace(0,numIter - 1,numIter) 
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 
-i = input("Would you like to save the movie?")
+# ask user if the movie generated should be saved
+i = input("Would you like to save the movie?(y/n) ")
 if(i == 'y'):
-    anim.save('movie.mp4',writer=writer)
+    anim.save('temp'+str(red_temp) +'.mp4',writer=writer)
 else:
     print("movie not saved")
 plt.show()
