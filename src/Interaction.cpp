@@ -101,10 +101,10 @@ double Interaction::periodicInteraction(std::vector<Particle>* particles,
       if(current_prt.getIdentifier() != compare_prt.getIdentifier()){ 
 
 	 if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
-	    a = LJ_par; 
+	    a = a_ref; 
 	 }
          else if(current_prt.getType() != compare_prt.getType()){
-	    a = LJ_antipar; 
+	    a = a_ref * a_mult; 
 	 }	 
          
 	 x_comp = compare_prt.getX_Position(); // set the comparison  
@@ -236,10 +236,10 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle>* particles,
       if(compare_prt.getIdentifier() != current_prt.getIdentifier()){
 
 	 if(current_prt.getType() == compare_prt.getType()){ // interaction betweeen like particles
-	    a = LJ_par; 
+	    a = a_ref; 
 	 }
          else if(current_prt.getType() != compare_prt.getType()){
-	    a = LJ_antipar; 
+	    a = a_ref * a_mult; 
 	 }
      	 
 	 x_comp = compare_prt.getX_Position(); // set the comparison  
@@ -355,8 +355,8 @@ void Interaction::initializeInteraction(Parameters* p){
 
    interact_type = p->getInteract_Type();
    
-   LJ_par       = p->getLJ_const_1(); 
-   LJ_antipar   = p->getLJ_const_2(); 
+   a_ref       = p->getRefAffinity(); 
+   a_mult      = p->getAffinityMult(); 
    truncation_values(); 
 }
 

@@ -13,11 +13,15 @@ void Parameters::initializeParameters(std::string yamlFile){
    sigma       = node["sigma"].as<double>(); 
    n_particles = node["totalParticles"].as<int>(); 
    k_spring    = node["springConstant"].as<double>(); 
-//   rest_L = 5.0/3.0; // center-center microtbules dist = 50 num, D = 30 nm = sigma
-//   rest_L = sqrt(2); // sigma = 1 = 40 nm.  
-   rest_L = 4.0/3.0;
-   LJ_const_1  = node["LJ_constant_1"].as<double>(); 
-   LJ_const_2  = node["LJ_constant_2"].as<double>(); 
+  
+   rest_L      = node["rest_length"].as<double>(); 
+//   rest_L = 2.6; // this is = 65nm/25nm = c-c/diam
+   
+//   LJ_const_1  = node["LJ_constant_1"].as<double>(); 
+//   LJ_const_2  = node["LJ_constant_2"].as<double>(); 
+   
+   a_ref       = node["reference_affinity"].as<double>(); 
+   a_mult      = node["affinity_multiple"].as<double>(); 
 
    eq_sweep    = node["equilibriate_sweep"].as<int>(); 
    d_interval  = node["data_collect_interval"].as<int>(); 
@@ -48,23 +52,26 @@ void Parameters::initializeParameters(std::string yamlFile){
 ///// GETTERS ////////////////
 
 int Parameters::getData_interval(){return d_interval;}
-int Parameters::getEq_sweep(){     return eq_sweep;}
-int Parameters::getUpdates(){      return n_updates;} 	
-int Parameters::getNumParticles(){ return n_particles;}
-long Parameters::getSeed(){        return seed;}
+int Parameters::getEq_sweep()     {return eq_sweep;}
+int Parameters::getUpdates()      {return n_updates;} 	
+int Parameters::getNumParticles() {return n_particles;}
+long Parameters::getSeed()        {return seed;}
 
-int Parameters::getInit_Type(){    return init_type;}
+int Parameters::getInit_Type()    {return init_type;}
 int Parameters::getInteract_Type(){return interact_type;}
-int Parameters::getBound_Type(){   return bound_type;}
+int Parameters::getBound_Type()   {return bound_type;}
 
-double Parameters::getLJ_const_1(){return LJ_const_1;}
-double Parameters::getLJ_const_2(){return LJ_const_2;}
+//double Parameters::getLJ_const_1(){return LJ_const_1;}
+//double Parameters::getLJ_const_2(){return LJ_const_2;}
 
-double Parameters::getSigma(){     return sigma;}
+double Parameters::getRefAffinity() {return a_ref;}
+double Parameters::getAffinityMult(){return a_mult;}; 
+
+double Parameters::getSigma()     {return sigma;}
 //double Parameters::getSigmaPar(){  return sigma_par;}
-double Parameters::getRedDens(){   return redDensity;}
-double Parameters::getRedTemp(){   return redTemp;}
-double Parameters::getBoxLength(){ return boxLength;}
+double Parameters::getRedDens()   {return redDensity;}
+double Parameters::getRedTemp()   {return redTemp;}
+double Parameters::getBoxLength() {return boxLength;}
 
 double Parameters::getRestLength(){return rest_L;}
 double Parameters::getSprConst()  {return k_spring;}

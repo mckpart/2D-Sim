@@ -42,8 +42,11 @@ private:
    double k_spring = 0; 
    double rest_L = 0; 
 
-   double LJ_par = 0; 
-   double LJ_antipar = 0; 
+//   double LJ_par = 0; 
+//   double LJ_antipar = 0; 
+
+   double a_ref = 0; 
+   double a_mult = 0; 
 
    double boxLength = 0; 
    int n_particles = 0; 

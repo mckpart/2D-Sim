@@ -235,7 +235,7 @@ def plot_RDF(r_vec,RDF,delta_r):
     fig,axs = plt.subplots(1,num, figsize = f, \
               facecolor='w', edgecolor='k',squeeze = False)
     txt = 'RDF from the Pair Correlation Function'
-    leg = ['RDF',r'$2^{1/6}$',r'$\frac{5}{3}*2.0^{1/6}$']
+    leg = ['RDF',r'$2^{1/6}$',r'$\frac{65}{25}$']
     if(num != 1): 
         fig.tight_layout()
         fig.subplots_adjust(top = .8,bottom =.18,left=.05,wspace=.22)
@@ -246,13 +246,13 @@ def plot_RDF(r_vec,RDF,delta_r):
     for k in range(num): 
         axs[0][k].plot(r_vec,RDF[k])
         axs[0][k].axvline(x = 2.0**(1.0/6.0),color = 'red',linestyle = '--')
-        
+        axs[0][k].axvline(x = 2.6, color = 'orange',linestyle = '--')     
         axs[0][k].set_title(titles[k])
         axs[0][k].set_xlabel(r'$\frac{r}{\sigma}$')
         axs[0][k].set_ylabel(r'$g(\frac{r}{\sigma})$')
         axs[0][k].legend(leg)
 
-        axs[0][k].axhline(y = 1,color = 'orange',linestyle = '--')
+        axs[0][k].axhline(y = 1, linestyle = '--')
         axs[0][k].set_xlim([0,boxL/2 - 2*delta_r])
         axs[0][k].set_ylim([0,max(RDF[0])*1.1])
     
@@ -310,8 +310,11 @@ plt.show();
 # as well as step size. Computing the virial from the 
 # forces seems to be far more reliable. 
 
-a0 = yaml_dict["LJ_constant_1"]
-a1 = yaml_dict["LJ_constant_2"]
+# a0 = yaml_dict["LJ_constant_1"]
+# a1 = yaml_dict["LJ_constant_2"]
+a_ref  = yaml_dict["reference_affinity"]
+a_mult = yaml_dict["affinity_multiple"]
+
 k_spring = yaml_dict["springConstant"]
 r_L = 5.0/3.0*2.0**(1.0/6.0)
 
@@ -343,8 +346,8 @@ def deter_force(interact_type):
     if(interact_type == 1): 
         f_tot= [lj_force(i) for i in r_vec[1:len(r_vec)]]
     elif(interact_type == 3): 
-        temp1 = [simple_force(i,a0) for i in r_vec[1:len(r_vec)]]
-        temp2 = [simple_force(i,a1) for i in r_vec[1:len(r_vec)]]
+        temp1 = [simple_force(i,a_ref) for i in r_vec[1:len(r_vec)]]
+        temp2 = [simple_force(i,a_ref * a_mult) for i in r_vec[1:len(r_vec)]]
         
         f1 = [WCA_force(i) for i in r_vec[1:len(r_vec)]]
         f2 = [temp1[i]+temp2[i] for i in range(len(temp1))]
@@ -376,5 +379,5 @@ virial2 = integrate.trapz(v,r_vec[1:len(r_vec)])
 pressure1 = red_dens*red_temp + math.pi/2.0*red_dens**2.0/sigma**2.0 * virial1
 pressure2 = red_dens*red_temp + math.pi/2.0*red_dens**2.0/sigma**2.0 * virial2
 
-print(virial1,pressure1)
-print(virial2,pressure2)
+print(math.pi*.5*virial1*red_dens,pressure1)
+print(math.pi*.5*virial2*red_dens,pressure2)

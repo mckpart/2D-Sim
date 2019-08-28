@@ -18,8 +18,11 @@ private:
    double red_dens = 0; 
    double red_temp = 0; 
 
-   double LJ_par = 0; 
-   double LJ_antipar = 0; 
+//   double LJ_par = 0; 
+//   double LJ_antipar = 0; 
+
+   double a_ref = 0; 
+   double a_mult = 0; 
 
    int interact_type = 0; 
 

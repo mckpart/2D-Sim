@@ -36,7 +36,8 @@ def calcPressure(d,t,n_part,vir):
    else:
        corr = 0
    print(p)
-   return p + corr 
+   return p + corr, .5*avg_virial/n_part
 
-pressure = calcPressure(red_dens,red_temp,n_part,vir)
+pressure,vir = calcPressure(red_dens,red_temp,n_part,vir)
 print("reduced pressure: ",pressure)
+print("virial: ",vir)

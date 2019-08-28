@@ -23,7 +23,7 @@ n_part_tot = yaml_dict["totalParticles"]
 sigma = float(yaml_dict["sigma"])
 interact_type = yaml_dict["interactionType"]
 bound_type = yaml_dict["boundaryType"]
-redDens = yaml_dict["reducedDens"]
+red_dens = yaml_dict["reducedDens"]
 red_temp = yaml_dict["reducedTemp"]
 boxLength  = yaml_dict["boxLength"]
 pos_file   = yaml_dict["animationFile"]
@@ -32,16 +32,16 @@ pos_file   = yaml_dict["animationFile"]
 # 0 corresponds to a hard disk interaction
 if(interact_type != 0):
     if(sigma == 0):
-        sigma = boxLength * math.sqrt(redDens/n_part_tot)
+        sigma = boxLength * math.sqrt(red_dens/n_part_tot)
     elif(boxLength == 0):
-        boxLength = sigma * math.sqrt(n_part_tot/redDens)
+        boxLength = sigma * math.sqrt(n_part_tot/red_dens)
     radius = 0.5 * sigma
 patches = []
 position = []
 x,y = [],[]
 
 fig,ax = plt.subplots()
-plot_title = r'$T* =$' + str(red_temp) # currently needs to be manually changed
+plot_title = r'$\rho^* =$' + str(red_dens) # currently needs to be manually changed
                                   # to match the value being altered
 file_1 = open('particle_type.txt','r')
 types = file_1.read().split(' ')
@@ -81,7 +81,7 @@ def saveMovie():
 
     i = input("Would you like to save the movie?(y/n) ")
     if(i == 'y'):
-        anim.save('temp'+str(red_temp) +'.mp4',writer=writer)
+        anim.save('dens'+str(red_dens) +'.mp4',writer=writer)
         print("Movie successfully saved.")
     else:
         print("Movie not saved.")

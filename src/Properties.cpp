@@ -170,12 +170,12 @@ void Properties::calcNonPerProp(std::vector<Particle>* particles){
 	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr,0); 
 
 	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
-	       LJ_constant = LJ_par;                // parallel microtubules
+	       LJ_constant = a_ref;                // parallel microtubules
 	       updateNumDensity(r_dist,1);          // updates number density 
 	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,1); //for parallel
 	    }                                       // interactions
 	    else if(curr_prt.getType() != comp_prt.getType()){ // interaction
-	       LJ_constant = LJ_antipar;       // of antiparallel microtubules
+	       LJ_constant = a_ref * a_mult;       // of antiparallel microtubules
 	       updateNumDensity(r_dist,2);     // updates number density for
 	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); // antiparallel
 	    }                                               // interactions
@@ -254,12 +254,12 @@ void Properties::calcPeriodicProp(std::vector<Particle>* particles){ // this nee
 	    calc_xy_dens(x_comp - x_curr, y_comp - y_curr,0); 
 
 	    if(curr_prt.getType() == comp_prt.getType()){ // interaction of 
-	       LJ_constant = LJ_par;                // parallel microtubules
+	       LJ_constant = a_ref;                // parallel microtubules
 	       updateNumDensity(r_dist,1);          // updates number density 
 	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,1); //for parallel
 	    }                                       // interactions
 	    else if(curr_prt.getType() != comp_prt.getType()){ // interaction
-	       LJ_constant = LJ_antipar;       // of antiparallel microtubules
+	       LJ_constant = a_ref * a_mult;       // of antiparallel microtubules
 	       updateNumDensity(r_dist,2);     // updates number density for
 	       calc_xy_dens(x_comp-x_curr,y_comp-y_curr,2); // antiparallel
 	    }                                               // interactions
@@ -414,8 +414,8 @@ void Properties::initializeProperties(Parameters* p){ // maybe make this into a
    interact_type = p->getInteract_Type(); 
    rest_L = p->getRestLength(); 
 
-   LJ_par = p->getLJ_const_1(); 
-   LJ_antipar = p->getLJ_const_2(); 
+   a_ref = p->getRefAffinity(); 
+   a_mult = p->getAffinityMult(); 
 
    delta_r = sigma/20; // this might not be the best way to define delta_r
    cell_L = sigma/20; 

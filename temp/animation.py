@@ -23,25 +23,26 @@ n_part_tot = yaml_dict["totalParticles"]
 sigma = float(yaml_dict["sigma"])
 interact_type = yaml_dict["interactionType"]
 bound_type = yaml_dict["boundaryType"]
-redDens = yaml_dict["reducedDens"]
+red_dens = yaml_dict["reducedDens"]
 red_temp = yaml_dict["reducedTemp"]
 boxLength  = yaml_dict["boxLength"]
 pos_file   = yaml_dict["animationFile"]
-k_spring = yaml_dict["springConstant"]
+k_spring   = yaml_dict["springConstant"]
+
 ######### initialize lists and read in position data ##########
 # 0 corresponds to a hard disk interaction
 if(interact_type != 0):
     if(sigma == 0):
-        sigma = boxLength * math.sqrt(redDens/n_part_tot)
+        sigma = boxLength * math.sqrt(red_dens/n_part_tot)
     elif(boxLength == 0):
-        boxLength = sigma * math.sqrt(n_part_tot/redDens)
+        boxLength = sigma * math.sqrt(n_part_tot/red_dens)
     radius = 0.5 * sigma
 patches = []
 position = []
 x,y = [],[]
 
 fig,ax = plt.subplots()
-plot_title = r'$T^* =$' + str(red_temp) # currently needs to be manually changed
+plot_title = r'$k_{spr}=$' + str(k_spring) # currently needs to be manually changed
                                   # to match the value being altered
 file_1 = open('particle_type.txt','r')
 types = file_1.read().split(' ')
@@ -50,16 +51,17 @@ print(types)
 
 for k in range(n_part_tot):
     if(types[k] == 1):
-        c = 'red'
+        c = 'b'
     else:
-        c = 'blue'
+        c = 'r'
     patches += [plt.Circle((0,0), radius, color = c)]
+
 # color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
-#color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
+# color_2 = plt.cm.autumn(np.linspace(0,1,n_part_2))
 # for i in range(n_part_1):
 #     patches += [plt.Circle((0,0), radius, color = color_1[i])]
 # for i in range(n_part_2):
-#     patches += [plt.Circle((0,0), radius, color = color_1[i])]    
+#     patches += [plt.Circle((0,0), radius, color = color_2[i])]    
 
 file = open(pos_file, "r" )
 for line in file:
@@ -68,55 +70,56 @@ for line in file:
     position.append(row)
 
 position = np.asarray(position)
-# print(position)
-
 numIter = len(position[:,0]) 
-# print(numIter)
 
 # creates writing object to allow the movie to be
 # saved as an .mp4 file
 Writer = ani_obj.writers['ffmpeg']
-writer = ani_obj.FFMpegWriter(fps=4, metadata=dict(artist='Me'), bitrate=1800)
+writer = ani_obj.FFMpegWriter(fps=4, \
+         metadata=dict(artist='Me'), bitrate=1800)
+
+def saveMovie():
+
+    i = input("Would you like to save the movie?(y/n) ")
+    if(i == 'y'):
+        anim.save('spr_k_'+str(k_spring) +'.mp4',writer=writer)
+        print("Movie successfully saved.")
+    else:
+        print("Movie not saved.")
 
 def init():
-
-   if(bound_type == 2):
-      ax.set_xlim(-1 * boxLength,boxLength)
-      ax.set_ylim(-1 * boxLength,boxLength)
-   else:  
-      ax.set_xlim(-.5 * boxLength,.5 * boxLength)       
-      ax.set_ylim(-.5 * boxLength,.5 * boxLength)
+    if(bound_type == 2):
+        ax.set_xlim(-1 * boxLength,boxLength)
+        ax.set_ylim(-1 * boxLength,boxLength)
+    else:  
+        ax.set_xlim(-.5 * boxLength,.5 * boxLength)       
+        ax.set_ylim(-.5 * boxLength,.5 * boxLength)
         
-   for i in range(n_part_tot):
-      ax.add_patch(patches[i])
+    for i in range(n_part_tot):
+        ax.add_patch(patches[i])
    
-   ax.set_title(plot_title)
-   return patches
+    ax.set_title(plot_title)
+    return patches
 
 def update(frame):
 
-   frame = int(frame)
-   print("frame is ", frame)
+    frame = int(frame)
+    print("frame is ", frame)
    
-   for k in range(n_part_tot):
-      x = position[frame][k * 2]
-      y = position[frame][(k * 2) + 1]
+    for k in range(n_part_tot):
+        x = position[frame][k * 2]
+        y = position[frame][(k * 2) + 1]
 
-      patch = patches[k]
-      patch.center = (x,y)
-      patches[k] = patch
+        patch = patches[k]
+        patch.center = (x,y)
+        patches[k] = patch
 
-   return patches
+    return patches
 
 t = np.linspace(0,numIter - 1,numIter) 
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 
-# ask user if the movie generated should be saved
-i = input("Would you like to save the movie?(y/n) ")
-if(i == 'y'):
-    anim.save('temp'+str(red_temp) +'.mp4',writer=writer)
-else:
-    print("movie not saved")
+saveMovie()
 plt.show()
 

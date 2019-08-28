@@ -16,8 +16,11 @@ private:
    double rest_L = 0; 
    double k_spring = 0; 
 
-   double LJ_const_1 = 0; 
-   double LJ_const_2 = 0; 
+//   double LJ_const_1 = 0; 
+//   double LJ_const_2 = 0; 
+
+   double a_ref = 0; 
+   double a_mult = 0; 
 
    int eq_sweep = 0; 
    int d_interval = 0; 
@@ -51,8 +54,11 @@ public:
    int getEq_sweep(); 
    int getData_interval(); 
 
-   double getLJ_const_1(); 
-   double getLJ_const_2(); 
+//   double getLJ_const_1(); 
+//   double getLJ_const_2(); 
+
+   double getRefAffinity(); 
+   double getAffinityMult(); 
 
    double getSprConst(); 
    double getRestLength(); 
