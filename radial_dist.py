@@ -128,12 +128,12 @@ for k in range(num):
 # plt.show()  
 
 def init_pos_matrix(val,cell_L): # this creates a 3D matrix that is 
-    s_2 = math.sqrt(2)
+#     s_2 = math.sqrt(2)
     M = np.zeros(shape=(val,val,2)) # contains each x,y coordinate
     for k in range(val):            # associated with the 2D 
-        k0 = -.5 *s_2* boxL + k*cell_L; # number density and is used to 
+        k0 = -.5 * boxL + k*cell_L; # number density and is used to 
         for n in range(val):        # calculate the RDF from the 
-            n0 = -.5 *s_2* boxL + n*cell_L # PCF
+            n0 = -.5 * boxL + n*cell_L # PCF
             M[k][n] = [k0,n0]
     return M 
 
@@ -278,7 +278,7 @@ def run_pcf():
     
     # create a matrix of the different x,y
     # coordinate positions
-    val = int(math.sqrt(2)*boxL/cell_L) + 1
+    val = int(boxL/cell_L) + 1
     pos = init_pos_matrix(val,cell_L)
     
     # normalize the number density data
@@ -379,5 +379,5 @@ virial2 = integrate.trapz(v,r_vec[1:len(r_vec)])
 pressure1 = red_dens*red_temp + math.pi/2.0*red_dens**2.0/sigma**2.0 * virial1
 pressure2 = red_dens*red_temp + math.pi/2.0*red_dens**2.0/sigma**2.0 * virial2
 
-print(math.pi*.5*virial1*red_dens,pressure1)
-print(math.pi*.5*virial2*red_dens,pressure2)
+print(math.pi*.5*virial1*red_dens*red_dens,pressure1)
+print(math.pi*.5*virial2*red_dens*red_dens,pressure2)

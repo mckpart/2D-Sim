@@ -1,43 +1,42 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include <yaml-cpp/yaml.h>
-#include <string>
 #include <fstream>
+#include <string>
 #include <vector>
+#include <yaml-cpp/yaml.h>
 
-#include "Particle.h"
-#include "Parameters.h"
-#include "Interaction.h"
 #include "Boundary.h"
+#include "Interaction.h"
+#include "Parameters.h"
+#include "Particle.h"
 #include "Properties.h"
 
-class Simulation{
+class Simulation {
 
-private: 
+  private:
+    std::string yamlFile;
 
-   std::string yamlFile;
+    Parameters param;
+    Interaction interact;
+    Boundary bound;
+    Properties prop;
 
-   Parameters param; 
-   Interaction interact;
-   Boundary bound;
-   Properties prop; 
+    std::vector<Particle> particles;
 
-   std::vector<Particle> particles; 	  
+    KISSRNG randVal;
 
-   KISSRNG randVal; 
+    int n_particles = 0;
+    double red_temp = 0;
 
-   int n_particles = 0; 
-   double red_temp = 0; 
-public: 
+  public:
+    Simulation(std::string yf);
 
-   Simulation(std::string yf); 
+    double boltzmannFactor(double delta_energy);
 
-   double boltzmannFactor(double delta_energy);
-
-   void runSimulation(); 
-   void setParticleParams(); 
-   void writePositions(std::ofstream* pos_file); 
-   void testSimulation(); 
-}; 
+    void runSimulation();
+    void setParticleParams();
+    void writePositions(std::ofstream *pos_file);
+    void testSimulation();
+};
 #endif

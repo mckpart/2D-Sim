@@ -27,7 +27,6 @@ red_dens = yaml_dict["reducedDens"]
 red_temp = yaml_dict["reducedTemp"]
 boxLength  = yaml_dict["boxLength"]
 pos_file   = yaml_dict["animationFile"]
-k_spring   = yaml_dict["springConstant"]
 
 ######### initialize lists and read in position data ##########
 # 0 corresponds to a hard disk interaction
@@ -42,7 +41,7 @@ position = []
 x,y = [],[]
 
 fig,ax = plt.subplots()
-plot_title = r'$k_{spr}=$' + str(k_spring) # currently needs to be manually changed
+plot_title = r'$\rho^* =$' + str(red_dens) # currently needs to be manually changed
                                   # to match the value being altered
 file_1 = open('particle_type.txt','r')
 types = file_1.read().split(' ')
@@ -51,9 +50,9 @@ print(types)
 
 for k in range(n_part_tot):
     if(types[k] == 1):
-        c = 'b'
+        c = 'red'
     else:
-        c = 'r'
+        c = 'blue'
     patches += [plt.Circle((0,0), radius, color = c)]
 
 # color_1 = plt.cm.winter(np.linspace(0,1,n_part_1))
@@ -82,7 +81,7 @@ def saveMovie():
 
     i = input("Would you like to save the movie?(y/n) ")
     if(i == 'y'):
-        anim.save('spr_k_'+str(k_spring) +'.mp4',writer=writer)
+        anim.save('dens'+str(red_dens) +'.mp4',writer=writer)
         print("Movie successfully saved.")
     else:
         print("Movie not saved.")
@@ -115,8 +114,8 @@ def update(frame):
         patches[k] = patch
 
     return patches
-
-t = np.linspace(0,numIter - 1,numIter) 
+print("number of frames:",numIter)
+t = np.linspace(500,numIter - 1,numIter) 
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 

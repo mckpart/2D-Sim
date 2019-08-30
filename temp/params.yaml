@@ -6,39 +6,34 @@ type2_Particles : 128
 
 particleRadius: .05
 
-# DEFINE THE REDUCED PARAMS ###
-
+# reduced parameters of the system 
 reducedTemp : 1.5  # not measured by the system currently
-reducedDens : .71  # currently user determined, but could be found from sigma,L
+reducedDens : .7  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
-# LJ_constant_1 : 1.5  # thus the well depth for each is equal to 
-# LJ_constant_2 : 15 # c * KbT
-
-reference_affinity : 2
+# strength of different interactions
+reference_affinity : 1.5
 affinity_multiple  : 8
 
-seed   : 92395203592350235
+seed   : 29387520359238520
 weight : .06 # weight is being calculated inside the program
 
-numberUpdates  : 60000  # each update = 1 sweep = n_part attempted moves 
+# initialization, interaction, and boundary type
 initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
+interactionType    : 3 # 0 = hard disk, 1 = LJ, 2 = WCA, 3 = WCA + spring energy
+boundaryType       : 2 # 0 = rigid, 1 = periodic, 2 = external well 
 
-### CHOOSE RUN LENGTH ####
-
-equilibriate_sweep : 30000  
+# run length parameters
+numberUpdates         : 100000  # each update = 1 sweep = n_part attempted moves 
+equilibriate_sweep    : 50000  
 data_collect_interval : 50
 
-### CHOOSE INTERACTION TYPE ####
+# parameters for using the spring potential
+springConstant : 4.0
+rest_length    : 2.6 # 65nm/25nm = c-c dist / diam 
 
-interactionType : 3 # 0 = hard disk, 1 = LJ, 2 = WCA
-                    # 3 = WCA + spring energy
-springConstant : 3.0
-rest_length : 2.6 # 65nm/25nm = c-c dist / diam 
-
-### DEFINE TYPE OF BOUNDARY ######
-
-boundaryType : 0 # 0 = rigid, 1 = periodic, 2 = external well 
+# parameters for using the external well boundary
+external_well_depth : 1 # c * (x^2 + y^2)
 
 animationFile : positions.txt

@@ -1,76 +1,65 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include <yaml-cpp/yaml.h>
 #include <cmath>
+#include <yaml-cpp/yaml.h>
 
-class Parameters{
+class Parameters {
 
-private:
+  private:
+    double redDensity = 0;
+    double redTemp = 0;
+    double sigma = 0;
+    double sigma_par = 0;
+    double boxLength = 0;
+    double rest_L = 0;
+    double k_spring = 0;
 
-   double redDensity = 0; 
-   double redTemp = 0; 
-   double sigma = 0;
-   double sigma_par = 0; 
-   double boxLength = 0; 
-   double rest_L = 0; 
-   double k_spring = 0; 
+    double a_ref = 0;
+    double a_mult = 0;
 
-//   double LJ_const_1 = 0; 
-//   double LJ_const_2 = 0; 
+    int eq_sweep = 0;
+    int d_interval = 0;
 
-   double a_ref = 0; 
-   double a_mult = 0; 
+    int n_updates = 0;
+    int n_particles = 0;
+    long seed = 0;
 
-   int eq_sweep = 0; 
-   int d_interval = 0; 
+    double ext_well_d = 0;
 
-   int n_updates = 0; 
-   int n_particles = 0; 
-   long seed = 0; 
+    int init_type = 0;
+    int interact_type = 0;
+    int bound_type = 0;
 
-//   double weight = 0; 
-//   double beta = 0; 
+  public:
+    // may be worth adding a default constructor that reads in the yaml file
+    void initializeParameters(std::string yamlFile);
 
-   int init_type = 0; 
-   int interact_type = 0; 
-   int bound_type = 0; 
+    int getUpdates();
+    int getNumParticles();
+    long getSeed();
 
-public: 
-		
-   void initializeParameters(std::string yamlFile); // may need to add a default constructor
+    int getInit_Type();
+    int getInteract_Type();
+    int getBound_Type();
 
-   int getUpdates(); 	
-   int getNumParticles(); 
-   long getSeed(); 
+    int getEq_sweep();
+    int getData_interval();
 
-//   double getWeight(); 
-//   double getBeta(); 
+    double getRefAffinity();
+    double getAffinityMult();
 
-   int getInit_Type(); 
-   int getInteract_Type(); 
-   int getBound_Type(); 
+    double getExtWellDepth();
 
-   int getEq_sweep(); 
-   int getData_interval(); 
+    double getSprConst();
+    double getRestLength();
+    double getRedDens();
+    double getRedTemp();
+    double getSigma();
+    double getBoxLength();
 
-//   double getLJ_const_1(); 
-//   double getLJ_const_2(); 
-
-   double getRefAffinity(); 
-   double getAffinityMult(); 
-
-   double getSprConst(); 
-   double getRestLength(); 
-   double getRedDens(); 
-   double getRedTemp();
-   double getSigma();
-//   double getSigmaPar(); 
-   double getBoxLength(); 
-
-   // NOTE: THE SETTERS ARE NOT NECESSARY
-   // GIVEN THAT THESE PARAMETERS ARE CONSTANT
-   // THROUGHOUT THE SIMULATION
-
-}; 
-#endif 
+    // NOTE: THE SETTERS ARE NOT NECESSARY
+    // GIVEN THAT THESE PARAMETERS ARE CONSTANT
+    // THROUGHOUT THE SIMULATION
+};
+#endif
