@@ -142,22 +142,8 @@ void Properties::calcNonPerProp(std::vector<Particle> *particles) {
     Particle curr_prt;
     Particle comp_prt;
 
-    double d_curr_wall_x = 0;
-    double d_curr_wall_y = 0;
-    double d_comp_wall_x = 0;
-    double d_comp_wall_y = 0;
-
-    double dist_curr_x = 0;
-    double dist_curr_y = 0;
-
-    //    double x_force = 0;
-    //    double y_force = 0;
-
     double LJ_constant = 0;
     double r_dist = 0;
-    double force_tot = 0;
-
-    int temp = 0;
 
     // make sure that the free energy previously calculated is reset the free
     // energy is only the energy that comes from the positions within the
@@ -235,27 +221,12 @@ void Properties::populateCellArray(
     (*cellPositions)[7][1] = y - boxLength;
 }
 
-void Properties::calcPeriodicProp(
-    std::vector<Particle> *particles) { // this needs to be reorganized
+void Properties::calcPeriodicProp(std::vector<Particle> *particles) {
     Particle curr_prt;
     Particle comp_prt;
 
-    double d_curr_wall_x = 0;
-    double d_curr_wall_y = 0;
-    double d_comp_wall_x = 0;
-    double d_comp_wall_y = 0;
-
-    double dist_curr_x = 0;
-    double dist_curr_y = 0;
-
-    double x_force = 0;
-    double y_force = 0;
-
     double LJ_constant = 0;
     double r_dist = 0;
-    double force_tot = 0;
-
-    int temp = 0;
 
     std::vector<std::vector<double>> cellPositions(9,
                                                    std::vector<double>(2, 0));
@@ -348,7 +319,6 @@ void Properties::calcPeriodicProp(
 
 // this calculation has been moved to external analysis code
 // and can probably be removed. 
-
 double Properties::calcPressure() {
     double avgEnergy = 0;
     double redPressure = 0;
@@ -418,6 +388,7 @@ void Properties::writeProperties() {
     n_dens_file.close(); // close all files written to
     par_dens_file.close();
     antp_dens_file.close();
+
     len = double(xy_num_density.size());
     for (int k = 0; k < len; ++k) {
         for (int n = 0; n < len; ++n) {
@@ -443,10 +414,11 @@ void Properties::truncation_dist() {
     }
 }
 
-void Properties::initializeProperties(Parameters *p) { // maybe make this into a
-                                                       // constructor
-    boxLength = p->getBoxLength();      // assign private variables used in
-    n_particles = p->getNumParticles(); // class
+// assign private variable used in class
+void Properties::initializeProperties(Parameters *p) {
+
+    boxLength = p->getBoxLength();
+    n_particles = p->getNumParticles();
     sigma = p->getSigma();
     redDens = p->getRedDens();
     red_temp = p->getRedTemp();

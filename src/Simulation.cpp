@@ -82,20 +82,8 @@ void Simulation::runSimulation() {
 
     Particle prt;
 
-    int n_initial = 0;
-    int n_updates = 0;
-    int curr_index = 0;
-
     double n_rejects = 0;
     double perc_rej = 0;
-
-    double x_trial = 0;
-    double y_trial = 0;
-
-    double delta_energy = 0;
-    double total_prob = 0;
-
-    bool accept = 0;
 
     std::ofstream rad_dist_file;
     rad_dist_file.open("radialDistance.txt");
@@ -103,8 +91,8 @@ void Simulation::runSimulation() {
     std::ofstream pos_file;
     pos_file.open("positions.txt");
 
-    n_updates = param.getUpdates();
-    n_initial = n_particles;
+    double n_updates = param.getUpdates();
+    double n_initial = n_particles;
 
     // initializing particle positions
     if (param.getInit_Type() == 0) {
@@ -127,19 +115,19 @@ void Simulation::runSimulation() {
         for (int k = 0; k < n_particles; k++) {
 
             // choose random particle
-            curr_index = int(randVal.RandomUniformDbl() * n_particles);
+            int curr_index = int(randVal.RandomUniformDbl() * n_particles);
             prt = particles[curr_index];
 
             // generate and set the x,y trial position
-            x_trial = prt.x_trial(randVal.RandomUniformDbl());
-            y_trial = prt.y_trial(randVal.RandomUniformDbl());
+            double x_trial = prt.x_trial(randVal.RandomUniformDbl());
+            double y_trial = prt.y_trial(randVal.RandomUniformDbl());
 
             prt.setX_TrialPos(x_trial);
             prt.setY_TrialPos(y_trial);
             particles[curr_index] = prt;
 
-            accept = 1;
-            delta_energy = 0; // sets change in energy to 0
+            bool accept = 1;
+            double delta_energy = 0; // sets change in energy to 0
 
             if (param.getBound_Type() == 1) {
 
@@ -170,7 +158,7 @@ void Simulation::runSimulation() {
                 }
             }
 
-            /*RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
+            /* RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
              * HARD DISKS IS A 0 - 1 PROBABILITY THUS A DELTA ENERGY IS NOT
              * RETURNED THE CHANGE IN ENERGY IS RETURNED FROM LENJONES AND WCA
              * POTENTIAL THIS TOTAL CHANGE IS SENT INTO THE BOLTZMANN FACTOR
@@ -185,9 +173,8 @@ void Simulation::runSimulation() {
             }
 
             if (accept == 1 && delta_energy > 0) {
-
                 // compute acceptance probability
-                total_prob = boltzmannFactor(delta_energy);
+                double total_prob = boltzmannFactor(delta_energy);
 
                 if (randVal.RandomUniformDbl() < total_prob) {
                     accept = 1;
@@ -232,49 +219,40 @@ void Simulation::setParticleParams() {
 
     Particle prt;
 
-    int num_part_1 = 0;
-    int num_part_2 = 0;
-
-    double radius = 0;
-    double weight = 0;
-    double sigma = 0;
-    double boxLength = 0;
-
-    double num_1 = 0;
-    double num_2 = 0;
-    double ratio = 0;
-    double n = 0;
-    int type = 0;
-
-    double redDensity = 0;
-
     std::ofstream type_file;
     type_file.open("particle_type.txt");
 
     YAML::Node node = YAML::LoadFile(yamlFile);
 
-    num_part_1 = node["type1_Particles"].as<int>();
-    num_part_2 = node["type2_Particles"].as<int>();
+    int num_part_1 = node["type1_Particles"].as<int>();
+    int num_part_2 = node["type2_Particles"].as<int>();
 
     // both particles have the same radius
-    radius = node["particleRadius"].as<double>();
+    double radius = node["particleRadius"].as<double>();
 
-    sigma = param.getSigma();
-    boxLength = param.getBoxLength();
-    ratio = (double)num_part_1 / n_particles;
+    double sigma = param.getSigma();
+    double boxLength = param.getBoxLength();
+
+    double ratio = (double)num_part_1 / n_particles;
     std::cout << "the ratio is: " << ratio << "\n";
-    weight = sigma * sqrt(1 / (4 * param.getRedDens()));
+
+    double weight = sigma * sqrt(1 / (4 * param.getRedDens()));
     std::cout << "the stepping weight is: " << weight << std::endl;
     prt.setStepWeight(weight);
 
     if (param.getInteract_Type() != 0) { // applies to the LJ and WCA potentials
         radius = .5 * sigma;
     }
-
     prt.setRadius(radius);
+
+    double num_1 = 0;
+    double num_2 = 0;
+    int type = 0;
+
     for (int k = 0; k < n_particles; ++k) {
         if (num_1 < num_part_1 && num_2 < num_part_2) {
-            n = randVal.RandomUniformDbl();
+
+            double n = randVal.RandomUniformDbl();
             if (n < ratio) {
                 type = 1;
                 ++num_1;

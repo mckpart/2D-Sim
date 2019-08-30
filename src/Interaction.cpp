@@ -31,7 +31,8 @@ double Interaction::simple_spring_energy(double r, double a) {
 
 void Interaction::populateCellArray(
     double x, double y, std::vector<std::vector<double>> *cellPositions) {
-    // accoutn for the periodic images of the 'parent' cell
+
+    // account for the periodic images of the 'parent' cell
     (*cellPositions)[0][0] = x;
     (*cellPositions)[0][1] = y;
     (*cellPositions)[1][0] = x;
@@ -57,13 +58,6 @@ double Interaction::periodicInteraction(std::vector<Particle> *particles,
     Particle current_prt;
     Particle compare_prt;
 
-    double x_temp = 0;
-    double y_temp = 0;
-    double x_curr = 0;
-    double y_curr = 0;
-    double x_comp = 0;
-    double y_comp = 0;
-
     double delta_energy = 0;
     double energy_curr = 0;
     double energy_temp = 0;
@@ -71,24 +65,16 @@ double Interaction::periodicInteraction(std::vector<Particle> *particles,
     double num = 0;
     double a = 0; // a is the binding affinity associated with
 
-    double dist_curr_x = 0;
-    double dist_curr_y = 0;
-    double dist_temp_x = 0;
-    double dist_temp_y = 0;
-
-    double dist_curr_tot = 0;
-    double dist_temp_tot = 0;
-
     std::vector<std::vector<double>> cellPositions(9,
                                                    std::vector<double>(2, 0));
 
     current_prt = (*particles)[index]; // assign current particle
 
-    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
-    y_temp = current_prt.getY_TrialPos(); // positions of the current
-                                          // particle
-    x_curr = current_prt.getX_Position();
-    y_curr = current_prt.getY_Position();
+    double x_temp = current_prt.getX_TrialPos(); // assign the current and trial
+    double y_temp = current_prt.getY_TrialPos(); // positions of the current
+                                                 // particle
+    double x_curr = current_prt.getX_Position();
+    double y_curr = current_prt.getY_Position();
 
     for (int k = 0; k < n_particles; k++) {
 
@@ -108,18 +94,19 @@ double Interaction::periodicInteraction(std::vector<Particle> *particles,
 
         if (current_prt.getIdentifier() != compare_prt.getIdentifier()) {
 
-            if (current_prt.getType() ==
-                compare_prt.getType()) { // interaction betweeen like particles
+            // type == type: interaction between parallel particles
+            // type != type: interaction between antiparallel particles
+            if (current_prt.getType() == compare_prt.getType()) {
                 a = a_ref;
             } else if (current_prt.getType() != compare_prt.getType()) {
                 a = a_ref * a_mult;
             }
 
-            x_comp = compare_prt.getX_Position(); // set the comparison
-            y_comp = compare_prt.getY_Position(); // particles position
+            double x_comp = compare_prt.getX_Position(); // set the comparison
+            double y_comp = compare_prt.getY_Position(); // particles position
 
-            dist_curr_tot = distance(x_curr, x_comp, y_curr, y_comp);
-            dist_temp_tot = distance(x_temp, x_comp, y_temp, y_comp);
+            double dist_curr_tot = distance(x_curr, x_comp, y_curr, y_comp);
+            double dist_temp_tot = distance(x_temp, x_comp, y_temp, y_comp);
 
             /* IF THE SUMMATION OF THE X DISTANCES FROM THE WALL IS WITHIN THE
              *    DISTANCE OF INTERACTION AND THE PARTICLES ARE NOT ON THE SAME
@@ -227,40 +214,25 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle> *particles,
     Particle current_prt;
     Particle compare_prt;
 
-    double x_temp = 0;
-    double y_temp = 0;
-    double x_curr = 0;
-    double y_curr = 0;
-    double x_comp = 0;
-    double y_comp = 0;
-
     double delta_energy = 0;
     double energy_curr = 0;
     double energy_temp = 0;
 
-    double num = 0;
     double a = 0; // a is the binding affinity associated with the
-
-    double dist_curr_x = 0;
-    double dist_curr_y = 0;
-    double dist_temp_x = 0;
-    double dist_temp_y = 0;
-
-    double dist_curr_tot = 0;
-    double dist_temp_tot = 0;
 
     current_prt = (*particles)[index]; // assign current particle
 
-    x_temp = current_prt.getX_TrialPos(); // assign the current and trial
-    y_temp = current_prt.getY_TrialPos(); // positions of the current
-                                          // particle
-    x_curr = current_prt.getX_Position();
-    y_curr = current_prt.getY_Position();
+    double x_temp = current_prt.getX_TrialPos(); // assign the current and trial
+    double y_temp = current_prt.getY_TrialPos(); // positions of the current
+                                                 // particle
+    double x_curr = current_prt.getX_Position();
+    double y_curr = current_prt.getY_Position();
 
     for (int k = 0; k < n_particles; k++) {
         compare_prt = (*particles)[k];
 
         if (compare_prt.getIdentifier() != current_prt.getIdentifier()) {
+
             // interaction between like if type == type, unlike if type != type
             if (current_prt.getType() == compare_prt.getType()) {
                 a = a_ref;
@@ -268,11 +240,11 @@ double Interaction::nonPeriodicInteraction(std::vector<Particle> *particles,
                 a = a_ref * a_mult;
             }
 
-            x_comp = compare_prt.getX_Position(); // set the comparison
-            y_comp = compare_prt.getY_Position(); // particles position
+            double x_comp = compare_prt.getX_Position(); // set the comparison
+            double y_comp = compare_prt.getY_Position(); // particles position
 
-            dist_curr_tot = distance(x_curr, x_comp, y_curr, y_comp);
-            dist_temp_tot = distance(x_temp, x_comp, y_temp, y_comp);
+            double dist_curr_tot = distance(x_curr, x_comp, y_curr, y_comp);
+            double dist_temp_tot = distance(x_temp, x_comp, y_temp, y_comp);
 
             if (dist_curr_tot < trunc_dist) {
                 // case 0 would be the hard disk interaction but that is
@@ -366,7 +338,7 @@ bool Interaction::hardDisks(std::vector<Particle> *particles, int index) {
 void Interaction::truncation_values() {
     switch (interact_type) {
     case 3:
-        trunc_dist = box_L / 2.0;
+        trunc_dist = .5 * box_L;
         break;
     default:
         trunc_dist = 2.5;
@@ -376,13 +348,13 @@ void Interaction::truncation_values() {
         break;
     }
 }
-
+// assign all private variables used in this class
 void Interaction::initializeInteraction(Parameters *p) {
 
-    box_L = p->getBoxLength();          // assign all private variables
-    n_particles = p->getNumParticles(); // used in this class
+    box_L = p->getBoxLength();
+    n_particles = p->getNumParticles();
     sigma = p->getSigma();
-    red_dens = p->getRedDens(); // parallel interactions
+    red_dens = p->getRedDens();
     red_temp = p->getRedTemp();
     rest_L = p->getRestLength();
     k_spring = p->getSprConst();
