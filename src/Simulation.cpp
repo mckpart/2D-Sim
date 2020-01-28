@@ -42,6 +42,8 @@ void Simulation::writePositions(std::ofstream *pos_file) {
     }
 }
 
+// eventually replace this test with some sort of Catch2
+
 void Simulation::testSimulation() {
 
     n_particles = 4;
@@ -53,29 +55,33 @@ void Simulation::testSimulation() {
     std::ofstream pos_file;
     pos_file.open("positions.txt");
 
-    for (int k = 0; k < 4; k++) {
-        if (k == 0) {
-            x = .25;
-            y = .25;
-        } else if (k == 1) {
-            x = .25;
-            y = -.25;
-        } else if (k == 2) {
-            x = -.25;
-            y = .25;
-        } else if (k == 3) {
-            x = -.25;
-            y = -.25;
-        }
-
-        prt.setX_Position(x);
-        prt.setY_Position(y);
-        particles[k] = prt;
-    }
-
-    for (int k = 0; k < 1000; k++) {
-        writePositions(&pos_file);
-    }
+    //    for (int k = 0; k < 4; k++) {
+    //        if (k == 0) {
+    //            x = .25;
+    //            y = .25;
+    //        } else if (k == 1) {
+    //            x = .25;
+    //            y = -.25;
+    //        } else if (k == 2) {
+    //            x = -.25;
+    //            y = .25;
+    //        } else if (k == 3) {
+    //            x = -.25;
+    //            y = -.25;
+    //        }
+    //
+    //        prt.setX_Position(x);
+    //        prt.setY_Position(y);
+    //        particles[k] = prt;
+    //    }
+    //
+    //    for (int k = 0; k < 1000; k++) {
+    //        writePositions(&pos_file);
+    //    }
+    x = -.5;
+    y = -.5;
+    double r = .5 * sqrt(2);
+    prop.calc_average_force(x, y, r);
 }
 
 void Simulation::runSimulation() {

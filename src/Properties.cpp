@@ -69,7 +69,7 @@ void Properties::calcEnergy(double r, double a) {
 }
 
 // sums the total virial of the current configuration
-void Properties::calcVirial(double r, double a) {
+void Properties::calcVirial(double x, double y, double r, double a) {
     double val = 0;
     switch (interact_type) {
     case 1:
@@ -82,6 +82,11 @@ void Properties::calcVirial(double r, double a) {
         val = WCA_force(r) + simple_spring_force(r, a);
         break;
     }
+
+    // I temporarily change this to compute the avg virial per particle
+    avg_force[0] = (x * val + avg_force[0] * force_num) / (1 + force_num);
+    avg_force[1] = (y * val + avg_force[1] * force_num) / (1 + force_num);
+
     f_r = f_r + r * val;
 }
 
@@ -152,6 +157,10 @@ void Properties::calcNonPerProp(std::vector<Particle> *particles) {
     f_r = 0;
 
     for (int k = 0; k < n_particles; k++) {
+        avg_force[0] = 0;
+        avg_force[1] = 0;
+        force_num = 0;
+
         curr_prt = (*particles)[k];
 
         // set current x,y position
@@ -191,10 +200,18 @@ void Properties::calcNonPerProp(std::vector<Particle> *particles) {
             }
             if (n > k && r_dist < truncDist) {
                 calcEnergy(r_dist, LJ_constant);
-                calcVirial(r_dist, LJ_constant);
+                calcVirial(x_curr - x_comp, y_curr - y_comp, r_dist,
+                           LJ_constant);
             }
+            //            calc_average_force(x_curr - x_comp, y_curr - y_comp,
+            //            r_dist);
+            ++force_num;
         }
+
+        writeAvgForces();
     }
+    avg_force_particle << "\n";
+    //    close_files();
     sum_Fdot_r.push_back(f_r);
     sum_energy.push_back(f_energy);
 }
@@ -302,19 +319,44 @@ void Properties::calcPeriodicProp(std::vector<Particle> *particles) {
                         if (r_dist < truncDist) {
                             for (int j = 0; j < 2; j++) {
                                 calcEnergy(r_dist, LJ_constant);
-                                calcVirial(r_dist, LJ_constant);
+                                calcVirial(x_curr - x_comp, y_curr - y_comp,
+                                           r_dist, LJ_constant);
                             }
                         }
                     }
                 } else {
                     calcEnergy(r_dist, LJ_constant);
-                    calcVirial(r_dist, LJ_constant);
+                    calcVirial(x_curr - x_comp, y_curr - y_comp, r_dist,
+                               LJ_constant);
                 }
             }
         }
     }
     sum_Fdot_r.push_back(f_r);
     sum_energy.push_back(f_energy);
+}
+
+// try to find a way to combine this calculation with the virial calculation
+void Properties::calc_average_force(double x, double y, double r) {
+    interact_type = 1;
+    std::vector<double> f(2, 0);
+    double FF = 0;
+    switch (interact_type) {
+    case 1:
+        FF = lenJonesForce(r, 1);
+        break;
+    case 2:
+        FF = WCA_force(r);
+        break;
+    case 3:
+        FF = WCA_force(r) + simple_spring_force(r, 1);
+        break;
+    }
+    f[0] = x / r * FF;
+    f[1] = y / r * FF;
+    std::cout << "fx = " << f[0] << " fy = " << f[1] << " fr = " << FF << "\n"
+              << "sqrt(fx^2 + fy^2) = " << sqrt(f[0] * f[0] + f[1] * f[1])
+              << "\n";
 }
 
 // this calculation has been moved to external analysis code
@@ -344,6 +386,12 @@ double Properties::calcAvgEnergy() {
     }                                          // energy vector to compute
     avgEnergy = avgEnergy / len;               // the average energy
     return avgEnergy;                          // of the whole config
+}
+
+void Properties::writeAvgForces() {
+    for (int k = 0; k < 2; ++k) {
+        avg_force_particle << avg_force[k] << " ";
+    }
 }
 
 void Properties::writeProperties() {
@@ -400,6 +448,8 @@ void Properties::writeProperties() {
     xy_dens_file.close();
     par_xy_file.close();
     antp_xy_file.close();
+
+    close_files();
 }
 
 void Properties::truncation_dist() {
@@ -414,6 +464,10 @@ void Properties::truncation_dist() {
     }
 }
 
+void Properties::open_files() {
+    avg_force_particle.open("avgForcePerParticle.txt");
+}
+void Properties::close_files() { avg_force_particle.close(); }
 // assign private variable used in class
 void Properties::initializeProperties(Parameters *p) {
 
@@ -430,20 +484,23 @@ void Properties::initializeProperties(Parameters *p) {
 
     a_ref = p->getRefAffinity();
     a_mult = p->getAffinityMult();
-
+    std::cout << k_spring << "  " << a_ref << std::endl;
+    // may be worth putting this chunk of code into a separate function
     delta_r = sigma / 20; // this might not be the best way to define delta_r
     cell_L = sigma / 20;
-    truncation_dist(); // determines truncation distance
-                       // dependent on interaction type
-    // define the various RDF vectors (dependent upon r)
 
+    // determines truncation distance
+    truncation_dist();
+    open_files();
+
+    // define the various RDF vectors (dependent upon r)
     int arr_size = 0.5 * boxLength / delta_r + 1;
     num_density.resize(arr_size);
     par_num_density.resize(arr_size);
     antp_num_density.resize(arr_size);
 
     int val = boxLength / cell_L + 1;
-    std::cout << "the size of the vector is " << val << std::endl;
+    //    std::cout << "the size of the vector is " << val << std::endl;
     xy_num_density.resize(val, std::vector<double>(val, 0));
     par_xy_density.resize(val, std::vector<double>(val, 0));
     antp_xy_density.resize(val, std::vector<double>(val, 0));

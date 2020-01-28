@@ -4,7 +4,7 @@ totalParticles  : 30
 type1_Particles : 15
 type2_Particles : 15
 
-particleRadius: .05
+particleRadius: .2 # to go back to previous test, use .05 as radius
 
 # reduced parameters of the system 
 reducedTemp : 1.5  # not measured by the system currently
@@ -13,10 +13,10 @@ sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 # strength of different interactions
-reference_affinity : 1.65
+reference_affinity : 1.9
 affinity_multiple  : 8
 
-seed   : 823058205295032951
+seed   : 8923052835283572
 weight : .06 # weight is being calculated inside the program
 
 # initialization, interaction, and boundary type
@@ -25,8 +25,8 @@ interactionType    : 3 # 0 = hard disk, 1 = LJ, 2 = WCA, 3 = WCA + spring energy
 boundaryType       : 2 # 0 = rigid, 1 = periodic, 2 = external well 
 
 # run length parameters
-numberUpdates         : 26000  # each update = 1 sweep = n_part attempted moves 
-equilibriate_sweep    : 13000  
+numberUpdates         : 20000  # each update = 1 sweep = n_part attempted moves 
+equilibriate_sweep    : 10000  
 data_collect_interval : 50
 
 # parameters for using the spring potential
@@ -34,6 +34,6 @@ springConstant : 4.0
 rest_length    : 2.6 # 65nm/25nm = c-c dist / diam 
 
 # parameters for using the external well boundary
-external_well_depth : 1 # c * (x^2 + y^2)
+external_well_depth : 1.3 # c * (x^2 + y^2)
 
 animationFile : positions.txt

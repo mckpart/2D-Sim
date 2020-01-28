@@ -14,6 +14,10 @@ class Properties {
     double f_energy = 0;
     double f_r = 0;
 
+    int force_num = 0;
+    std::vector<double> avg_force{std::vector<double>(2, 0)};
+    std::ofstream avg_force_particle;
+
     std::vector<double> sum_Fdot_r;
     std::vector<double> sum_energy;
 
@@ -25,6 +29,9 @@ class Properties {
     std::vector<std::vector<double>> xy_num_density;
     std::vector<std::vector<double>> par_xy_density;
     std::vector<std::vector<double>> antp_xy_density;
+
+    // this is the average force per particle - holds x,y coordinate
+    //    std::vector<std::vector<double>> avg_force;
 
     double delta_r = 0;
     double cell_L = 0;
@@ -66,13 +73,18 @@ class Properties {
     void calcPeriodicProp(std::vector<Particle> *particles);
     void calcNonPerProp(std::vector<Particle> *particles);
     void calcEnergy(double r, double c);
-    void calcVirial(double r, double c);
+    void calcVirial(double x, double y, double r, double c);
 
     double radDistance(double x1, double x2, double y1, double y2);
 
     double calcPressure();
     double calcAvgEnergy();
+    void calc_average_force(double x, double y, double r);
 
     void writeProperties();
+    void writeAvgForces();
+
+    void open_files();
+    void close_files();
 };
 #endif
