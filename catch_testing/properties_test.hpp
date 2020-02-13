@@ -8,45 +8,12 @@
 // come back and "un" hardcode the yaml file.. prob bad practice
 Parameters *init_test_params() {
     static Parameters param;
-    param.initializeParameters("params.yaml");
+    param.initializeParameters("catch_testing/test_params.yaml");
     return &param;
 }
 
-// write this force calculation function here first and then if it seems to be
-// working, add it to the properties class
+void prepare_particles(std::vector<Particle> *p) {
 
-// the x and y here represent the distance between the particles, not the
-// position of the reference particle in the simulation
-void calc_force_vec(double r, double x, double y, double force,
-                    std::vector<double> *F) {
-    double Fx = -x / r * force;
-    double Fy = -y / r * force;
-    std::cout << "Fx = " << Fx << " Fy = " << Fy << std::endl;
-    (*F)[0] = Fx;
-    (*F)[1] = Fy;
-}
-
-void average_force_vec(std::vector<std::vector<double>> *Force) {
-    std::vector<double> f(2);
-    double fx = 0;
-    double fy = 0;
-    //    std::cout << Force->size() << std::endl;
-    for (int i = 0; i < Force->size(); ++i) {
-        fx = fx + (*Force)[i][0];
-        fy = fy + (*Force)[i][1];
-    }
-    // for the LJ model, when the particle at (-.5,.5) is the refernce particle,
-    // the total force vector should be 22.875(-1,1)
-    std::cout << "final x and y: " << fx << " " << fy << std::endl;
-}
-// TEST_CASE("does func return 1") { REQUIRE(func_1() == 2); }
-
-TEST_CASE("Lennard Jones Force Calculation") {
-    Properties prop;
-    Parameters *param;
-
-    param = init_test_params();
-    prop.initializeProperties(param);
     Particle p1;
     Particle p2;
     Particle p3;
@@ -61,29 +28,76 @@ TEST_CASE("Lennard Jones Force Calculation") {
     p4.setX_Position(-.5);
     p4.setY_Position(-.5);
 
-    std::vector<std::vector<double>> force_vecs(3, std::vector<double>(2));
-    std::vector<Particle> particles = {p1, p2, p3, p4};
-    for (int i = 0; i < 3; ++i) {
-        Particle p = particles[i + 1];
-        //        std::cout << "x of p1: " << p1.getX_Position()
-        //                  << " x of p: " << p.getX_Position() << std::endl;
-        double r = prop.radDistance(p1.getX_Position(), p.getX_Position(),
-                                    p1.getY_Position(), p.getY_Position());
-        std::cout << "rad dist is: " << r << std::endl;
-        // not sure what the c = 1 was originally for...
-        double F = prop.lenJonesForce(r, 1);
-        std::cout << "force is = " << F << std::endl;
-
-        calc_force_vec(r, p.getX_Position() - p1.getX_Position(),
-                       p.getY_Position() - p1.getY_Position(), F,
-                       &force_vecs[i]);
-    }
-    for (int i = 0; i < 3; ++i) {
-
-        std::cout << force_vecs[i][0] << "  " << force_vecs[i][1] << std::endl;
-    }
-
-    average_force_vec(&force_vecs);
-    std::cout << "here it is" << param->getSigma() << std::endl;
+    *p = {p1, p2, p3, p4};
 }
 
+// the x and y here represent the distance between the particles, not the
+// position of the reference particle in the simulation
+void calc_force_vec(double r, double x, double y, double force,
+                    std::vector<double> *F) {
+    double Fx = -x / r * force;
+    double Fy = -y / r * force;
+    std::cout << "Fx = " << Fx << " Fy = " << Fy << std::endl;
+    (*F)[0] = Fx + (*F)[0];
+    (*F)[1] = Fy + (*F)[1];
+}
+
+void average_force_vec(std::vector<std::vector<double>> *Force) {
+    std::vector<double> f(2);
+    double fx = 0;
+    double fy = 0;
+    for (int i = 0; i < Force->size(); ++i) {
+        fx += (*Force)[i][0];
+        fy += (*Force)[i][1];
+    }
+    // for the LJ model, when the particle at (-.5,.5) is the refernce particle,
+    // the total force vector should be 22.875(-1,1)
+    std::cout << "final x and y: " << fx << " " << fy << std::endl;
+}
+
+void compute_f_vecs(std::vector<double> *tot_f, int k, Properties *prop) {
+
+    std::vector<Particle> particles;
+    prepare_particles(&particles);
+    Particle p_reff = particles[k];
+
+    for (int i = 0; i < 4; ++i) {
+        if (i != k) {
+            Particle p = particles[i];
+            double r =
+                prop->radDistance(p_reff.getX_Position(), p.getX_Position(),
+                                  p_reff.getY_Position(), p.getY_Position());
+            // not sure what the c = 1 was originally for...
+            double F = prop->lenJonesForce(r, 1);
+            prop->calc_force_vec(p.getX_Position() - p_reff.getX_Position(),
+                                 p.getY_Position() - p_reff.getY_Position(), r,
+                                 tot_f);
+        }
+    }
+}
+
+// VERY IMPORTANT: THIS TEST CASE WORKS WHEN SIGMA IS 1! MAYBE MAKE A SIMPLE
+// PARAMETER FILE TO BE READ IN BY THIS TEST FUNCTIONS!!!!!!!!!!!
+TEST_CASE("Lennard Jones Force Calculation") {
+    Properties prop;
+    Parameters *param;
+
+    param = init_test_params();
+    prop.initializeProperties(param);
+
+    std::vector<std::vector<double>> force_vecs(4, std::vector<double>(2));
+    std::vector<double> tot_force_vec(2);
+
+    compute_f_vecs(&tot_force_vec, 0, &prop);
+    REQUIRE(tot_force_vec[0] == -22.875);
+    REQUIRE(tot_force_vec[1] == 22.875);
+    std::cout << "LJ FORCE PASSED TEST" << std::endl;
+
+    for (int k = 0; k < 4; ++k) {
+        compute_f_vecs(&force_vecs[k], k, &prop);
+    }
+    for (int k = 0; k < 4; ++k) {
+        std::cout << force_vecs[k][0] << " and " << force_vecs[k][1]
+                  << std::endl;
+    }
+}

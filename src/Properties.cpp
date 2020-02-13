@@ -5,12 +5,12 @@
 double Properties::radDistance(double x1, double x2, 
 		               double y1, double y2){
    return sqrt(pow(x2-x1,2) + pow(y2-y1,2)) / sigma;  
-}   
-
-double Properties::lenJonesForce(double r, double c){
-   return 24*c/sigma * (2 * pow(1/r,13) - pow(1/r,7));  // r is really r/sigma
 }
 
+double Properties::lenJonesForce(double r, double c){
+    // r is really r/sigma
+    return 24 * c / sigma * (2 * pow(1 / r, 13) - pow(1 / r, 7));
+}
 // Note: r is the characteristic length r/sigma
 double Properties::lenJonesEnergy(double r, double a) {
     return 4 * a * (pow(1 / r, 12) - pow(1 / r, 6) + truncShift);
@@ -23,7 +23,7 @@ double Properties::lenJonesEnergy(double r, double a) {
 // PURPOSE OF A SOFT DISK INTERACTION
 double Properties::WCA_force(double r) {
     double val = 0;
-
+    // as usual... r = r/sigma
     // if r > 2^1/6 then there is no force/potential energy
     if (r <= pow(2.0, 1.0 / 6.0)) {
         val = 24 / sigma * (2 * pow(1 / r, 13) - pow(1 / r, 7));
@@ -147,6 +147,7 @@ void Properties::calcNonPerProp(std::vector<Particle> *particles) {
     Particle curr_prt;
     Particle comp_prt;
 
+    // can probably remove the L
     double LJ_constant = 0;
     double r_dist = 0;
 
@@ -207,7 +208,8 @@ void Properties::calcNonPerProp(std::vector<Particle> *particles) {
             //            r_dist);
             ++force_num;
         }
-
+        // this should probably be write total forces. the tot forces could then
+        // be averaged in a separate python analysis program.
         writeAvgForces();
     }
     avg_force_particle << "\n";
@@ -337,9 +339,13 @@ void Properties::calcPeriodicProp(std::vector<Particle> *particles) {
 }
 
 // try to find a way to combine this calculation with the virial calculation
-void Properties::calc_average_force(double x, double y, double r) {
+//
+// JUST INCORORATED THE VECTOR INTO THIS FUNCTION. IF BAD, REMOVE!!!!!!!!!
+void Properties::calc_force_vec(double x, double y, double r,
+                                std::vector<double> *F_vec) {
+    // I should NOT be forcing the interaction type to be 1 here.. bad practice
     interact_type = 1;
-    std::vector<double> f(2, 0);
+    //    std::vector<double> f(2, 0);
     double FF = 0;
     switch (interact_type) {
     case 1:
@@ -352,11 +358,24 @@ void Properties::calc_average_force(double x, double y, double r) {
         FF = WCA_force(r) + simple_spring_force(r, 1);
         break;
     }
-    f[0] = x / r * FF;
-    f[1] = y / r * FF;
-    std::cout << "fx = " << f[0] << " fy = " << f[1] << " fr = " << FF << "\n"
-              << "sqrt(fx^2 + fy^2) = " << sqrt(f[0] * f[0] + f[1] * f[1])
-              << "\n";
+    // here x = (x2 - x1) and y = (y2 - y1). It represents the vector pointing
+    // from the reference particle to the comparison particle... thus a negative
+    // sign is needed to appropriately orient the force vector
+    (*F_vec)[0] = -x / r * FF + (*F_vec)[0];
+    (*F_vec)[1] = -y / r * FF + (*F_vec)[1];
+    // this currently matches for LJ - compute
+}
+
+// this routine is for calculating the total
+void Properties::avg_force_vec(std::vector<std::vector<double>> *F) {
+    std::vector<double> f(2);
+    double fx = 0;
+    double fy = 0;
+    for (int i = 0; i < F->size(); ++i) {
+        fx = fx + (*F)[i][0];
+        fy = fy + (*F)[i][1];
+    }
+    std::cout << "in properties... fx = " << fx << " fy = " << fy << std::endl;
 }
 
 // this calculation has been moved to external analysis code
@@ -452,6 +471,9 @@ void Properties::writeProperties() {
     close_files();
 }
 
+// recall that this function only applies to the LJ force
+// and the WCA force - maybe find a correction for the other
+// forces implemented
 void Properties::truncation_dist() {
     switch (interact_type) {
     case 3:
@@ -485,6 +507,7 @@ void Properties::initializeProperties(Parameters *p) {
     a_ref = p->getRefAffinity();
     a_mult = p->getAffinityMult();
     std::cout << k_spring << "  " << a_ref << std::endl;
+
     // may be worth putting this chunk of code into a separate function
     delta_r = sigma / 20; // this might not be the best way to define delta_r
     cell_L = sigma / 20;

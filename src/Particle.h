@@ -1,6 +1,9 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
+#include <iostream>
+#include <vector>
+
 class Particle {
 
   private:
@@ -16,7 +19,13 @@ class Particle {
 
     double stepWeight = 0;
 
+    std::vector<double> force;
+
   public:
+    // DEFAULT CONSTRUCTOR //
+    Particle();
+
+    // GETTERS //
     int getType();
     int getIdentifier();
 
@@ -26,6 +35,10 @@ class Particle {
     double getX_TrialPos();
     double getY_TrialPos();
 
+    double getX_Force();
+    double getY_Force();
+
+    // SETTERS //
     double getStepWeight();
 
     void setType(int t);
@@ -39,7 +52,11 @@ class Particle {
 
     void setStepWeight(double w);
 
+    void addForce(double fx, double fy);
+    void resetForce();
+
     double x_trial(double randVal);
     double y_trial(double randVal);
+
 };
 #endif

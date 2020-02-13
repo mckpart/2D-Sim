@@ -1,6 +1,9 @@
 #include "Particle.h"
 #include <iostream>
 
+// here I could add the observer object to manage the force calculations on the
+// particles.
+Particle::Particle() { force.resize(2, 0); }
 /////////// GETTERS ////////////////////
 
 int Particle::getType() { return type; }
@@ -13,6 +16,9 @@ double Particle::getY_TrialPos() { return y_trialPos; }
 
 double Particle::getStepWeight() { return stepWeight; }
 double Particle::getRadius() { return radius; }
+
+double Particle::getX_Force() { return force[0]; }
+double Particle::getY_Force() { return force[1]; }
 
 //////////// SETTERS //////////////////////
 
@@ -34,4 +40,13 @@ double Particle::x_trial(double randVal) {
 }
 double Particle::y_trial(double randVal) {
     return y_position + stepWeight * (randVal - 0.5);
+}
+
+void Particle::resetForce() {
+    force[0] = 0;
+    force[1] = 0;
+}
+void Particle::addForce(double fx, double fy) {
+    force[0] += fx;
+    force[1] += fy;
 }

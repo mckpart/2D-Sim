@@ -79,7 +79,9 @@ class Properties {
 
     double calcPressure();
     double calcAvgEnergy();
-    void calc_average_force(double x, double y, double r);
+    void calc_force_vec(double x, double y, double r,
+                        std::vector<double> *F_vec);
+    void avg_force_vec(std::vector<std::vector<double>> *F);
 
     void writeProperties();
     void writeAvgForces();
