@@ -81,7 +81,7 @@ void Simulation::testSimulation() {
     x = -.5;
     y = -.5;
     double r = .5 * sqrt(2);
-    prop.calc_average_force(x, y, r);
+    //    prop.calc_average_force(x, y, r);
 }
 
 void Simulation::runSimulation() {
