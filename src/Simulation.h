@@ -11,6 +11,7 @@
 #include "Parameters.h"
 #include "Particle.h"
 #include "Properties.h"
+//#include "System_Manager.h"
 
 class Simulation {
 
@@ -21,7 +22,7 @@ class Simulation {
     Interaction interact;
     Boundary bound;
     Properties prop;
-
+    //    System_Manager sim_manage;
     std::vector<Particle> particles;
 
     KISSRNG randVal;
@@ -29,14 +30,26 @@ class Simulation {
     int n_particles = 0;
     double red_temp = 0;
 
+    double delta_energy = 0;
+    std::vector<double> trial_position;
+
+
   public:
     Simulation(std::string yf);
 
     double boltzmannFactor(double delta_energy);
 
     void runSimulation();
+    // recall that this function is going to get moved to the particle manager
+    // class
     void setParticleParams();
     void writePositions(std::ofstream *pos_file);
     void testSimulation();
+
+    // private functions that I want to have access to the properties of the
+    // class
+    void periodic_pos_trial(Particle *p);
+    bool nonperiodic_pos_trial(Particle *p, bool accept);
+    void init_configuration();
 };
 #endif

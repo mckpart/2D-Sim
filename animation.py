@@ -70,7 +70,7 @@ for line in file:
 
 position = np.asarray(position)
 numIter = len(position[:,0]) 
-
+print(position)
 # creates writing object to allow the movie to be
 # saved as an .mp4 file
 Writer = ani_obj.writers['ffmpeg']

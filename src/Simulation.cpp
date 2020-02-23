@@ -1,6 +1,9 @@
 #include <iostream>
 #include "Simulation.h"
 
+// having this 'reduced energy' made sense in the context of the Lennard Jones
+// system, but is confusing for all other systems. so this would be worth
+// changing back & then rerunning LJ to make sure nothing broke.
 double Simulation::boltzmannFactor(double energy) {
     return exp(-1 * energy / red_temp); // energy here is already reduced
 }
@@ -22,8 +25,9 @@ Simulation::Simulation(std::string yf) {
     Particle prt;
 
     red_temp = param.getRedTemp();
-}
 
+    trial_position.resize(2);
+}
 void Simulation::writePositions(std::ofstream *pos_file) {
     Particle prt;
 
@@ -46,8 +50,8 @@ void Simulation::writePositions(std::ofstream *pos_file) {
 
 void Simulation::testSimulation() {
 
-    n_particles = 4;
-    particles.resize(n_particles);
+    //    n_particles = 4;
+    //    particles.resize(n_particles);
     Particle prt;
     double x = 0;
     double y = 0;
@@ -75,14 +79,74 @@ void Simulation::testSimulation() {
     //        particles[k] = prt;
     //    }
     //
-    //    for (int k = 0; k < 1000; k++) {
-    //        writePositions(&pos_file);
-    //    }
+    for (int k = 0; k < 1000; k++) {
+        writePositions(&pos_file);
+    }
     x = -.5;
     y = -.5;
     double r = .5 * sqrt(2);
     //    prop.calc_average_force(x, y, r);
 }
+
+// end sim if this error is thrown
+void Simulation::init_configuration() {
+    double n_initial = n_particles;
+
+    // IT MIGHT BE EVEN BETTER TO PUT THIS INTO A PARTICLE MANAGER CLASS
+    // make this into a function - could probaby write some sort of catch2 test
+    // that checks the various types of initializations of the system
+    // initializing particle positions
+    if (param.getInit_Type() == 0) {
+        bound.initialPosition(&particles, randVal);
+    } else if (param.getInit_Type() == 1) {
+        n_initial = bound.initialHexagonal(&particles);
+    } else if (param.getInit_Type() == 2) {
+        n_initial = bound.initialSquare(&particles);
+    }
+    // this should be placed into the same function mentioned above.
+    // print warning if the system has too many particles
+    if (n_initial < n_particles) {
+        std::cout << "ERROR: TOO MANY PARTICLES. INITIALIZED " << n_initial
+                  << " PARTICLES" << std::endl;
+    } else {
+        std::cout << "SUCCESSFULLY INITIALIZED " << n_initial << " PARTICLES"
+                  << std::endl;
+    }
+}
+
+void Simulation::periodic_pos_trial(Particle *p) {
+
+    // updates trial position in function then particle - particle
+    // interactions
+    // for now I am going to make x_trial and y_trial private variables of the
+    // sim class but they should be made into properties of the particle manager
+    // class later
+    trial_position[0] = p->getX_TrialPos();
+    trial_position[1] = p->getY_TrialPos();
+    double curr_index = p->getIdentifier();
+    // later, rather than doing curr_index, recall that each particle has an
+    // identifier that relates it back to its index in the particle array
+    if (param.getInteract_Type() != 0) {
+        delta_energy = interact.periodicInteraction(&particles, curr_index);
+    }
+}
+
+bool Simulation::nonperiodic_pos_trial(Particle *p, bool accept) {
+    if (param.getBound_Type() == 0) {
+        accept = bound.rigidBoundary(&particles, p->getIdentifier());
+    } else if (param.getBound_Type() == 2) {
+        delta_energy = bound.externalWell(&particles, p->getIdentifier());
+    }
+
+    if (param.getInteract_Type() != 0) {
+        delta_energy = delta_energy + interact.nonPeriodicInteraction(
+                                          &particles, p->getIdentifier());
+    }
+    return accept;
+}
+// once sim is working again, consider making these private functions since they
+// don't need to be used outside of the sim class
+// void runSweep() {}
 
 void Simulation::runSimulation() {
 
@@ -98,25 +162,9 @@ void Simulation::runSimulation() {
     pos_file.open("positions.txt");
 
     double n_updates = param.getUpdates();
-    double n_initial = n_particles;
 
-    // initializing particle positions
-    if (param.getInit_Type() == 0) {
-        bound.initialPosition(&particles, randVal);
-    } else if (param.getInit_Type() == 1) {
-        n_initial = bound.initialHexagonal(&particles);
-    } else if (param.getInit_Type() == 2) {
-        n_initial = bound.initialSquare(&particles);
-    }
-
-    // print warning if the system has too many particles
-    if (n_initial < n_particles) {
-        std::cout << "ERROR: TOO MANY PARTICLES. INITIALIZED " << n_initial
-                  << " PARTICLES" << std::endl;
-    } else {
-        std::cout << "SUCCESSFULLY INITIALIZED " << n_initial << " PARTICLES"
-                  << std::endl;
-    }
+    init_configuration();
+    // turn this into a function like sweep()
     for (int sweepNum = 0; sweepNum < n_updates; sweepNum++) {
         for (int k = 0; k < n_particles; k++) {
 
@@ -125,43 +173,27 @@ void Simulation::runSimulation() {
             prt = particles[curr_index];
 
             // generate and set the x,y trial position
-            double x_trial = prt.x_trial(randVal.RandomUniformDbl());
-            double y_trial = prt.y_trial(randVal.RandomUniformDbl());
+            trial_position[0] = prt.x_trial(randVal.RandomUniformDbl());
+            trial_position[1] = prt.y_trial(randVal.RandomUniformDbl());
 
-            prt.setX_TrialPos(x_trial);
-            prt.setY_TrialPos(y_trial);
+            // might be worth just putting this into the create trial position
+            // function in particle class
+            prt.setX_TrialPos(trial_position[0]);
+            prt.setY_TrialPos(trial_position[1]);
             particles[curr_index] = prt;
 
             bool accept = 1;
-            double delta_energy = 0; // sets change in energy to 0
+            delta_energy = 0;
+            //            double delta_energy = 0; // sets change in energy to 0
 
             if (param.getBound_Type() == 1) {
 
                 // run sim with periodic boundaries
                 bound.periodicBoundary(&particles, curr_index);
                 prt = particles[curr_index];
-
-                // updates trial position in function then particle - particle
-                // interactions
-                x_trial = prt.getX_TrialPos();
-                y_trial = prt.getY_TrialPos();
-
-                if (param.getInteract_Type() != 0) {
-                    delta_energy =
-                        interact.periodicInteraction(&particles, curr_index);
-                }
+                periodic_pos_trial(&prt);
             } else {
-                if (param.getBound_Type() == 0) {
-                    accept = bound.rigidBoundary(&particles, curr_index);
-                } else if (param.getBound_Type() == 2) {
-                    delta_energy = bound.externalWell(&particles, curr_index);
-                }
-
-                if (param.getInteract_Type() != 0) {
-                    delta_energy =
-                        delta_energy +
-                        interact.nonPeriodicInteraction(&particles, curr_index);
-                }
+                accept = nonperiodic_pos_trial(&prt, accept);
             }
 
             /* RUNS DIFFERENT TYPES OF PARTICLE-PARTICLE INTERACTIONS
@@ -173,7 +205,8 @@ void Simulation::runSimulation() {
              * RANDOM NUMBER IS GENERATED TO DETERMINE WHETHER THE MOVE IS TO BE
              * ACCEPTED
              */
-
+            // recall that for hard disks hte delta energy will always remain 0
+            // & there's no need for redundancy
             if (param.getInteract_Type() == 0 && accept == 1) {
                 accept = interact.hardDisks(&particles, curr_index);
             }
@@ -192,8 +225,8 @@ void Simulation::runSimulation() {
             // if trial move is accepted, update the position of current
             // particle and put back in particle vector
             if (accept == 1) {
-                prt.setX_Position(x_trial);
-                prt.setY_Position(y_trial);
+                prt.setX_Position(trial_position[0]);
+                prt.setY_Position(trial_position[1]);
                 particles[curr_index] = prt;
             } else {
                 n_rejects++; // keeps count of total moves rejected
@@ -204,6 +237,7 @@ void Simulation::runSimulation() {
             sweepNum % param.getData_interval() == 0) {
             std::cout << "current sweep: " << sweepNum << std::endl;
             writePositions(&pos_file);
+            // recall that these functions are going to be moved into this class
             if (param.getBound_Type() == 1) {
                 prop.calcPeriodicProp(&particles);
             } else {
@@ -220,7 +254,8 @@ void Simulation::runSimulation() {
 }
 
 // THIS IS THE NEXT PIECE TO BE ALTERED ////
-
+// this should probably be moved into the particle manager class. Have a
+// function that initializes the system's particles
 void Simulation::setParticleParams() {
 
     Particle prt;

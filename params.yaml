@@ -25,7 +25,7 @@ interactionType    : 3 # 0 = hard disk, 1 = LJ, 2 = WCA, 3 = WCA + spring energy
 boundaryType       : 2 # 0 = rigid, 1 = periodic, 2 = external well 
 
 # run length parameters
-numberUpdates         : 20000  # each update = 1 sweep = n_part attempted moves 
+numberUpdates         : 1000  # each update = 1 sweep = n_part attempted moves 
 equilibriate_sweep    : 10000  
 data_collect_interval : 50
 
