@@ -55,7 +55,7 @@ class Properties {
 
   public:
     void initializeProperties(Parameters *p);
-    void truncation_dist();
+    double truncation_dist();
 
     void populateCellArray(double x, double y,
                            std::vector<std::vector<double>> *cellPositions);
@@ -72,13 +72,15 @@ class Properties {
 
     void calcPeriodicProp(std::vector<Particle> *particles);
     void calcNonPerProp(std::vector<Particle> *particles);
-    void calcEnergy(double r, double c);
-    void calcVirial(double x, double y, double r, double c);
+    double calcEnergy(double r, double c);
+    double calcVirial(double x, double y, double r, double a);
 
     double radDistance(double x1, double x2, double y1, double y2);
 
     double calcPressure();
     double calcAvgEnergy();
+
+    // remember, these are being moved to the particle manager class eventually
     void calc_force_vec(double x, double y, double r,
                         std::vector<double> *F_vec);
     void avg_force_vec(std::vector<std::vector<double>> *F);

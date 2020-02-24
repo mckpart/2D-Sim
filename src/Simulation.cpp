@@ -9,14 +9,18 @@ double Simulation::boltzmannFactor(double energy) {
 }
 
 Simulation::Simulation(std::string yf) {
-    yamlFile = yf;
+    yaml_file = yf;
 
-    param.initializeParameters(yamlFile);   // initialize the parameters
+    param.initializeParameters(yaml_file);  // initialize the parameters
     interact.initializeInteraction(&param); // for the simulation
     bound.initializeBoundary(&param);
     prop.initializeProperties(&param);
 
     randVal.InitCold(param.getSeed());
+    // this really might not work at all...
+    // this is the correct syntax for setting to an object using the other
+    // constructor
+    sim_manage = System_Manager(yaml_file);
 
     n_particles = param.getNumParticles(); // initialize vector of
     particles.resize(n_particles);         // particles and set particle
@@ -88,6 +92,106 @@ void Simulation::testSimulation() {
     //    prop.calc_average_force(x, y, r);
 }
 
+// for now leave this routine as is... and check the periodic properties. If
+// periodic properties still works, then move this to sim class as weell
+// the main loop that actually runs the sim should probably be put in to the
+// main.cpp file
+void Simulation::calcNonPerProp() {
+    Particle curr_prt;
+    Particle comp_prt;
+
+    // can probably remove the LJ constant at some point..
+    double LJ_constant = 0;
+    double r_dist = 0;
+    std::vector<double> delta_pos(2);
+    // here we should note that these are still being initialized in the
+    // properties class and should be here OR there
+    double a_ref = param.getRefAffinity();
+    double a_mult = param.getAffinityMult();
+    double trunc_dist = prop.truncation_dist();
+    // make sure that the free energy previously calculated is reset the
+    //    free
+    // energy is only the energy that comes from the positions within the
+    // configuration
+    sim_manage.resetEnergy();
+    sim_manage.resetVirial();
+
+    for (int k = 0; k < n_particles; k++) {
+        // this avg_force should be tracked in the sim manager class
+        //        avg_force[0] = 0;
+        //        avg_force[1] = 0;
+        // this force number should be entirely unnecessary - calculation of
+        // forces per particle will be kept more in the particle manageer class
+        //        force_num = 0;
+
+        curr_prt = particles[k];
+
+        // set current x,y position
+        std::vector<double> curr_pos(2);
+        curr_pos[0] = curr_prt.getX_Position();
+        curr_pos[1] = curr_prt.getY_Position();
+
+        // each particle-particle interaction
+        for (int n = 0; n < n_particles; n++) {
+
+            comp_prt = particles[n];
+
+            // set comparison x,y position
+
+            std::vector<double> comp_pos{comp_prt.getX_Position(),
+                                         comp_prt.getY_Position()};
+
+            // the particle cannot interact with itself
+            if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
+                r_dist = prop.radDistance(curr_pos[0], comp_pos[0], curr_pos[1],
+                                          comp_pos[1]);
+                delta_pos = {comp_pos[0] - curr_pos[0],
+                             comp_pos[1] - curr_pos[1]};
+                // updates overall number density
+                sim_manage.updateNumDensity(r_dist, 0);
+                sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 0);
+
+                // if type == type interaction of parallel microtubules
+                // updates
+                // number density for parallel interactions if type !=
+                // type :
+                // interaction of antiparallel microtubules updates number
+                // density for antiparallel interactions
+                if (curr_prt.getType() == comp_prt.getType()) {
+                    LJ_constant = a_ref;
+                    sim_manage.updateNumDensity(r_dist, 1);
+                    sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 1);
+                }
+                else if (curr_prt.getType() != comp_prt.getType()) {
+                    LJ_constant = a_ref * a_mult;
+                    sim_manage.updateNumDensity(r_dist, 2);
+                    sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 2);
+                }
+            }
+            if (n > k && r_dist < trunc_dist) {
+                sim_manage.updateEnergy(prop.calcEnergy(r_dist, LJ_constant));
+                // here I have curr - comp whereas everywhere else I have comp -
+                // curr - for now keep it the same but come back to check later
+                sim_manage.updateVirial(prop.calcVirial(
+                    -1 * delta_pos[0], -1 * delta_pos[1], r_dist, LJ_constant));
+            }
+            //            calc_average_force(x_curr - x_comp, y_curr -
+            //            y_comp,
+            //            r_dist);
+            //            ++force_num;
+        }
+        // this should probably be write total forces. the tot forces
+        //   could then
+        // be averaged in a separate python analysis program.
+        //        writeAvgForces();
+    }
+    //    avg_force_particle << "\n";
+    //    close_files();
+    sim_manage.setTotalVirial();
+    sim_manage.setTotalEnergy();
+
+    std::cout << "in sim class, nonperiodic stuff" << std::endl;
+}
 // end sim if this error is thrown
 void Simulation::init_configuration() {
     double n_initial = n_particles;
@@ -241,7 +345,7 @@ void Simulation::runSimulation() {
             if (param.getBound_Type() == 1) {
                 prop.calcPeriodicProp(&particles);
             } else {
-                prop.calcNonPerProp(&particles);
+                calcNonPerProp();
             }
         }
     }
@@ -263,7 +367,7 @@ void Simulation::setParticleParams() {
     std::ofstream type_file;
     type_file.open("particle_type.txt");
 
-    YAML::Node node = YAML::LoadFile(yamlFile);
+    YAML::Node node = YAML::LoadFile(yaml_file);
 
     int num_part_1 = node["type1_Particles"].as<int>();
     int num_part_2 = node["type2_Particles"].as<int>();

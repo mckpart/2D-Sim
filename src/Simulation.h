@@ -11,18 +11,18 @@
 #include "Parameters.h"
 #include "Particle.h"
 #include "Properties.h"
-//#include "System_Manager.h"
+#include "System_Manager.h"
 
 class Simulation {
 
   private:
-    std::string yamlFile;
+    std::string yaml_file;
 
     Parameters param;
     Interaction interact;
     Boundary bound;
     Properties prop;
-    //    System_Manager sim_manage;
+    System_Manager sim_manage;
     std::vector<Particle> particles;
 
     KISSRNG randVal;
@@ -51,5 +51,10 @@ class Simulation {
     void periodic_pos_trial(Particle *p);
     bool nonperiodic_pos_trial(Particle *p, bool accept);
     void init_configuration();
+
+    //    void calcNonPerProp(std::vector<Particle> particles);
+    // have this commented out since the particles are currently part of the sim
+    // class
+    void calcNonPerProp();
 };
 #endif

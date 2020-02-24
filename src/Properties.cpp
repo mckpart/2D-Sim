@@ -52,7 +52,7 @@ double Properties::simple_spring_energy(double r, double a) {
 }
 
 // calculates the total energy of current configuration
-void Properties::calcEnergy(double r, double a) {
+double Properties::calcEnergy(double r, double a) {
     double val = 0;
     switch (interact_type) {
     case 1:
@@ -65,11 +65,11 @@ void Properties::calcEnergy(double r, double a) {
         val = WCA_energy(r) + simple_spring_energy(r, a);
         break;
     }
-    f_energy = f_energy + val;
+    return val;
 }
 
 // sums the total virial of the current configuration
-void Properties::calcVirial(double x, double y, double r, double a) {
+double Properties::calcVirial(double x, double y, double r, double a) {
     double val = 0;
     switch (interact_type) {
     case 1:
@@ -87,7 +87,7 @@ void Properties::calcVirial(double x, double y, double r, double a) {
     avg_force[0] = (x * val + avg_force[0] * force_num) / (1 + force_num);
     avg_force[1] = (y * val + avg_force[1] * force_num) / (1 + force_num);
 
-    f_r = f_r + r * val;
+    return r * val;
 }
 
 // void Properties::updateNumDensity(double r, int ID) {
@@ -145,87 +145,87 @@ void Properties::calcVirial(double x, double y, double r, double a) {
 
 // for now leave this routine as is... and check the periodic properties. If
 // periodic properties still works, then move this to sim class as weell
-void Properties::calcNonPerProp(std::vector<Particle> *particles) {
-    //    Particle curr_prt;
-    //    Particle comp_prt;
-    //
-    //    // can probably remove the L
-    //    double LJ_constant = 0;
-    //    double r_dist = 0;
-    //
-    //    // make sure that the free energy previously calculated is reset the
-    //    free
-    //    // energy is only the energy that comes from the positions within the
-    //    // configuration
-    //    f_energy = 0;
-    //    f_r = 0;
-    //
-    //    for (int k = 0; k < n_particles; k++) {
-    //        avg_force[0] = 0;
-    //        avg_force[1] = 0;
-    //        force_num = 0;
-    //
-    //        curr_prt = (*particles)[k];
-    //
-    //        // set current x,y position
-    //        double x_curr = curr_prt.getX_Position();
-    //        double y_curr = curr_prt.getY_Position();
-    //
-    //        // each particle-particle interaction
-    //        for (int n = 0; n < n_particles; n++) {
-    //
-    //            comp_prt = (*particles)[n];
-    //
-    //            // set comparison x,y position
-    //            double x_comp = comp_prt.getX_Position();
-    //            double y_comp = comp_prt.getY_Position();
-    //
-    //            // the particle cannot interact with itself
-    //            if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
-    //                r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
-    //
-    //                // updates overall number density
-    //                updateNumDensity(r_dist, 0);
-    //                calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 0);
-    //
-    //                // if type == type interaction of parallel microtubules
-    //                updates
-    //                // number density for parallel interactions if type !=
-    //                type:
-    //                // interaction of antiparallel microtubules updates number
-    //                // density for antiparallel interactions
-    //                if (curr_prt.getType() == comp_prt.getType()) {
-    //                    LJ_constant = a_ref;
-    //                    updateNumDensity(r_dist, 1);
-    //                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 1);
-    //                } else if (curr_prt.getType() != comp_prt.getType()) {
-    //                    LJ_constant = a_ref * a_mult;
-    //                    updateNumDensity(r_dist, 2);
-    //                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 2);
-    //                }
-    //            }
-    //            if (n > k && r_dist < truncDist) {
-    //                calcEnergy(r_dist, LJ_constant);
-    //                calcVirial(x_curr - x_comp, y_curr - y_comp, r_dist,
-    //                           LJ_constant);
-    //            }
-    //            //            calc_average_force(x_curr - x_comp, y_curr -
-    //            y_comp,
-    //            //            r_dist);
-    //            ++force_num;
-    //        }
-    //        // this should probably be write total forces. the tot forces
-    //        could then
-    //        // be averaged in a separate python analysis program.
-    //        writeAvgForces();
-    //    }
-    //    avg_force_particle << "\n";
-    //    //    close_files();
-    //    sum_Fdot_r.push_back(f_r);
-    //    sum_energy.push_back(f_energy);
+// void Properties::calcNonPerProp(std::vector<Particle> *particles) {
+//    Particle curr_prt;
+//    Particle comp_prt;
+//
+//    // can probably remove the L
+//    double LJ_constant = 0;
+//    double r_dist = 0;
+//
+//    // make sure that the free energy previously calculated is reset the
+//    free
+//    // energy is only the energy that comes from the positions within the
+//    // configuration
+//    f_energy = 0;
+//    f_r = 0;
+//
+//    for (int k = 0; k < n_particles; k++) {
+//        avg_force[0] = 0;
+//        avg_force[1] = 0;
+//        force_num = 0;
+//
+//        curr_prt = (*particles)[k];
+//
+//        // set current x,y position
+//        double x_curr = curr_prt.getX_Position();
+//        double y_curr = curr_prt.getY_Position();
+//
+//        // each particle-particle interaction
+//        for (int n = 0; n < n_particles; n++) {
+//
+//            comp_prt = (*particles)[n];
+//
+//            // set comparison x,y position
+//            double x_comp = comp_prt.getX_Position();
+//            double y_comp = comp_prt.getY_Position();
+//
+//            // the particle cannot interact with itself
+//            if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
+//                r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
+//
+//                // updates overall number density
+//                updateNumDensity(r_dist, 0);
+//                calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 0);
+//
+//                // if type == type interaction of parallel microtubules
+//                updates
+//                // number density for parallel interactions if type !=
+//                type:
+//                // interaction of antiparallel microtubules updates number
+//                // density for antiparallel interactions
+//                if (curr_prt.getType() == comp_prt.getType()) {
+//                    LJ_constant = a_ref;
+//                    updateNumDensity(r_dist, 1);
+//                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 1);
+//                } else if (curr_prt.getType() != comp_prt.getType()) {
+//                    LJ_constant = a_ref * a_mult;
+//                    updateNumDensity(r_dist, 2);
+//                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 2);
+//                }
+//            }
+//            if (n > k && r_dist < truncDist) {
+//                calcEnergy(r_dist, LJ_constant);
+//                calcVirial(x_curr - x_comp, y_curr - y_comp, r_dist,
+//                           LJ_constant);
+//            }
+//            //            calc_average_force(x_curr - x_comp, y_curr -
+//            y_comp,
+//            //            r_dist);
+//            ++force_num;
+//        }
+//        // this should probably be write total forces. the tot forces
+//        could then
+//        // be averaged in a separate python analysis program.
+//        writeAvgForces();
+//    }
+//    avg_force_particle << "\n";
+//    //    close_files();
+//    sum_Fdot_r.push_back(f_r);
+//    sum_energy.push_back(f_energy);
 
-    std::cout << "in properties, nonperiodic stuff" << std::endl;
-}
+//    std::cout << "in properties, nonperiodic stuff" << std::endl;
+//}
 
 // this is for computing the non periodic properties... could probably also be
 // moved to the simulation class
@@ -495,7 +495,7 @@ void Properties::writeProperties() {
 // recall that this function only applies to the LJ force
 // and the WCA force - maybe find a correction for the other
 // forces implemented
-void Properties::truncation_dist() {
+double Properties::truncation_dist() {
     switch (interact_type) {
     case 3:
         truncDist = .5 * boxLength;
@@ -505,6 +505,7 @@ void Properties::truncation_dist() {
         truncShift = -1 * (pow(1 / truncDist, 12) - pow(1 / truncDist, 6));
         break;
     }
+    return truncDist;
 }
 
 // should I put more of the files I am writing to into these functions?
