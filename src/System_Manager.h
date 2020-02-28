@@ -14,11 +14,6 @@
 
 class System_Manager {
   private:
-    // vector of strings that holds the different combinations for  .. this
-    //    may
-    // be a good unit test later...
-    //
-    //
     // maybe keep private objects here
     // current total force (2 by 1 vector)
     Properties prop;
@@ -47,17 +42,12 @@ class System_Manager {
     std::vector<std::vector<double>> antp_xy_density;
 
   public:
-    // here is the default constructor
+    // constructors
     System_Manager();
     System_Manager(std::string yaml_file);
-    // update total force on the particle
-    // move the update forces function into the particle manager class
-    //     void update_forces();
 
     void updateNumDensity(double r, int ID);
     void calc_xy_dens(double x, double y, int ID);
-    //    recall that this routine should really be moved to the sim class void
-    //    calcPerProp(std::vector<Particle> *particles);
 
     void updateVirial(double v);
     void setTotalVirial();
@@ -66,5 +56,16 @@ class System_Manager {
     void updateEnergy(double v);
     void setTotalEnergy();
     void resetEnergy();
+
+    std::vector<double> *getTotalEnergy();
+    std::vector<double> *getTotalVirial();
+
+    std::vector<double> *getTotalNumDensity();
+    std::vector<double> *getParNumDensity();
+    std::vector<double> *getAntiNumDensity();
+
+    std::vector<std::vector<double>> *getTotalXYDensity();
+    std::vector<std::vector<double>> *getParXYDensity();
+    std::vector<std::vector<double>> *getAntiXYDensity();
 };
 #endif

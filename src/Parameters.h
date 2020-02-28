@@ -20,11 +20,13 @@ class Parameters {
 
     int eq_sweep = 0;
     int d_interval = 0;
-
     int n_updates = 0;
-    int n_particles = 0;
-    long seed = 0;
 
+    int n_particles = 0;
+    int parallel_num = 0;
+    int antiparallel_num = 0;
+
+    long seed = 0;
     double ext_well_d = 0;
 
     int init_type = 0;
@@ -37,6 +39,9 @@ class Parameters {
 
     int getUpdates();
     int getNumParticles();
+    int getNumParallel();
+    int getNumAntiparallel();
+
     long getSeed();
 
     int getInit_Type();

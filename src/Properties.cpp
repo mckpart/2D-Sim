@@ -90,143 +90,6 @@ double Properties::calcVirial(double x, double y, double r, double a) {
     return r * val;
 }
 
-// void Properties::updateNumDensity(double r, int ID) {
-//    int val = r / delta_r;
-//    int index = 0;
-//
-//    if (r < 0.5 * boxLength) {
-//        if (r > (val + 0.5) * delta_r) {
-//            index = val + 1;
-//        } else {
-//            index = val;
-//        }
-//
-//        switch (ID) {
-//        case 0:
-//            num_density[index] = num_density[index] + 1;
-//            break;
-//        case 1:
-//            par_num_density[index] = par_num_density[index] + 1;
-//            break;
-//        case 2:
-//            antp_num_density[index] = antp_num_density[index] + 1;
-//            break;
-//        }
-//    }
-//}
-
-// void Properties::calc_xy_dens(double x, double y, int ID) {
-//    double half_boxL = .5 * boxLength;
-//    int ind_1 = (x + half_boxL) / cell_L; // cell_L = delta x = delta y
-//    int ind_2 = (y + half_boxL) / cell_L;
-//
-//    if (fabs(x) < half_boxL - cell_L && fabs(y) < half_boxL - cell_L) {
-//        if (x > (ind_1 + 0.5) * cell_L - half_boxL) {
-//            ++ind_1;
-//        }
-//        if (y > (ind_2 + 0.5) * cell_L - half_boxL) {
-//            ++ind_2;
-//        }
-//
-//        // increment vales of appropriate number densities
-//        switch (ID) {
-//        case 0:
-//            xy_num_density[ind_1][ind_2] = xy_num_density[ind_1][ind_2] + 1;
-//            break;
-//        case 1:
-//            par_xy_density[ind_1][ind_2] = par_xy_density[ind_1][ind_2] + 1;
-//            break;
-//        case 2:
-//            antp_xy_density[ind_1][ind_2] = antp_xy_density[ind_1][ind_2] + 1;
-//            break;
-//        }
-//    }
-//}
-
-// for now leave this routine as is... and check the periodic properties. If
-// periodic properties still works, then move this to sim class as weell
-// void Properties::calcNonPerProp(std::vector<Particle> *particles) {
-//    Particle curr_prt;
-//    Particle comp_prt;
-//
-//    // can probably remove the L
-//    double LJ_constant = 0;
-//    double r_dist = 0;
-//
-//    // make sure that the free energy previously calculated is reset the
-//    free
-//    // energy is only the energy that comes from the positions within the
-//    // configuration
-//    f_energy = 0;
-//    f_r = 0;
-//
-//    for (int k = 0; k < n_particles; k++) {
-//        avg_force[0] = 0;
-//        avg_force[1] = 0;
-//        force_num = 0;
-//
-//        curr_prt = (*particles)[k];
-//
-//        // set current x,y position
-//        double x_curr = curr_prt.getX_Position();
-//        double y_curr = curr_prt.getY_Position();
-//
-//        // each particle-particle interaction
-//        for (int n = 0; n < n_particles; n++) {
-//
-//            comp_prt = (*particles)[n];
-//
-//            // set comparison x,y position
-//            double x_comp = comp_prt.getX_Position();
-//            double y_comp = comp_prt.getY_Position();
-//
-//            // the particle cannot interact with itself
-//            if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
-//                r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
-//
-//                // updates overall number density
-//                updateNumDensity(r_dist, 0);
-//                calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 0);
-//
-//                // if type == type interaction of parallel microtubules
-//                updates
-//                // number density for parallel interactions if type !=
-//                type:
-//                // interaction of antiparallel microtubules updates number
-//                // density for antiparallel interactions
-//                if (curr_prt.getType() == comp_prt.getType()) {
-//                    LJ_constant = a_ref;
-//                    updateNumDensity(r_dist, 1);
-//                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 1);
-//                } else if (curr_prt.getType() != comp_prt.getType()) {
-//                    LJ_constant = a_ref * a_mult;
-//                    updateNumDensity(r_dist, 2);
-//                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 2);
-//                }
-//            }
-//            if (n > k && r_dist < truncDist) {
-//                calcEnergy(r_dist, LJ_constant);
-//                calcVirial(x_curr - x_comp, y_curr - y_comp, r_dist,
-//                           LJ_constant);
-//            }
-//            //            calc_average_force(x_curr - x_comp, y_curr -
-//            y_comp,
-//            //            r_dist);
-//            ++force_num;
-//        }
-//        // this should probably be write total forces. the tot forces
-//        could then
-//        // be averaged in a separate python analysis program.
-//        writeAvgForces();
-//    }
-//    avg_force_particle << "\n";
-//    //    close_files();
-//    sum_Fdot_r.push_back(f_r);
-//    sum_energy.push_back(f_energy);
-
-//    std::cout << "in properties, nonperiodic stuff" << std::endl;
-//}
-
 // this is for computing the non periodic properties... could probably also be
 // moved to the simulation class
 void Properties::populateCellArray(
@@ -249,113 +112,6 @@ void Properties::populateCellArray(
     (*cellPositions)[6][1] = y + boxLength;
     (*cellPositions)[7][0] = x - boxLength;
     (*cellPositions)[7][1] = y - boxLength;
-}
-
-void Properties::calcPeriodicProp(std::vector<Particle> *particles) {
-    //    Particle curr_prt;
-    //    Particle comp_prt;
-    //
-    //    double LJ_constant = 0;
-    //    double r_dist = 0;
-    //
-    //    std::vector<std::vector<double>> cellPositions(9,
-    //                                                   std::vector<double>(2,
-    //                                                   0));
-    //    // make sure that the free energy previously calculated is reset
-    //    // the free energy is only the energy that comes from the positions
-    //    // within the configuration
-    //    f_energy = 0;
-    //    f_r = 0;
-    //
-    //    for (int k = 0; k < n_particles; k++) {
-    //        curr_prt = (*particles)[k];
-    //
-    //        // set current x,y position
-    //        double x_curr = curr_prt.getX_Position();
-    //        double y_curr = curr_prt.getY_Position();
-    //
-    //        // takes into account each particle-particle interaction
-    //        for (int n = 0; n < n_particles; n++) {
-    //
-    //            comp_prt = (*particles)[n];
-    //
-    //            // set comparison x,y position
-    //            double x_comp = comp_prt.getX_Position();
-    //            double y_comp = comp_prt.getY_Position();
-    //
-    //            // the particle cannot interact with itself
-    //            if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
-    //                r_dist = radDistance(x_curr, x_comp, y_curr, y_comp);
-    //
-    //                // updates total radial num density and x,y num density
-    //                updateNumDensity(r_dist, 0);
-    //                calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 0);
-    //
-    //                // if type == type: interaction of parallel microtubules
-    //                // and parallel num density is updated
-    //                // if type != type: interaction of antiparallel
-    //                microtubules
-    //                // and antiparallel num density is updated
-    //                if (curr_prt.getType() == comp_prt.getType()) {
-    //                    LJ_constant = a_ref;
-    //                    updateNumDensity(r_dist, 1);
-    //                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 1);
-    //                } else if (curr_prt.getType() != comp_prt.getType()) {
-    //                    LJ_constant = a_ref * a_mult;
-    //                    updateNumDensity(r_dist, 2);
-    //                    calc_xy_dens(x_comp - x_curr, y_comp - y_curr, 2);
-    //                }
-    //            }
-    //
-    //            if (n > k) {
-    //                if (r_dist > truncDist) {
-    //                    populateCellArray(x_comp, y_comp, &cellPositions);
-    //                    for (int z = 0; z < 8; z++) {
-    //                        // creates the 8 cell images
-    //                        x_comp = cellPositions[z][0];
-    //                        y_comp = cellPositions[z][1];
-    //                        r_dist = radDistance(x_curr, x_comp, y_curr,
-    //                        y_comp);
-    //
-    //                        for (int j = 0; j < 2; j++) {
-    //                            updateNumDensity(r_dist, 0);
-    //                            calc_xy_dens(x_comp - x_curr, y_comp - y_curr,
-    //                            0);
-    //
-    //                            if (curr_prt.getType() == comp_prt.getType())
-    //                            {
-    //                                updateNumDensity(r_dist, 1);
-    //                                calc_xy_dens(x_comp - x_curr, y_comp -
-    //                                y_curr,
-    //                                             1);
-    //                            } else if (curr_prt.getType() !=
-    //                                       comp_prt.getType()) {
-    //                                updateNumDensity(r_dist, 2);
-    //                                calc_xy_dens(x_comp - x_curr, y_comp -
-    //                                y_curr,
-    //                                             2);
-    //                            }
-    //                        }
-    //                        if (r_dist < truncDist) {
-    //                            for (int j = 0; j < 2; j++) {
-    //                                calcEnergy(r_dist, LJ_constant);
-    //                                calcVirial(x_curr - x_comp, y_curr -
-    //                                y_comp,
-    //                                           r_dist, LJ_constant);
-    //                            }
-    //                        }
-    //                    }
-    //                } else {
-    //                    calcEnergy(r_dist, LJ_constant);
-    //                    calcVirial(x_curr - x_comp, y_curr - y_comp, r_dist,
-    //                               LJ_constant);
-    //                }
-    //            }
-    //        }
-    //    }
-    //    sum_Fdot_r.push_back(f_r);
-    //    sum_energy.push_back(f_energy);
-    std::cout << "in properties, periodic stuff" << std::endl;
 }
 
 // try to find a way to combine this calculation with the virial calculation
@@ -434,7 +190,14 @@ void Properties::writeAvgForces() {
 }
 
 // this is probably a fine place to leave this function, but give it thought
-void Properties::writeProperties() {
+void Properties::writeProperties(std::vector<double> *sum_energy,
+                                 std::vector<double> *sum_virial,
+                                 std::vector<double> *nd,
+                                 std::vector<double> *par_nd,
+                                 std::vector<double> *antp_nd,
+                                 std::vector<std::vector<double>> *xy,
+                                 std::vector<std::vector<double>> *par_xy,
+                                 std::vector<std::vector<double>> *antp_xy) {
     double len = 0;
 
     std::ofstream virial_file;
@@ -459,30 +222,35 @@ void Properties::writeProperties() {
     par_xy_file.open("par_xy_numDensity.txt");
     antp_xy_file.open("antp_xy_numDensity.txt");
 
-    len = double(sum_Fdot_r.size()); // the force and energy vector are the same
-    for (int k = 0; k < len; k++) {  // size hence are put into one for-loop
-        virial_file << sum_Fdot_r[k] << " ";
-        energy_file << sum_energy[k] << " ";
+    // the force and energy vector are the same size hence are put into one
+    // for-loop
+    len = double(sum_energy->size());
+    for (int k = 0; k < len; k++) {
+        virial_file << (*sum_virial)[k] << " ";
+        energy_file << (*sum_energy)[k] << " ";
     }
+
     virial_file.close();
     energy_file.close();
 
-    len = double(num_density.size());
+    // len should be calculated ahead of time to avoid pushbacks in the sum
+    // energy vector
+    len = double(nd->size());
     for (int k = 0; k < len; k++) {           // all of the number density
-        n_dens_file << num_density[k] << " "; // vectors are the same length
-        antp_dens_file << antp_num_density[k] << " ";
-        par_dens_file << par_num_density[k] << " ";
+        n_dens_file << (*nd)[k] << " ";       // vectors are the same length
+        antp_dens_file << (*antp_nd)[k] << " ";
+        par_dens_file << (*par_nd)[k] << " ";
     }
     n_dens_file.close(); // close all files written to
     par_dens_file.close();
     antp_dens_file.close();
 
-    len = double(xy_num_density.size());
+    len = double(xy->size());
     for (int k = 0; k < len; ++k) {
         for (int n = 0; n < len; ++n) {
-            xy_dens_file << xy_num_density[k][n] << " ";
-            par_xy_file << par_xy_density[k][n] << " ";
-            antp_xy_file << antp_xy_density[k][n] << " ";
+            xy_dens_file << (*xy)[k][n] << " ";
+            par_xy_file << (*par_xy)[k][n] << " ";
+            antp_xy_file << (*antp_xy)[k][n] << " ";
         }
     }
     xy_dens_file.close();
@@ -529,25 +297,8 @@ void Properties::initializeProperties(Parameters *p) {
 
     a_ref = p->getRefAffinity();
     a_mult = p->getAffinityMult();
-    //    std::cout << k_spring << "  " << a_ref << std::endl;
-
-    // may be worth putting this chunk of code into a separate function
-    delta_r = sigma / 20; // this might not be the best way to define delta_r
-    cell_L = sigma / 20;
 
     // determines truncation distance
     truncation_dist();
     open_files();
-
-    // define the various RDF vectors(dependent upon r)
-    int arr_size = 0.5 * boxLength / delta_r + 1;
-    num_density.resize(arr_size);
-    par_num_density.resize(arr_size);
-    antp_num_density.resize(arr_size);
-
-    int val = boxLength / cell_L + 1;
-    //    std::cout << "the size of the vector is " << val << std::endl;
-    xy_num_density.resize(val, std::vector<double>(val, 0));
-    par_xy_density.resize(val, std::vector<double>(val, 0));
-    antp_xy_density.resize(val, std::vector<double>(val, 0));
 }

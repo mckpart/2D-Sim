@@ -10,9 +10,12 @@ void Parameters::initializeParameters(std::string yamlFile) {
     redDensity = node["reducedDens"].as<double>();
     redTemp = node["reducedTemp"].as<double>();
     sigma = node["sigma"].as<double>();
-    n_particles = node["totalParticles"].as<int>();
-    k_spring = node["springConstant"].as<double>();
 
+    n_particles = node["totalParticles"].as<int>();
+    parallel_num = node["type1_Particles"].as<int>();
+    antiparallel_num = node["type2_Particles"].as<int>();
+
+    k_spring = node["springConstant"].as<double>();
     rest_L = node["rest_length"].as<double>();
 
     a_ref = node["reference_affinity"].as<double>();
@@ -32,11 +35,6 @@ void Parameters::initializeParameters(std::string yamlFile) {
         redDensity = n_particles * pow(sigma / boxLength, 2);
     }
 
-    std::cout << "reduced density: " << redDensity
-              << "\nreduced temp: " << redTemp << "\nsigma: " << sigma
-              << "\nbox length: " << boxLength << "\nrest length: " << rest_L
-              << std::endl;
-
     seed = node["seed"].as<long>();
     n_updates = node["numberUpdates"].as<int>();
 
@@ -51,6 +49,9 @@ int Parameters::getData_interval() { return d_interval; }
 int Parameters::getEq_sweep() { return eq_sweep; }
 int Parameters::getUpdates() { return n_updates; }
 int Parameters::getNumParticles() { return n_particles; }
+int Parameters::getNumParallel() { return parallel_num; }
+int Parameters::getNumAntiparallel() { return antiparallel_num; }
+
 long Parameters::getSeed() { return seed; }
 
 int Parameters::getInit_Type() { return init_type; }

@@ -1,19 +1,19 @@
 ### total = type1 + type2 ######
 
-totalParticles  : 30
-type1_Particles : 15
-type2_Particles : 15
+totalParticles  : 40
+type1_Particles : 40
+type2_Particles : 0 
 
 particleRadius: .2 # to go back to previous test, use .05 as radius
 
 # reduced parameters of the system 
-reducedTemp : 1.5  # not measured by the system currently
+reducedTemp : 1.2  # not measured by the system currently
 reducedDens : .7  # currently user determined, but could be found from sigma,L
 sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 # strength of different interactions
-reference_affinity : 1.9
+reference_affinity : 1
 affinity_multiple  : 8
 
 seed   : 8923052835283572
@@ -21,7 +21,7 @@ weight : .06 # weight is being calculated inside the program
 
 # initialization, interaction, and boundary type
 initializationType : 1 # 0 = random, 1 = hexagonal, 2 = square
-interactionType    : 3 # 0 = hard disk, 1 = LJ, 2 = WCA, 3 = WCA + spring energy
+interactionType    : 1 # 0 = hard disk, 1 = LJ, 2 = WCA, 3 = WCA + spring energy
 boundaryType       : 2 # 0 = rigid, 1 = periodic, 2 = external well 
 
 # run length parameters

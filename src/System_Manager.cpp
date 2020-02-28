@@ -4,15 +4,12 @@
 System_Manager::System_Manager() {}
 
 System_Manager::System_Manager(std::string yaml_file) {
-    // ask Adam for a better method for choosing the intervals for the pcf rdf
-    // boxes
-    // also - it might be better to actually pass these objects into this
-    // function
 
     param.initializeParameters(yaml_file); // initialize the parameters
     prop.initializeProperties(&param);
-    delta_r = param.getSigma() /
-              20; // this might not be the best way to define delta_r
+
+    // think of alternative way to define del_r and cell_l
+    delta_r = param.getSigma() / 20;
     cell_L = param.getSigma() / 20;
 
     // define the various RDF vectors (dependent upon r)
@@ -28,6 +25,7 @@ System_Manager::System_Manager(std::string yaml_file) {
     antp_xy_density.resize(val, std::vector<double>(val, 0));
 }
 
+// these densities are used to calculate the pcf
 void System_Manager::updateNumDensity(double r, int ID) {
     int val = r / delta_r;
     int index = 0;
@@ -53,6 +51,7 @@ void System_Manager::updateNumDensity(double r, int ID) {
     }
 }
 
+// these densities are used to calculate the pcf
 void System_Manager::calc_xy_dens(double x, double y, int ID) {
     double half_boxL = .5 * param.getBoxLength();
     int ind_1 = (x + half_boxL) / cell_L; // cell_L = delta x = delta y
@@ -90,3 +89,26 @@ void System_Manager::updateEnergy(double e) { f_energy += e; }
 void System_Manager::setTotalEnergy() { sum_energy.push_back(f_energy); }
 void System_Manager::resetEnergy() { f_energy = 0; }
 
+// functions that return total system quantities as pointers to vectors
+std::vector<double> *System_Manager::getTotalEnergy() { return &sum_energy; }
+std::vector<double> *System_Manager::getTotalVirial() { return &sum_virial; }
+
+std::vector<double> *System_Manager::getTotalNumDensity() {
+    return &num_density;
+}
+std::vector<double> *System_Manager::getParNumDensity() {
+    return &par_num_density;
+}
+std::vector<double> *System_Manager::getAntiNumDensity() {
+    return &antp_num_density;
+}
+
+std::vector<std::vector<double>> *System_Manager::getTotalXYDensity() {
+    return &xy_num_density;
+}
+std::vector<std::vector<double>> *System_Manager::getParXYDensity() {
+    return &par_xy_density;
+}
+std::vector<std::vector<double>> *System_Manager::getAntiXYDensity() {
+    return &antp_xy_density;
+}

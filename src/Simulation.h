@@ -10,6 +10,7 @@
 #include "Interaction.h"
 #include "Parameters.h"
 #include "Particle.h"
+#include "Particle_Manager.h"
 #include "Properties.h"
 #include "System_Manager.h"
 
@@ -23,6 +24,7 @@ class Simulation {
     Boundary bound;
     Properties prop;
     System_Manager sim_manage;
+    Particle_Manager part_manage;
     std::vector<Particle> particles;
 
     KISSRNG randVal;
@@ -40,9 +42,7 @@ class Simulation {
     double boltzmannFactor(double delta_energy);
 
     void runSimulation();
-    // recall that this function is going to get moved to the particle manager
-    // class
-    void setParticleParams();
+
     void writePositions(std::ofstream *pos_file);
     void testSimulation();
 
@@ -52,9 +52,7 @@ class Simulation {
     bool nonperiodic_pos_trial(Particle *p, bool accept);
     void init_configuration();
 
-    //    void calcNonPerProp(std::vector<Particle> particles);
-    // have this commented out since the particles are currently part of the sim
-    // class
     void calcNonPerProp();
+    void calcPeriodicProp();
 };
 #endif

@@ -18,23 +18,10 @@ class Properties {
     std::vector<double> avg_force{std::vector<double>(2, 0)};
     std::ofstream avg_force_particle;
 
+    // these are included in the sysmanager class... go through and update the
+    // appropriate functions that use these
     std::vector<double> sum_Fdot_r;
     std::vector<double> sum_energy;
-
-    std::vector<double> num_density;
-    std::vector<double> par_num_density;
-    std::vector<double> antp_num_density;
-
-    // 2D arrays used for calculating the PCFs
-    std::vector<std::vector<double>> xy_num_density;
-    std::vector<std::vector<double>> par_xy_density;
-    std::vector<std::vector<double>> antp_xy_density;
-
-    // this is the average force per particle - holds x,y coordinate
-    //    std::vector<std::vector<double>> avg_force;
-
-    double delta_r = 0;
-    double cell_L = 0;
 
     double sigma = 0;
     double truncDist = 0;
@@ -67,11 +54,6 @@ class Properties {
     double simple_spring_energy(double r, double a);
     double simple_spring_force(double r, double a);
 
-    void updateNumDensity(double r, int ID);
-    void calc_xy_dens(double x, double y, int ID);
-
-    void calcPeriodicProp(std::vector<Particle> *particles);
-    void calcNonPerProp(std::vector<Particle> *particles);
     double calcEnergy(double r, double c);
     double calcVirial(double x, double y, double r, double a);
 
@@ -85,7 +67,13 @@ class Properties {
                         std::vector<double> *F_vec);
     void avg_force_vec(std::vector<std::vector<double>> *F);
 
-    void writeProperties();
+    void writeProperties(std::vector<double> *sum_energy,
+                         std::vector<double> *sum_virial,
+                         std::vector<double> *nd, std::vector<double> *par_nd,
+                         std::vector<double> *antp_nd,
+                         std::vector<std::vector<double>> *xy,
+                         std::vector<std::vector<double>> *par_xy,
+                         std::vector<std::vector<double>> *antp_xy);
     void writeAvgForces();
 
     void open_files();

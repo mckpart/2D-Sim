@@ -17,21 +17,20 @@ Simulation::Simulation(std::string yf) {
     prop.initializeProperties(&param);
 
     randVal.InitCold(param.getSeed());
-    // this really might not work at all...
-    // this is the correct syntax for setting to an object using the other
-    // constructor
-    sim_manage = System_Manager(yaml_file);
 
-    n_particles = param.getNumParticles(); // initialize vector of
-    particles.resize(n_particles);         // particles and set particle
-    setParticleParams();                   // parameters
+    sim_manage = System_Manager(yaml_file);
+    part_manage = Particle_Manager(yaml_file);
 
     Particle prt;
+    n_particles = param.getNumParticles(); // initialize vector of
+    particles.resize(n_particles);         // particles and set particle
+    part_manage.init_particle_params(&particles, &randVal); // parameters
 
     red_temp = param.getRedTemp();
 
     trial_position.resize(2);
 }
+
 void Simulation::writePositions(std::ofstream *pos_file) {
     Particle prt;
 
@@ -109,10 +108,9 @@ void Simulation::calcNonPerProp() {
     double a_ref = param.getRefAffinity();
     double a_mult = param.getAffinityMult();
     double trunc_dist = prop.truncation_dist();
-    // make sure that the free energy previously calculated is reset the
-    //    free
-    // energy is only the energy that comes from the positions within the
-    // configuration
+
+    // make sure the energy is being properly reset each time the properties are
+    // updated
     sim_manage.resetEnergy();
     sim_manage.resetVirial();
 
@@ -137,7 +135,6 @@ void Simulation::calcNonPerProp() {
             comp_prt = particles[n];
 
             // set comparison x,y position
-
             std::vector<double> comp_pos{comp_prt.getX_Position(),
                                          comp_prt.getY_Position()};
 
@@ -191,6 +188,125 @@ void Simulation::calcNonPerProp() {
     sim_manage.setTotalEnergy();
 
     std::cout << "in sim class, nonperiodic stuff" << std::endl;
+}
+
+void Simulation::calcPeriodicProp() {
+    Particle curr_prt;
+    Particle comp_prt;
+
+    // can probably remove the LJ constant at some point..
+    double LJ_constant = 0;
+    double r_dist = 0;
+    std::vector<double> delta_pos(2);
+
+    double a_ref = param.getRefAffinity();
+    double a_mult = param.getAffinityMult();
+    double trunc_dist = prop.truncation_dist();
+
+    sim_manage.resetEnergy();
+    sim_manage.resetVirial();
+
+    std::vector<std::vector<double>> cellPositions(9,
+                                                   std::vector<double>(2, 0));
+    // what if in particle manager class, the object had a curr particle, ref
+    // particle, etc, to help track the behvaior here
+    for (int k = 0; k < n_particles; k++) {
+
+        curr_prt = particles[k];
+
+        // set current x,y position
+        std::vector<double> curr_pos(2);
+        curr_pos[0] = curr_prt.getX_Position();
+        curr_pos[1] = curr_prt.getY_Position();
+        // takes into account each particle-particle interaction
+        for (int n = 0; n < n_particles; n++) {
+
+            comp_prt = particles[n];
+
+            // set comparison x,y position
+            std::vector<double> comp_pos{comp_prt.getX_Position(),
+                                         comp_prt.getY_Position()};
+
+            // the particle cannot interact with itself
+            if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
+                r_dist = prop.radDistance(curr_pos[0], comp_pos[0], curr_pos[1],
+                                          comp_pos[1]);
+                delta_pos = {comp_pos[0] - curr_pos[0],
+                             comp_pos[1] - curr_pos[1]};
+                // updates overall number density
+                sim_manage.updateNumDensity(r_dist, 0);
+                sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 0);
+
+                // if type == type: interaction of parallel microtubules
+                // and parallel num density is updated
+                // if type != type: interaction of antiparallel
+                //                microtubules
+                // and antiparallel num density is updated
+                if (curr_prt.getType() == comp_prt.getType()) {
+                    LJ_constant = a_ref;
+                    sim_manage.updateNumDensity(r_dist, 1);
+                    sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 1);
+                }
+                else if (curr_prt.getType() != comp_prt.getType()) {
+                    LJ_constant = a_ref * a_mult;
+                    sim_manage.updateNumDensity(r_dist, 2);
+                    sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 2);
+                }
+            }
+            // this should certainly be broken up into smaller functions
+            if (n > k) {
+                if (r_dist > trunc_dist) {
+                    prop.populateCellArray(comp_pos[0], comp_pos[1],
+                                           &cellPositions);
+                    for (int z = 0; z < 8; z++) {
+                        // creates the 8 cell images
+                        comp_pos = {cellPositions[z][0], cellPositions[z][1]};
+
+                        r_dist = prop.radDistance(curr_pos[0], comp_pos[0],
+                                                  curr_pos[1], comp_pos[1]);
+
+                        for (int j = 0; j < 2; j++) {
+                            sim_manage.updateNumDensity(r_dist, 0);
+                            sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1],
+                                                    0);
+
+                            if (curr_prt.getType() == comp_prt.getType()) {
+                                sim_manage.updateNumDensity(r_dist, 1);
+                                sim_manage.calc_xy_dens(delta_pos[0],
+                                                        delta_pos[1], 1);
+                            } else if (curr_prt.getType() !=
+                                       comp_prt.getType()) {
+                                sim_manage.updateNumDensity(r_dist, 2);
+                                sim_manage.calc_xy_dens(delta_pos[0],
+                                                        delta_pos[1], 2);
+                            }
+                        }
+                        if (r_dist < trunc_dist) {
+                            for (int j = 0; j < 2; j++) {
+                                sim_manage.updateEnergy(
+                                    prop.calcEnergy(r_dist, LJ_constant));
+                                // see comments about virial calculation above
+                                sim_manage.updateVirial(prop.calcVirial(
+                                    -1 * delta_pos[0], -1 * delta_pos[1],
+                                    r_dist, LJ_constant));
+                            }
+                        }
+                    }
+                } else {
+                    sim_manage.updateEnergy(
+                        prop.calcEnergy(r_dist, LJ_constant));
+                    // see comments about virial calculation above
+                    sim_manage.updateVirial(
+                        prop.calcVirial(-1 * delta_pos[0], -1 * delta_pos[1],
+                                        r_dist, LJ_constant));
+                }
+            }
+        }
+    }
+    sim_manage.setTotalVirial();
+    sim_manage.setTotalEnergy();
+
+    std::cout << "in sim class, periodic stuff" << std::endl;
 }
 // end sim if this error is thrown
 void Simulation::init_configuration() {
@@ -250,7 +366,6 @@ bool Simulation::nonperiodic_pos_trial(Particle *p, bool accept) {
 }
 // once sim is working again, consider making these private functions since they
 // don't need to be used outside of the sim class
-// void runSweep() {}
 
 void Simulation::runSimulation() {
 
@@ -343,13 +458,18 @@ void Simulation::runSimulation() {
             writePositions(&pos_file);
             // recall that these functions are going to be moved into this class
             if (param.getBound_Type() == 1) {
-                prop.calcPeriodicProp(&particles);
+                calcPeriodicProp();
             } else {
                 calcNonPerProp();
             }
         }
     }
-    prop.writeProperties();
+
+    prop.writeProperties(
+        sim_manage.getTotalEnergy(), sim_manage.getTotalVirial(),
+        sim_manage.getTotalNumDensity(), sim_manage.getParNumDensity(),
+        sim_manage.getAntiNumDensity(), sim_manage.getTotalXYDensity(),
+        sim_manage.getParXYDensity(), sim_manage.getAntiXYDensity());
     //   std::cout << "The average energy of the system is " <<
     //   prop.calcAvgEnergy() << std::endl; std::cout << "The pressure of the
     //   system is " << prop.c alcPressure() << std::endl;
@@ -357,68 +477,3 @@ void Simulation::runSimulation() {
     std::cout << perc_rej << "% of the moves were rejected." << std::endl;
 }
 
-// THIS IS THE NEXT PIECE TO BE ALTERED ////
-// this should probably be moved into the particle manager class. Have a
-// function that initializes the system's particles
-void Simulation::setParticleParams() {
-
-    Particle prt;
-
-    std::ofstream type_file;
-    type_file.open("particle_type.txt");
-
-    YAML::Node node = YAML::LoadFile(yaml_file);
-
-    int num_part_1 = node["type1_Particles"].as<int>();
-    int num_part_2 = node["type2_Particles"].as<int>();
-
-    // both particles have the same radius
-    double radius = node["particleRadius"].as<double>();
-
-    double sigma = param.getSigma();
-    double boxLength = param.getBoxLength();
-
-    double ratio = (double)num_part_1 / n_particles;
-    std::cout << "the ratio is: " << ratio << "\n";
-
-    double weight = sigma * sqrt(1 / (4 * param.getRedDens()));
-    std::cout << "the stepping weight is: " << weight << std::endl;
-    prt.setStepWeight(weight);
-
-    if (param.getInteract_Type() != 0) { // applies to the LJ and WCA potentials
-        radius = .5 * sigma;
-    }
-    prt.setRadius(radius);
-
-    double num_1 = 0;
-    double num_2 = 0;
-    int type = 0;
-
-    for (int k = 0; k < n_particles; ++k) {
-        if (num_1 < num_part_1 && num_2 < num_part_2) {
-
-            double n = randVal.RandomUniformDbl();
-            if (n < ratio) {
-                type = 1;
-                ++num_1;
-            } else {
-                type = 2;
-                ++num_2;
-            }
-        } else if (num_1 < num_part_1) {
-            type = 1;
-            ++num_1;
-        } else if (num_2 < num_part_2) {
-            type = 2;
-            ++num_2;
-        } else {
-            std::cout << "count again" << std::endl;
-        }
-        prt.setType(type);
-        prt.setIdentifier(k);
-        particles[k] = prt;
-
-        type_file << type << " ";
-    }
-    type_file.close();
-}
