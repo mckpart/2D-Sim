@@ -183,9 +183,11 @@ double Properties::calcAvgEnergy() {
     return avgEnergy;                          // of the whole config
 }
 
-void Properties::writeAvgForces() {
-    for (int k = 0; k < 2; ++k) {
-        avg_force_particle << avg_force[k] << " ";
+void Properties::writeForces(std::vector<Particle> *particles) {
+
+    for (int k = 0; k < n_particles; ++k) {
+        avg_force_particle << (*(*particles)[k].getForce())[0] << " ";
+        avg_force_particle << (*(*particles)[k].getForce())[1] << " ";
     }
 }
 

@@ -20,6 +20,10 @@ class Particle_Manager {
     Particle_Manager(std::string yaml_file);
     void init_particle_params(std::vector<Particle> *particles,
                               KISSRNG *randVal);
+
+    void assign_forces(double r, double LJ_const, Particle *curr,
+                       Particle *ref);
+    void reset_forces(std::vector<Particle> *particles);
 };
 #endif
 

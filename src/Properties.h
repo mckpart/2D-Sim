@@ -74,7 +74,7 @@ class Properties {
                          std::vector<std::vector<double>> *xy,
                          std::vector<std::vector<double>> *par_xy,
                          std::vector<std::vector<double>> *antp_xy);
-    void writeAvgForces();
+    void writeForces(std::vector<Particle> *particles);
 
     void open_files();
     void close_files();

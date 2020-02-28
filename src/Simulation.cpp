@@ -113,14 +113,10 @@ void Simulation::calcNonPerProp() {
     // updated
     sim_manage.resetEnergy();
     sim_manage.resetVirial();
-
+    part_manage.reset_forces(&particles);
+    // keep in mind that r_dist here is ALWAYS the reduced distance (see Prop
+    // class)
     for (int k = 0; k < n_particles; k++) {
-        // this avg_force should be tracked in the sim manager class
-        //        avg_force[0] = 0;
-        //        avg_force[1] = 0;
-        // this force number should be entirely unnecessary - calculation of
-        // forces per particle will be kept more in the particle manageer class
-        //        force_num = 0;
 
         curr_prt = particles[k];
 
@@ -172,18 +168,16 @@ void Simulation::calcNonPerProp() {
                 sim_manage.updateVirial(prop.calcVirial(
                     -1 * delta_pos[0], -1 * delta_pos[1], r_dist, LJ_constant));
             }
-            //            calc_average_force(x_curr - x_comp, y_curr -
-            //            y_comp,
-            //            r_dist);
-            //            ++force_num;
+            if (n > k) {
+                // part[k] = current particle, part[n] = ref part. k != n since
+                // each particle can't interacted with self
+                part_manage.assign_forces(r_dist, LJ_constant, &particles[k],
+                                          &particles[n]);
+            }
         }
-        // this should probably be write total forces. the tot forces
-        //   could then
-        // be averaged in a separate python analysis program.
-        //        writeAvgForces();
     }
-    //    avg_force_particle << "\n";
-    //    close_files();
+
+    prop.writeForces(&particles);
     sim_manage.setTotalVirial();
     sim_manage.setTotalEnergy();
 

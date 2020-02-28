@@ -54,6 +54,7 @@ class Particle {
 
     void addForce(double fx, double fy);
     void resetForce();
+    std::vector<double> *getForce();
 
     double x_trial(double randVal);
     double y_trial(double randVal);

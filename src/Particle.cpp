@@ -50,3 +50,5 @@ void Particle::addForce(double fx, double fy) {
     force[0] += fx;
     force[1] += fy;
 }
+
+std::vector<double> *Particle::getForce() { return &force; }
