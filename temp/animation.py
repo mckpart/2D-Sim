@@ -70,7 +70,7 @@ for line in file:
 
 position = np.asarray(position)
 numIter = len(position[:,0]) 
-
+print(position)
 # creates writing object to allow the movie to be
 # saved as an .mp4 file
 Writer = ani_obj.writers['ffmpeg']
@@ -114,8 +114,8 @@ def update(frame):
         patches[k] = patch
 
     return patches
-print("number of frames:",numIter)
-t = np.linspace(500,numIter - 1,numIter) 
+
+t = np.linspace(0,numIter - 1,numIter) 
 
 anim = FuncAnimation(fig, update, frames = t,init_func = init,blit = True)
 

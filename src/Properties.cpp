@@ -271,7 +271,7 @@ double Properties::truncation_dist() {
         truncDist = .5 * boxLength;
         break;
     default:
-        truncDist = 2.5;
+        truncDist = 2.5; // perhaps change to 2.5 * sigma
         truncShift = -1 * (pow(1 / truncDist, 12) - pow(1 / truncDist, 6));
         break;
     }

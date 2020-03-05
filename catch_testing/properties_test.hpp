@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <catch2/catch.hpp>
 #include <yaml-cpp/yaml.h>
 
@@ -78,26 +80,45 @@ void compute_f_vecs(std::vector<double> *tot_f, int k, Properties *prop) {
 
 // VERY IMPORTANT: THIS TEST CASE WORKS WHEN SIGMA IS 1! MAYBE MAKE A SIMPLE
 // PARAMETER FILE TO BE READ IN BY THIS TEST FUNCTIONS!!!!!!!!!!!
-TEST_CASE("Lennard Jones Force Calculation") {
+// TEST_CASE("Lennard Jones Force Calculation") {
+//    Properties prop;
+//    Parameters *param;
+//
+//    param = init_test_params();
+//    prop.initializeProperties(param);
+//
+//    std::vector<std::vector<double>> force_vecs(4, std::vector<double>(2));
+//    std::vector<double> tot_force_vec(2);
+//
+//    compute_f_vecs(&tot_force_vec, 0, &prop);
+//    REQUIRE(tot_force_vec[0] == -22.875);
+//    REQUIRE(tot_force_vec[1] == 22.875);
+//    std::cout << "LJ FORCE PASSED TEST" << std::endl;
+//
+//    for (int k = 0; k < 4; ++k) {
+//        compute_f_vecs(&force_vecs[k], k, &prop);
+//    }
+//    for (int k = 0; k < 4; ++k) {
+//        std::cout << force_vecs[k][0] << " and " << force_vecs[k][1]
+//                  << std::endl;
+//    }
+//}
+
+TEST_CASE("periodic cell population") {
     Properties prop;
     Parameters *param;
 
+    std::vector<std::vector<double>> cell_p(8, std::vector<double>(2, 0));
     param = init_test_params();
     prop.initializeProperties(param);
+    double box_l = param->getBoxLength();
 
-    std::vector<std::vector<double>> force_vecs(4, std::vector<double>(2));
-    std::vector<double> tot_force_vec(2);
+    prop.populateCellArray(0, 0, &cell_p);
+    std::vector<std::vector<double>> check = {
+        {0, box_l},      {0, -box_l}, {box_l, 0},      {box_l, box_l},
+        {box_l, -box_l}, {-box_l, 0}, {-box_l, box_l}, {-box_l, -box_l}};
 
-    compute_f_vecs(&tot_force_vec, 0, &prop);
-    REQUIRE(tot_force_vec[0] == -22.875);
-    REQUIRE(tot_force_vec[1] == 22.875);
-    std::cout << "LJ FORCE PASSED TEST" << std::endl;
-
-    for (int k = 0; k < 4; ++k) {
-        compute_f_vecs(&force_vecs[k], k, &prop);
-    }
-    for (int k = 0; k < 4; ++k) {
-        std::cout << force_vecs[k][0] << " and " << force_vecs[k][1]
-                  << std::endl;
-    }
+    REQUIRE(cell_p == check);
+    std::cout << "Periodic cells populate appropriately." << std::endl;
 }
+

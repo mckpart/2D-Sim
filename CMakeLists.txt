@@ -18,15 +18,15 @@ target_link_libraries(sim ${YAML_CPP_LIBRARIES})
 find_package(Catch2 REQUIRED)
 include_directories(${CATCH2_INCLUDE_DIR})
 
-add_executable(test_sim 
+add_executable(tsim 
 	catch_testing/main_config.cpp 
 	catch_testing/properties_test.hpp
 	src/Particle.cpp
 	src/Properties.cpp
 	src/Parameters.cpp)
 
-target_link_libraries(test_sim Catch2::Catch2 ${YAML_CPP_LIBRARIES})
+target_link_libraries(tsim Catch2::Catch2 ${YAML_CPP_LIBRARIES})
 
 include(CTest)
 include(Catch)
-catch_discover_tests(test_sim)
+catch_discover_tests(tsim)

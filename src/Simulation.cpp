@@ -220,13 +220,12 @@ void Simulation::calcPeriodicProp() {
             // set comparison x,y position
             std::vector<double> comp_pos{comp_prt.getX_Position(),
                                          comp_prt.getY_Position()};
+            delta_pos = {comp_pos[0] - curr_pos[0], comp_pos[1] - curr_pos[1]};
 
             // the particle cannot interact with itself
             if (curr_prt.getIdentifier() != comp_prt.getIdentifier()) {
                 r_dist = prop.radDistance(curr_pos[0], comp_pos[0], curr_pos[1],
                                           comp_pos[1]);
-                delta_pos = {comp_pos[0] - curr_pos[0],
-                             comp_pos[1] - curr_pos[1]};
                 // updates overall number density
                 sim_manage.updateNumDensity(r_dist, 0);
                 sim_manage.calc_xy_dens(delta_pos[0], delta_pos[1], 0);
@@ -255,7 +254,8 @@ void Simulation::calcPeriodicProp() {
                     for (int z = 0; z < 8; z++) {
                         // creates the 8 cell images
                         comp_pos = {cellPositions[z][0], cellPositions[z][1]};
-
+                        std::cout << comp_pos[0] << " and " << comp_pos[1]
+                                  << std::endl;
                         r_dist = prop.radDistance(curr_pos[0], comp_pos[0],
                                                   curr_pos[1], comp_pos[1]);
 
