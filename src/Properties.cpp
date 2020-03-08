@@ -213,7 +213,8 @@ void Properties::writeProperties(std::vector<double> *sum_energy,
     std::ofstream par_xy_file;
     std::ofstream antp_xy_file;
 
-    virial_file.open("forces.txt"); // open each file that will be written to
+    // change this in analysis code
+    virial_file.open("virial.txt"); // open each file that will be written to
     energy_file.open("energies.txt");
 
     n_dens_file.open("numDensity.txt");

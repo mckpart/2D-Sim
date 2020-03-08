@@ -2,6 +2,7 @@
 #define PARTICLE_MANAGER_H
 
 // can probably remove this
+#include <iostream>
 #include <vector>
 
 #include "Parameters.h"
@@ -14,6 +15,7 @@ class Particle_Manager {
   private:
     Parameters param;
     Properties prop;
+    std::ofstream force_file;
 
   public:
     Particle_Manager();

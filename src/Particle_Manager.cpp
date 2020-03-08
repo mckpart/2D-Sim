@@ -9,6 +9,7 @@ Particle_Manager::Particle_Manager(std::string yaml_file) {
     // set params & properties object
     param.initializeParameters(yaml_file); // initialize the parameters
     prop.initializeProperties(&param);
+    force_file.open("force.txt");
 }
 
 // Particle_Manager:: function that assigns forces to appropriate particles
@@ -27,14 +28,16 @@ Particle_Manager::Particle_Manager(std::string yaml_file) {
 
 // MAKE SURE THAT THIS IS CHANGING THE CORRECT PARTICLE IN THE VECTOR OF
 // PARTICLES!!!!!! //
+//
+// I might have my current and reference particle backwards here....
 void Particle_Manager::assign_forces(double r, double LJ_const, Particle *curr,
                                      Particle *ref) {
     std::vector<double> f(2);
     std::vector<double> del = {ref->getX_Position() - curr->getX_Position(),
                                ref->getY_Position() - curr->getY_Position()};
     prop.calc_force_vec(del[0], del[1], r, &f);
-    ref->addForce(f[0], f[1]);
-    curr->addForce(-1 * f[0], -1 * f[1]);
+    curr->addForce(f[0], f[1]);
+    ref->addForce(-1 * f[0], -1 * f[1]);
 }
 
 void Particle_Manager::reset_forces(std::vector<Particle> *particles) {
@@ -42,6 +45,18 @@ void Particle_Manager::reset_forces(std::vector<Particle> *particles) {
         (*particles)[k].resetForce();
     }
 }
+// this function should be called when the state is written to a file... this
+// will write the total forces per particle to the file and then important
+// quantities can be extracted
+//
+// implement into nonperiodic first, then periodic ....
+// void Particle_Manager::write_forces(std::vector<Particle> *p) {
+//    for (int k = 0; k < param.getNumParticles(); ++k) {
+//        for (int j = 0; j < 2; ++j) {
+//            force_file << (*(*p)[k].getForce())[j] << " ";
+//        }
+//    }
+//}
 
 void Particle_Manager::init_particle_params(std::vector<Particle> *particles,
                                             KISSRNG *randVal) {

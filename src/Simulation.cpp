@@ -200,6 +200,7 @@ void Simulation::calcPeriodicProp() {
     sim_manage.resetEnergy();
     sim_manage.resetVirial();
 
+    // note here that the cell length should be 8, not 9. fix later
     std::vector<std::vector<double>> cellPositions(9,
                                                    std::vector<double>(2, 0));
     // what if in particle manager class, the object had a curr particle, ref
@@ -254,8 +255,8 @@ void Simulation::calcPeriodicProp() {
                     for (int z = 0; z < 8; z++) {
                         // creates the 8 cell images
                         comp_pos = {cellPositions[z][0], cellPositions[z][1]};
-                        std::cout << comp_pos[0] << " and " << comp_pos[1]
-                                  << std::endl;
+                        // std::cout << comp_pos[0] << " and " << comp_pos[1]
+                        // << std::endl;
                         r_dist = prop.radDistance(curr_pos[0], comp_pos[0],
                                                   curr_pos[1], comp_pos[1]);
 

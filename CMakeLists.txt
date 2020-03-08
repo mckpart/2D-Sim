@@ -23,7 +23,8 @@ add_executable(tsim
 	catch_testing/properties_test.hpp
 	src/Particle.cpp
 	src/Properties.cpp
-	src/Parameters.cpp)
+	src/Parameters.cpp
+	src/Particle_Manager.cpp)
 
 target_link_libraries(tsim Catch2::Catch2 ${YAML_CPP_LIBRARIES})
 

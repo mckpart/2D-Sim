@@ -13,7 +13,7 @@ sigma       : 1    # if = 0, then sigma = Lsqrt(p^*/NumPart)
 boxLength   : 0    # if = 0, then L = sigma sqrt(N/p^*)
 
 # strength of different interactions
-reference_affinity : 2
+reference_affinity : 1
 affinity_multiple  : 8
 
 seed   : 8923052835283572
