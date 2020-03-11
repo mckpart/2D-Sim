@@ -10,8 +10,8 @@ System_Manager::System_Manager(std::string yaml_file) {
 
     // think of alternative way to define del_r and cell_l
     delta_r = param.getSigma() / 20;
-    cell_L = param.getSigma() / 20;
-    //    cell_L = param.getBoxLength() / 200;
+    //    cell_L = param.getSigma() / 25;
+    cell_L = param.getBoxLength() / 200;
 
     // define the various RDF vectors (dependent upon r)
     int arr_size = 0.5 * param.getBoxLength() / delta_r + 1;

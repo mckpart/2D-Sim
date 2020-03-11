@@ -274,8 +274,8 @@ def run_pcf():
         densities = [n]
     
     cell_L = sigma/20.0
-    delta_r = boxL/200
-    cell_L = boxL/200
+    delta_r = boxL/200.
+    cell_L = boxL/200.
     
     # create a matrix of the different x,y
     # coordinate positions

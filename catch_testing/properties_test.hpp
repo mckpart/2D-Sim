@@ -7,6 +7,7 @@
 #include "../src/Particle.h"
 #include "../src/Particle_Manager.h"
 #include "../src/Properties.h"
+#include "../src/System_Manager.h"
 
 // come back and "un" hardcode the yaml file.. prob bad practice
 Parameters *init_test_params() {
@@ -117,6 +118,7 @@ TEST_CASE("Lennard Jones Force Calculation") {
 TEST_CASE("periodic cell population") {
     Properties prop;
     Parameters *param;
+    System_Manager sim_m("catch_testing/test_params.yaml");
 
     std::vector<std::vector<double>> cell_p(8, std::vector<double>(2, 0));
     param = init_test_params();
@@ -130,5 +132,6 @@ TEST_CASE("periodic cell population") {
 
     REQUIRE(cell_p == check);
     std::cout << "Periodic cells populate appropriately." << std::endl;
+
 }
 

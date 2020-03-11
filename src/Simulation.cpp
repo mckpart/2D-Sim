@@ -108,7 +108,6 @@ void Simulation::calcNonPerProp() {
     double a_ref = param.getRefAffinity();
     double a_mult = param.getAffinityMult();
     double trunc_dist = prop.truncation_dist();
-
     // make sure the energy is being properly reset each time the properties are
     // updated
     sim_manage.resetEnergy();
@@ -181,7 +180,7 @@ void Simulation::calcNonPerProp() {
     sim_manage.setTotalVirial();
     sim_manage.setTotalEnergy();
 
-    std::cout << "in sim class, nonperiodic stuff" << std::endl;
+    //    std::cout << "in sim class, nonperiodic stuff" << std::endl;
 }
 
 void Simulation::calcPeriodicProp() {
@@ -200,8 +199,7 @@ void Simulation::calcPeriodicProp() {
     sim_manage.resetEnergy();
     sim_manage.resetVirial();
 
-    // note here that the cell length should be 8, not 9. fix later
-    std::vector<std::vector<double>> cellPositions(9,
+    std::vector<std::vector<double>> cellPositions(8,
                                                    std::vector<double>(2, 0));
     // what if in particle manager class, the object had a curr particle, ref
     // particle, etc, to help track the behvaior here
@@ -259,6 +257,8 @@ void Simulation::calcPeriodicProp() {
                         // << std::endl;
                         r_dist = prop.radDistance(curr_pos[0], comp_pos[0],
                                                   curr_pos[1], comp_pos[1]);
+                        delta_pos = {comp_pos[0] - curr_pos[0],
+                                     comp_pos[1] - curr_pos[1]};
 
                         for (int j = 0; j < 2; j++) {
                             sim_manage.updateNumDensity(r_dist, 0);
@@ -301,7 +301,7 @@ void Simulation::calcPeriodicProp() {
     sim_manage.setTotalVirial();
     sim_manage.setTotalEnergy();
 
-    std::cout << "in sim class, periodic stuff" << std::endl;
+    //    std::cout << "in sim class, periodic stuff" << std::endl;
 }
 // end sim if this error is thrown
 void Simulation::init_configuration() {
